@@ -9,6 +9,20 @@
 UCLASS()
 class PROJECTSANZO_API ASanzoGameState : public AGameStateBase
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
+public:
+	ASanzoGameState();
+	virtual void BeginPlay() override;
+
+#pragma region UI
+
+	FTimerHandle HUDUpdateTimerHandle;
+	void UpdateHUD();
+
+	//임시 함수
+	void StartStage();
+
+
+#pragma endregion
 };
