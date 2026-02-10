@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -39,6 +37,12 @@ protected:
 	// 연사 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float FireRate;
+	// 캐릭터가 재생할 애니메이션
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UAnimMontage* CharacterFireMontage;
+	// 총기에서 발생할 애니메이션
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UAnimationAsset* WeaponFireAnim;
 
 public:
 	// 마우스 좌클릭 눌렀을 때 작동, 활이면 차징 시작, 총(연사)면 발사~, 총(단발)이면 Fire() 1번 호출 

@@ -2,6 +2,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
+
 
 
 ASanzoWeaponBase::ASanzoWeaponBase()
@@ -72,7 +74,20 @@ void ASanzoWeaponBase::FinishReload()
 
 void ASanzoWeaponBase::PlayFireEffects()
 {
-  // 추후 구현
+  ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+  if (OwnerCharacter)
+  {
+    UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+    if (AnimInstance && CharacterFireMontage)
+    {
+      AnimInstance->Montage_Play(CharacterFireMontage, 1.0f);
+    }
+  }
+
+  if (WeaponMesh && WeaponFireAnim)
+  {
+    WeaponMesh->PlayAnimation(WeaponFireAnim, false);
+  }
 }
 
 void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo)

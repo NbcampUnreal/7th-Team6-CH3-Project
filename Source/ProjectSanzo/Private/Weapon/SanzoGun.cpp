@@ -42,6 +42,7 @@ void ASanzoGun::StopFire()
 
 void ASanzoGun::Fire()
 {
+
 	if ((!bInfiniteAmmo && CurrentAmmo <= 0) || bIsReloading)
 	{
 		StopFire();
@@ -51,9 +52,17 @@ void ASanzoGun::Fire()
 	CurrentAmmo--;
 	PlayFireEffects();
 
-	FVector Start = FireStartLocation->GetComponentLocation(); 
-	FVector Forward = FireStartLocation->GetForwardVector();   
-	FVector End = Start + (Forward * MaxRange);
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (!OwnerPawn) return;
+	AController* OwnerController = OwnerPawn->GetController();
+	if (!OwnerController) return;
+
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	FVector Start = CameraLocation;
+	FVector End = Start + (CameraRotation.Vector() * MaxRange);
 
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
@@ -71,7 +80,7 @@ void ASanzoGun::Fire()
 	if (bHit)
 	{
 		// 어딘가 맞았으면: 총구 -> 맞은 곳까지만 그림
-		DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Red, false, 5.0f, 0, 1.0f);
+		DrawDebugLine(GetWorld(), FireStartLocation->GetComponentLocation(), HitResult.ImpactPoint, FColor::Red, false, 5.0f, 0, 1.0f);
 
 		// 데미지 전달
 		ApplyDamageToTarget(HitResult.GetActor(), HitResult);
@@ -79,9 +88,8 @@ void ASanzoGun::Fire()
 	else
 	{
 		// 안 맞았으면(허공): 총구 -> 사거리 끝까지 그림
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.0f, 0, 1.0f);
+		DrawDebugLine(GetWorld(), FireStartLocation->GetComponentLocation(), End, FColor::Red, false, 5.0f, 0, 1.0f);
 	}
-
 }
 
 void ASanzoGun::AddAmmo(int32 Amount)
