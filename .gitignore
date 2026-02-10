@@ -77,3 +77,8 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# L_EnemyTest
+Content/__ExternalActors__/Maps/L_EnemyTest/*
+Content/__ExternalObjects__/Maps/L_EnemyTest/*
+Content/Maps/L_EnemyTest.umap
