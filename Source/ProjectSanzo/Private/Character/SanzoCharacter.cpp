@@ -139,3 +139,18 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
       FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
   }
 }
+
+void ASanzoCharacter::FireStart(const FInputActionValue& Value)
+{
+
+  //TODO : 발사 구현 (무기 클래스에서 발사 함수 호출)
+}
+
+void ASanzoCharacter::StopFire(const FInputActionValue& Value)
+{
+  //TODO : 발사 중지 구현 (무기 클래스에서 발사 중지 함수 호출)
+}
+
+void ASanzoCharacter::Dodge(const FInputActionValue& Value)
+{
+}

@@ -43,7 +43,7 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Components", meta = (AllowPrivateAccess = "true"))
   USanzoEquipmentComponent* EquipmentComp;
 
-#pragma endregion
+#pragma endregion 김형백
 
 #pragma region InputActions
  /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -64,7 +64,11 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* FireAction;
 
-#pragma endregion
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* AimAction;
+  
+
+#pragma endregion 김형백
 
 public:
   ASanzoCharacter();
@@ -91,6 +95,7 @@ protected:
 
   void StopFire(const FInputActionValue& Value);
 
+  void Dodge(const FInputActionValue& Value);
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
