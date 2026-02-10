@@ -50,6 +50,9 @@ SourceArt/**/*.tga
 Binaries/*
 Plugins/**/Binaries/*
 
+#PluginBaby
+Plugins/VRM4U/*
+
 # Builds
 Build/*
 
