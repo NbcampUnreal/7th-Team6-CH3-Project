@@ -28,7 +28,12 @@ ASanzoCharacter::ASanzoCharacter()
 
   GetCharacterMovement()->JumpZVelocity = 700.f;
   GetCharacterMovement()->AirControl = 0.35f;
-  GetCharacterMovement()->MaxWalkSpeed = 500.f;
+
+  NomalSpeed = 500.f;
+  SprintSpeedMultiplier = 1.8f;
+  SprintSpeed = NomalSpeed * SprintSpeedMultiplier; 
+
+  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
   //게임패드 아날로그 스틱 최소이동속도
   GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 
@@ -74,6 +79,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Move);
 
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Look);
+    EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::SprintStart);
+    EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopSprint); 
   }
   else
   {
@@ -112,10 +119,23 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
 
 void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 {
-
+  if(GetCharacterMovement())
+  {
+    GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+    //TODO : 스태미너 감소 시작
+    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
+      FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
+  }
 }
 
 void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 {
-}
+  if(GetCharacterMovement())
+  {
 
+    GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+    //TODO : 스태미너 감소 중지
+    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
+      FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
+  }
+}
