@@ -42,10 +42,6 @@ void ASanzoPlayerController::BeginPlay()
 }
 
 #pragma region UI
-UUserWidget* ASanzoPlayerController::GetHUDWidget() const
-{
-	return HUDWidgetInstance;
-}
 
 void ASanzoPlayerController::ShowGameHUD()
 {
@@ -78,11 +74,6 @@ void ASanzoPlayerController::ShowGameHUD()
 			SanzoGameState->UpdateHUD();
 		}
 	}
-}
-
-UUserWidget* ASanzoPlayerController::GetPopUpWidget() const
-{
-	return PopUpWidgetInstance;
 }
 
 void ASanzoPlayerController::ShowPopUp(bool bIsLevelUp)
@@ -348,4 +339,4 @@ void ASanzoPlayerController::ExitGame()
 		false
 	);
 }
-#pragma endregion
+#pragma endregion 이준로

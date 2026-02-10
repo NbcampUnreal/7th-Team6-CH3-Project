@@ -41,12 +41,14 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
-	UUserWidget* GetHUDWidget() const;
+	UUserWidget* GetHUDWidget() const { return HUDWidgetInstance; }
+
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
 
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
-	UUserWidget* GetPopUpWidget() const;
+	UUserWidget* GetPopUpWidget() const { return PopUpWidgetInstance; }
+
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ShowPopUp(bool bIsLevelUp);
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
@@ -62,5 +64,5 @@ public:
 	void ExitGame();
 
 
-#pragma endregion
+#pragma endregion 이준로
 };
