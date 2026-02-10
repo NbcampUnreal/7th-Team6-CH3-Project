@@ -10,7 +10,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-
+#include "Character/Components/SanzoStatComponent.h"
+#include "Character/Components/SanzoParryComponent.h"
+#include "Character/Components/SanzoEquipmentComponent.h"
 DEFINE_LOG_CATEGORY(LogSanzo);
 
 ASanzoCharacter::ASanzoCharacter()
@@ -27,7 +29,10 @@ ASanzoCharacter::ASanzoCharacter()
   GetCharacterMovement()->JumpZVelocity = 700.f;
   GetCharacterMovement()->AirControl = 0.35f;
   GetCharacterMovement()->MaxWalkSpeed = 500.f;
+  //게임패드 아날로그 스틱 최소이동속도
   GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+
+  //감속힘
   GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
   GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
@@ -40,6 +45,10 @@ ASanzoCharacter::ASanzoCharacter()
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
 
+
+  StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
+  ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
+  EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -60,8 +69,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
   if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+    //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+    //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
     EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Move);
 
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Look);
@@ -99,5 +108,14 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
     AddControllerYawInput(LookAxisVector.X);
     AddControllerPitchInput(LookAxisVector.Y);
   }
+}
+
+void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
+{
+
+}
+
+void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
+{
 }
 

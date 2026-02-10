@@ -12,7 +12,9 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
-
+class USanzoStatComponent;
+class USanzoParryComponent;
+class USanzoEquipmentComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -29,14 +31,30 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputMappingContext* DefaultMappingContext;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-  UInputAction* JumpAction;
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+  USanzoStatComponent* StatComp;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+  USanzoParryComponent* ParryComp;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+  USanzoEquipmentComponent* EquipmentComp;
+
+ /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* JumpAction;*/
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* MoveAction;
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* LookAction;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* SprintAction;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* DodgeAction;
+
 
 public:
   ASanzoCharacter();
@@ -46,6 +64,10 @@ protected:
   void Move(const FInputActionValue& Value);
 
   void Look(const FInputActionValue& Value);
+
+  void SprintStart(const FInputActionValue& Value);
+
+  void StopSprint(const FInputActionValue& Value);
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
