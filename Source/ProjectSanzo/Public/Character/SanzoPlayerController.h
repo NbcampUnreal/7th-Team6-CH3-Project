@@ -34,11 +34,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
 	UUserWidget* MenuWidgetInstance;
 
-	UFUNCTION(BlueprintCallable, Category = "HUD")
-	UUserWidget* GetHUDWidget() const;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	TSubclassOf<UUserWidget> PopUpWidgetClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
+	UUserWidget* PopUpWidgetInstance;
+
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
+	UUserWidget* GetHUDWidget() const;
+	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
+
+	UFUNCTION(BlueprintCallable, Category = "PopUp")
+	UUserWidget* GetPopUpWidget() const;
+	UFUNCTION(BlueprintCallable, Category = "PopUp")
+	void ShowPopUp(bool bIsLevelUp);
+	UFUNCTION(BlueprintCallable, Category = "PopUp")
+	void ResumeGame();
 
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainUI(int32 CaseIndex);

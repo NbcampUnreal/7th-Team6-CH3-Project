@@ -19,10 +19,7 @@ ASanzoGameState::ASanzoGameState()
 void ASanzoGameState::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Start GameState BeginPlay"));
-	}
+
 	StartStage();
 
 	GetWorldTimerManager().SetTimer(
