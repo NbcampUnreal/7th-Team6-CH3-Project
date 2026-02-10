@@ -42,15 +42,18 @@ protected:
 
 public:
 	// 마우스 좌클릭 눌렀을 때 작동, 활이면 차징 시작, 총(연사)면 발사~, 총(단발)이면 Fire() 1번 호출 
+	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
 	virtual void StartFire();
 	// 마우스 좌클릭 땠을 때 작동, 활이면 발사, 총(연사)면  발사 중지
+	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
 	virtual void StopFire();
 	// 재장전 애니메이션 실행용
+	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
 	virtual void Reload();
 
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
-	virtual void Fire() = 0;
+	virtual void Fire() {};
 	// 사운드, 이펙트 담장 로직, 부모 클래스에서 로직 담당, 자식 클래스에서 사운드, 이펙트 종류 정함
 	virtual void PlayFireEffects();
 	// 실제 총알 재장전
