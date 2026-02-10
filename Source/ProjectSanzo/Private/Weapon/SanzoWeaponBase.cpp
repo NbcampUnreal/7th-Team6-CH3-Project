@@ -9,15 +9,25 @@ ASanzoWeaponBase::ASanzoWeaponBase()
 
 }
 
-void ASanzoWeaponBase::BeginPlay()
+void ASanzoWeaponBase::StartFire()
 {
-  Super::BeginPlay();
 
 }
 
-void ASanzoWeaponBase::Tick(float DeltaTime)
+void ASanzoWeaponBase::StopFire()
 {
-  Super::Tick(DeltaTime);
 
 }
+
+void ASanzoWeaponBase::PlayFireEffects()
+{
+
+}
+
+void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo)
+{
+
+}
+
+
 
