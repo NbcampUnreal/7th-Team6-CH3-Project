@@ -44,4 +44,26 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Stats")
   bool IsDead() const;
 #pragma endregion
+
+#pragma region Combat
+protected:
+  // 헤드샷 배율
+  UPROPERTY(EditAnywhere, Category = "Combat")
+  float HeadShotMultiplier = 2.5f;
+
+  // 머리 뼈 이름
+  UPROPERTY(EditAnywhere, Category = "Combat")
+  FName HeadBoneName = TEXT("head");
+
+public:
+  // 데미지 처리 함수 오버라이드
+  virtual float TakeDamage
+  (
+    float DamageAmount,
+    struct FDamageEvent const& DamageEvent,
+    class AController* EventInstigator,
+    AActor* DamageCauser
+  ) override;
+#pragma endregion
+
 };
