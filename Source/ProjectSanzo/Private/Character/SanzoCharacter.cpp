@@ -79,6 +79,8 @@ void ASanzoCharacter::BeginPlay()
 
 void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+  Super::SetupPlayerInputComponent(PlayerInputComponent);
+
   if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
     //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
