@@ -58,8 +58,7 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
     }
     else
     {
-      // 놓침 -> 블랙보드에서 타겟 해제
-      GetBlackboardComponent()->SetValueAsObject(TEXT("TargetActor"), nullptr);
+      // 놓침
       UE_LOG(LogTemp, Log, TEXT("Player Lost!"));
     }
   }

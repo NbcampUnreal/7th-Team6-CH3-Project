@@ -28,13 +28,19 @@ void USanzoBTService_Detect::TickNode(
   ACharacter* AIChar = Cast<ACharacter>(ControllingPawn);
   if (!AIChar) return;
 
-  UObject* TargetObject = OwnerComp.GetBlackboardComponent()
-    ->GetValueAsObject(TEXT("TargetActor"));
+  UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
+  AActor* Target = Cast<AActor>(Blackboard->GetValueAsObject(TEXT("TargetActor")));
 
-  if (TargetObject)
+  if (Target)
   {
     // 타겟 발견 시 -> 달리기
     AIChar->GetCharacterMovement()->MaxWalkSpeed = ChaseSpeed;
+
+    float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), Target->GetActorLocation());
+    if (Distance > 1200.0f)
+    {
+      Blackboard->SetValueAsObject(TEXT("TargetActor"), nullptr);
+    }
   }
   else
   {
