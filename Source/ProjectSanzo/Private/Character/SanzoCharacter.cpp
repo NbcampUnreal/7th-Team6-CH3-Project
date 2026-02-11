@@ -10,30 +10,41 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
-#include "DrawDebugHelpers.h" // 디버그 라인 그리기용
-#include "Engine/DamageEvents.h"
+#include "Character/Components/SanzoStatComponent.h"
+#include "Character/Components/SanzoParryComponent.h"
+#include "Character/Components/SanzoEquipmentComponent.h"
+#include "Weapon/SanzoWeaponBase.h"
+#include "Weapon/SanzoGun.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
 ASanzoCharacter::ASanzoCharacter()
 {
-  GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
+  
+#pragma region MovementInit 
   bUseControllerRotationPitch = false;
   bUseControllerRotationYaw = false;
   bUseControllerRotationRoll = false;
 
   GetCharacterMovement()->bOrientRotationToMovement = true;
   GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
-
   GetCharacterMovement()->JumpZVelocity = 700.f;
   GetCharacterMovement()->AirControl = 0.35f;
-  GetCharacterMovement()->MaxWalkSpeed = 500.f;
+
+  NomalSpeed = 500.f;
+  SprintSpeedMultiplier = 1.8f;
+  SprintSpeed = NomalSpeed * SprintSpeedMultiplier; 
+
+  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+  //게임패드 아날로그 스틱 최소이동속도
   GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+
+  //감속힘
   GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
   GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
-
+#pragma endregion 김형백 
+#pragma region ComponentInit
+  GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
   CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
   CameraBoom->SetupAttachment(RootComponent);
   CameraBoom->TargetArmLength = 400.0f;
@@ -43,6 +54,12 @@ ASanzoCharacter::ASanzoCharacter()
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
 
+  StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
+  ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
+  EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
+#pragma endregion 김형백 
+
+  
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -57,6 +74,7 @@ void ASanzoCharacter::BeginPlay()
       Subsystem->AddMappingContext(DefaultMappingContext, 0);
     }
   }
+
 }
 
 void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -65,11 +83,13 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
   if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-    EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+    //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+    //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
     EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Move);
 
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Look);
+    EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::SprintStart);
+    EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopSprint); 
   }
   else
   {
@@ -106,80 +126,47 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
   }
 }
 
-#pragma region AttackTest
-
-void ASanzoCharacter::TestLineTraceAttack()
+void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 {
-  if (!FollowCamera) return;
 
-  // [카메라 기준] 시선 방향으로 트레이스 (조준점 계산)
-  FVector CameraStart = FollowCamera->GetComponentLocation();
-  FVector CameraForward = FollowCamera->GetForwardVector();
-  FVector CameraEnd = CameraStart + (CameraForward * TestAttackRange);
-
-  // 트레이스 파라미터 설정
-  FHitResult CameraHitResult;
-  FCollisionQueryParams Params;
-  Params.AddIgnoredActor(this); // 자기 자신은 무시
-
-  // 라인 트레이스 발사
-  bool bHit = GetWorld()->LineTraceSingleByChannel
-  (
-    CameraHitResult,
-    CameraStart,
-    CameraEnd,
-    ECC_Visibility,
-    Params
-  );
-
-  // 맞았으면 그 지점(ImpactPoint)
-  // 안 맞았으면 허공의 끝점(CameraEnd)
-  FVector TargetLocation = bHit ?
-    CameraHitResult.ImpactPoint : CameraEnd;
-
-  // [발사 원점] 캐릭터의 오른손에서 시작
-  FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("hand_r"));
-
-  // 트레이스 궤적 그리기
-  // 맞았으면 빨간색, 아니면 초록색 선을 1초간 표시
-  FColor LineColor = bHit ? FColor::Red : FColor::Green;
-  DrawDebugLine
-  (
-    GetWorld(),
-    MuzzleLocation,
-    TargetLocation,
-    LineColor,
-    false,
-    1.f,
-    0,
-    1.f
-  );
-
-  if (bHit && CameraHitResult.GetActor())
+  if(GetCharacterMovement())
   {
-    // 맞은 지점에 점 찍기
-    DrawDebugPoint
-    (
-      GetWorld(),
-      TargetLocation,
-      10.f,
-      FColor::Yellow,
-      false,
-      1.f
-    );
-
-    // 적에게 데미지 전달
-    UGameplayStatics::ApplyPointDamage
-    (
-      CameraHitResult.GetActor(),
-      TestBaseDamage,
-      CameraForward,    // 공격 방향은 카메라 보는 방향
-      CameraHitResult,
-      GetController(),  // 공격자 컨트롤러
-      this,             // 데미지 원인 액터
-      UDamageType::StaticClass()
-    );
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    bUseControllerRotationYaw = false;
+    GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+    //TODO : 스태미너 감소 시작
+   
+    
+    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
+      FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
   }
 }
-#pragma endregion
 
+void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
+{
+  if(GetCharacterMovement())
+  {
+    GetCharacterMovement()->bOrientRotationToMovement = false;
+    bUseControllerRotationYaw = true;
+    GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+    //TODO : 스태미너 감소 중지
+    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
+      FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
+  }
+}
+
+void ASanzoCharacter::FireStart(const FInputActionValue& Value)
+{
+
+  //TODO : 발사 구현 (무기 클래스에서 발사 함수 호출)
+}
+
+void ASanzoCharacter::StopFire(const FInputActionValue& Value)
+{
+  //TODO : 발사 중지 구현 (무기 클래스에서 발사 중지 함수 호출)
+}
+
+void ASanzoCharacter::Dodge(const FInputActionValue& Value)
+{
+  
+}
