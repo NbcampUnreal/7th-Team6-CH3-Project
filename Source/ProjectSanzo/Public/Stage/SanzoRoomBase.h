@@ -30,4 +30,6 @@ public:
 public:
   virtual void Tick(float DeltaTime) override;
 
+  FTimerHandle RoomSequenceTimerHandle;
+
 };
