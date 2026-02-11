@@ -10,7 +10,7 @@
 UCLASS()
 class PROJECTSANZO_API ASanzoGameState : public AGameStateBase
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
   ASanzoGameState();
@@ -33,5 +33,16 @@ public:
   float CurrentCount;
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
   float TotalCount;
+	
 
+#pragma region UI
+	
+	FTimerHandle HUDUpdateTimerHandle;
+	void UpdateHUD();
+
+	//임시 함수
+	//void StartStage();
+
+
+#pragma endregion 이준로
 };
