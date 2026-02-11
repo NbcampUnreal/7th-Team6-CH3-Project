@@ -21,14 +21,25 @@ void ASanzoGameMode::BeginPlay()
   InitStageType();
 }
 
+// 맵 이름에 따라 스테이지 타입 설정
 void ASanzoGameMode::InitStageType()
 {
   if (GetWorld()->GetMapName().Contains("Stage1"))
+  {
     CurrentStageType = ESanzoStageType::Extermination;
+  }
   else if (GetWorld()->GetMapName().Contains("Stage2"))
+  {
     CurrentStageType = ESanzoStageType::Survival;
+  }
   else if (GetWorld()->GetMapName().Contains("Stage3"))
+  {
     CurrentStageType = ESanzoStageType::Boss;
+  }
+  else
+  {
+    CurrentStageType = ESanzoStageType::None;
+  }
 }
 void ASanzoGameMode::StartStage()
 {

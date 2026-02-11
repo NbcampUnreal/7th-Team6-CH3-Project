@@ -35,6 +35,9 @@ void ASanzoStageManager::StartStage()
 
   switch (StageType)
   {
+  case ESanzoStageType::None:
+      UE_LOG(LogTemp, Warning, TEXT("전투 타입: 없음"));
+      return;
     case ESanzoStageType::Extermination:
       UE_LOG(LogTemp, Warning, TEXT("전투 타입: 섬멸전"));
       RoomClassToSpawn = ExterminationRoomClass;
