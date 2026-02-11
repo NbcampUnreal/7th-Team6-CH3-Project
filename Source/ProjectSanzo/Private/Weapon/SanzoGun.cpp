@@ -3,15 +3,17 @@
 #include "Engine/World.h"
 #include "Components/ArrowComponent.h"
 #include "TimerManager.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ASanzoGun::ASanzoGun()
 {
 	BaseDamage = 20.0f;       // 기본 데미지
 	FireRate = 0.1f;          // 0.1초마다 발사 (빠른 연사)
-	MaxRange = 5000.0f;       // 사거리 50미터
-	MaxAmmo = 30;             // 최대 탄약
+	MaxRange = 5000.0f;       // 사거리 50미터           
 	CurrentAmmo = 30;         // 시작 탄약
 	bInfiniteAmmo = false;
+	TracerTargetName = TEXT("Target");
 }
 
 void ASanzoGun::StartFire()
@@ -57,13 +59,15 @@ void ASanzoGun::Fire()
 	AController* OwnerController = OwnerPawn->GetController();
 	if (!OwnerController) return;
 
+	// 카메라에서 정보값 가져오기
 	FVector CameraLocation;
 	FRotator CameraRotation;
 	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
 	FVector Start = CameraLocation;
 	FVector End = Start + (CameraRotation.Vector() * MaxRange);
-
+	
+	// 라인트레이스 시작될 때 쏜 무기와 무기 들고있는 플레이어 판정 제외
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);           
@@ -77,23 +81,34 @@ void ASanzoGun::Fire()
 		QueryParams
 	);
 
+	if (TracerEffect && FireStartLocation)
+	{
+		FVector MuzzleLocation = FireStartLocation->GetComponentLocation();
+
+		// 트레이스 목표 지점 설정
+		FVector TraceEndPoint = bHit ? HitResult.ImpactPoint : End;
+
+		// 총구에서 목표 지점으로 가기 위한 회전값 계산
+		FRotator LaunchRotation = (TraceEndPoint - MuzzleLocation).Rotation();
+
+		UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			TracerEffect,
+			MuzzleLocation,
+			LaunchRotation,
+			true
+		);
+	}
+	
+	// 데미지 적용
 	if (bHit)
 	{
-		// 어딘가 맞았으면: 총구 -> 맞은 곳까지만 그림
-		DrawDebugLine(GetWorld(), FireStartLocation->GetComponentLocation(), HitResult.ImpactPoint, FColor::Red, false, 5.0f, 0, 1.0f);
-
-		// 데미지 전달
 		ApplyDamageToTarget(HitResult.GetActor(), HitResult);
-	}
-	else
-	{
-		// 안 맞았으면(허공): 총구 -> 사거리 끝까지 그림
-		DrawDebugLine(GetWorld(), FireStartLocation->GetComponentLocation(), End, FColor::Red, false, 5.0f, 0, 1.0f);
 	}
 }
 
-void ASanzoGun::AddAmmo(int32 Amount)
+void ASanzoGun::AddAmmo()
 {
-	CurrentAmmo = FMath::Clamp(CurrentAmmo + Amount, 0, MaxAmmo);
-	UE_LOG(LogTemp, Log, TEXT("Ammo Added: %d / Current: %d"), Amount, CurrentAmmo);
+	CurrentAmmo++;
+	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %d"), CurrentAmmo);
 }

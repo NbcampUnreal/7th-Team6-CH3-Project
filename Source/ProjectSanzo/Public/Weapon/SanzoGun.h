@@ -13,6 +13,12 @@ public:
 	ASanzoGun();
 
 protected:
+	// 에셋에 있는 트레이스 이펙트 사용위한 변수
+	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
+	UParticleSystem* TracerEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
+	FName TracerTargetName;
 
 	// 마우스 누름: 연사 타이머 시작
 	virtual void StartFire() override;
@@ -26,5 +32,5 @@ protected:
 public:
 
 	// 후에 드랍된 총알 먹었을 때 탄약 보충될 함수
-	void AddAmmo(int32 Amount);
+	void AddAmmo();
 };

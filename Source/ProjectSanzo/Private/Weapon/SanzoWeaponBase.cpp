@@ -20,7 +20,6 @@ ASanzoWeaponBase::ASanzoWeaponBase()
 
   BaseDamage = 10.0f;
   FireRate = 0.1f;
-  MaxAmmo = 30;
   MaxRange = 5000.0f;
   CurrentAmmo = 30;
   bInfiniteAmmo = false;
@@ -58,6 +57,16 @@ void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitIn
 {
   if (!TargetActor) return;
 
+  float FinalDamage = BaseDamage;
+  // 헤드샷 판정되는지 확인용
+  bool bIsHeadshot = false;
+
+  if (HitInfo.BoneName == HeadBoneName)
+  {
+    FinalDamage *= HeadshotMultiplier;
+    bIsHeadshot = true;
+  }
+
   APawn* OwnerPawn = Cast<APawn>(GetOwner());
   if (!OwnerPawn) return;
 
@@ -65,11 +74,21 @@ void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitIn
 
   UGameplayStatics::ApplyDamage(
     TargetActor,
-    BaseDamage,
+    FinalDamage,
     OwnerController,
     this,
     UDamageType::StaticClass()
   );
+
+  // 로그 체크용 후에 확인되면 삭제 가능
+  if (bIsHeadshot)
+  {
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("HEADSHOT! Damage: %f"), FinalDamage));
+  }
+  else
+  {
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Body Hit. Damage: %f"), FinalDamage));
+  }
 }
 
 

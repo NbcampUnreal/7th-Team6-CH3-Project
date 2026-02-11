@@ -20,9 +20,6 @@ protected:
 	// 투사체 발사 시작 위치, 히트스캔 시작 위치
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Components")
 	class UArrowComponent* FireStartLocation;
-	// 최대 탄약 제한 (필요 없으면 삭제)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Ammo")
-	int32 MaxAmmo;
 	// 무기 중 총 사용 시 필요(UI에서도 필요할수도)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Ammo")
 	int32 CurrentAmmo;
@@ -37,6 +34,12 @@ protected:
 	// 연사 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float FireRate;
+	// 헤드샷 데미지 배율
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
+	float HeadshotMultiplier = 2.0f;
+	// 헤드샷 판정할 뼈 이름
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
+	FName HeadBoneName = FName("head");
 	// 캐릭터가 재생할 애니메이션
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UAnimMontage* CharacterFireMontage;
