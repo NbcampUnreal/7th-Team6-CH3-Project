@@ -3,3 +3,7 @@
 
 #include "UI/SanzoHUDWidget.h"
 
+void USanzoHUDWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
