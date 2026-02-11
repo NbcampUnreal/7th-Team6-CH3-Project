@@ -24,7 +24,6 @@ ASanzoWeaponBase::ASanzoWeaponBase()
   MaxRange = 5000.0f;
   CurrentAmmo = 30;
   bInfiniteAmmo = false;
-  bIsReloading = false;
 }
 
 void ASanzoWeaponBase::StartFire()
@@ -35,41 +34,6 @@ void ASanzoWeaponBase::StartFire()
 void ASanzoWeaponBase::StopFire()
 {
 
-}
-
-void ASanzoWeaponBase::Reload()
-{
-  if (bIsReloading || (CurrentAmmo >= MaxAmmo && !bInfiniteAmmo)) return;
-
-  bIsReloading = true;
-
-  if (WeaponMesh)
-  {
-    float ReloadDuration = 2.0f;
-
-    GetWorldTimerManager().SetTimer(
-      FireTimerHandle,
-      this,
-      &ASanzoWeaponBase::FinishReload,
-      ReloadDuration,
-      false
-    );
-  }
-}
-
-void ASanzoWeaponBase::FinishReload()
-{
-  bIsReloading = false;
-
-  if (bInfiniteAmmo == false)
-  {
-    CurrentAmmo = MaxAmmo;
-    UE_LOG(LogTemp, Log, TEXT("Reload Finished."));
-  }
-  else
-  {
-    UE_LOG(LogTemp, Log, TEXT("Reload Action Finished"));
-  }
 }
 
 void ASanzoWeaponBase::PlayFireEffects()

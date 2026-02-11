@@ -18,7 +18,7 @@ void ASanzoGun::StartFire()
 {
 	Super::StartFire();
 
-	if ((!bInfiniteAmmo && CurrentAmmo <= 0) || bIsReloading) return;
+	if (!bInfiniteAmmo && CurrentAmmo <= 0) return;
 
 	Fire();
 
@@ -43,7 +43,7 @@ void ASanzoGun::StopFire()
 void ASanzoGun::Fire()
 {
 
-	if ((!bInfiniteAmmo && CurrentAmmo <= 0) || bIsReloading)
+	if (!bInfiniteAmmo && CurrentAmmo <= 0)
 	{
 		StopFire();
 		return;

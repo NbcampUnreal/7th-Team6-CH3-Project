@@ -52,18 +52,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
 	virtual void StopFire();
 	// 재장전 애니메이션 실행용
-	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
-	virtual void Reload();
 
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
 	virtual void Fire() {};
 	// 사운드, 이펙트 담장 로직, 부모 클래스에서 로직 담당, 자식 클래스에서 사운드, 이펙트 종류 정함
 	virtual void PlayFireEffects();
-	// 실제 총알 재장전
-	virtual void FinishReload();
-	// 현재 리로딩 중인지 판단, 리로딩 중이면 발사 불가
-	bool bIsReloading;
 	// 데미지 전달용(함수 내부에서 플레이어나 적의 상태(버프, 강화 등) 에 따라서 최종데미지 계산)
 	void ApplyDamageToTarget(AActor * TargetActor, FHitResult HitInfo);
 	// 플레이어 총기 사용 시 연사 발사 속도 제어용 타이머
