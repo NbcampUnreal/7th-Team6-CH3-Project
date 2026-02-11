@@ -18,9 +18,7 @@ void ASanzoRoomBase::BeginRoomSequence()
 	UE_LOG(LogTemp, Warning, TEXT("RB: 시퀀스 시작"));
 	RoomStateTags.AddTag(FGameplayTag::RequestGameplayTag("Room.State.Actived"));
 
-	// 클리어 조건 달성
-  UE_LOG(LogTemp, Warning, TEXT("RB: 클리어 조건 달성"));
-  EndRoomSequence();
+
 }
 
 void ASanzoRoomBase::EndRoomSequence()
