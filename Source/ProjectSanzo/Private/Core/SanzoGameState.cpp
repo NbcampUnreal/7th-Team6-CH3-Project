@@ -11,15 +11,16 @@
 #include "Components/TextBlock.h"
 
 //임시 코드
+/*
 ASanzoGameState::ASanzoGameState()
 {
 }
-
+*/
 void ASanzoGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartStage();
+	//StartStage();
 
 	GetWorldTimerManager().SetTimer(
 		HUDUpdateTimerHandle,
@@ -100,6 +101,7 @@ void ASanzoGameState::UpdateHUD()
 }
 
 //테스트용 임시 함수
+/*
 void ASanzoGameState::StartStage()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
@@ -110,4 +112,5 @@ void ASanzoGameState::StartStage()
 		}
 	}
 }
+*/
 #pragma endregion 이준로

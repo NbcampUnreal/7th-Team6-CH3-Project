@@ -13,7 +13,7 @@ class PROJECTSANZO_API ASanzoGameState : public AGameStateBase
 
 public:
 	//임시 코드
-	ASanzoGameState();
+	//ASanzoGameState();
 	
 	virtual void BeginPlay() override;
 	
@@ -24,7 +24,7 @@ public:
 	void UpdateHUD();
 
 	//임시 함수
-	void StartStage();
+	//void StartStage();
 
 
 #pragma endregion 이준로
