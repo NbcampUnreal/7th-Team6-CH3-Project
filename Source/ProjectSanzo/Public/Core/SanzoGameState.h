@@ -12,11 +12,14 @@ class PROJECTSANZO_API ASanzoGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	//임시 코드
 	ASanzoGameState();
+	
 	virtual void BeginPlay() override;
+	
 
 #pragma region UI
-
+	
 	FTimerHandle HUDUpdateTimerHandle;
 	void UpdateHUD();
 

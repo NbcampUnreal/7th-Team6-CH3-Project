@@ -10,8 +10,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
-#pragma region UI
-
+//임시 코드
 ASanzoGameState::ASanzoGameState()
 {
 }
@@ -30,6 +29,8 @@ void ASanzoGameState::BeginPlay()
 		true
 	);
 }
+
+#pragma region UI
 
 void ASanzoGameState::UpdateHUD()
 {
