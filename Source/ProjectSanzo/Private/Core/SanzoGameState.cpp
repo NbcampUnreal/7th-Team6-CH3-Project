@@ -1,8 +1,6 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Core/SanzoGameState.h"
-
+#include "Core/SanzoGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
@@ -10,18 +8,25 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
-//임시 코드
-/*
 ASanzoGameState::ASanzoGameState()
 {
+  CurrentStageIndex = 0;
 }
-*/
+
 void ASanzoGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
 	//StartStage();
-
+if (UGameInstance* GI = GetGameInstance())
+  {
+    USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GI);
+    if (SGI)
+    {
+      //CurrentStageIndex = SGI->CurrentLevelIndex;
+    }
+  }
+  
 	GetWorldTimerManager().SetTimer(
 		HUDUpdateTimerHandle,
 		this,

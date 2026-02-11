@@ -1,10 +1,14 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// 방 공통 로직
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
+#include "Stage/SanzoStageGate.h"
 #include "SanzoRoomBase.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FOnRoomCleared);
 
 UCLASS()
 class PROJECTSANZO_API ASanzoRoomBase : public AActor
@@ -14,10 +18,19 @@ class PROJECTSANZO_API ASanzoRoomBase : public AActor
 public:
   ASanzoRoomBase();
 
-protected:
+  FOnRoomCleared OnRoomCleared;
+
   virtual void BeginPlay() override;
+
+  virtual void BeginRoomSequence();
+  virtual void EndRoomSequence();
 
 public:
   virtual void Tick(float DeltaTime) override;
+
+  FTimerHandle RoomSequenceTimerHandle;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage")
+  ASanzoStageGate* StageGate;
 
 };

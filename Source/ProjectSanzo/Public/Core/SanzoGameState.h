@@ -1,8 +1,9 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// 실시간 상태 동기화
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/GameStateBase.h"
 #include "SanzoGameState.generated.h"
 
@@ -12,11 +13,26 @@ class PROJECTSANZO_API ASanzoGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-	//임시 코드
-	//ASanzoGameState();
-	
-	virtual void BeginPlay() override;
-	
+  ASanzoGameState();
+
+  virtual void BeginPlay() override;
+
+  // 게임 상태
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+  FGameplayTagContainer GameStateTags;
+
+  // 스테이지 정보
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
+  int32 CurrentStageType;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
+  int32 CurrentStageIndex;
+  
+  // 전투 정보
+  // 섬멸전일때는 적 수, 버티기일때는 생존 시간
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+  float CurrentCount;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+  float TotalCount;
 
 #pragma region UI
 	
