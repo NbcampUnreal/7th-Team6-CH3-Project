@@ -54,15 +54,4 @@ protected:
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
   FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-#pragma region AttackTest
-protected:
-  // 테스트용 사격 함수
-  UFUNCTION(BlueprintCallable, Category = "Combat")
-  void TestLineTraceAttack();
-
-public:
-  float TestAttackRange = 2000.f;
-  float TestBaseDamage = 10.f;
-#pragma endregion
 };

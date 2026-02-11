@@ -10,9 +10,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
-#include "DrawDebugHelpers.h" // 디버그 라인 그리기용
-#include "Engine/DamageEvents.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -105,81 +102,4 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
     AddControllerPitchInput(LookAxisVector.Y);
   }
 }
-
-#pragma region AttackTest
-
-void ASanzoCharacter::TestLineTraceAttack()
-{
-  if (!FollowCamera) return;
-
-  // [카메라 기준] 시선 방향으로 트레이스 (조준점 계산)
-  FVector CameraStart = FollowCamera->GetComponentLocation();
-  FVector CameraForward = FollowCamera->GetForwardVector();
-  FVector CameraEnd = CameraStart + (CameraForward * TestAttackRange);
-
-  // 트레이스 파라미터 설정
-  FHitResult CameraHitResult;
-  FCollisionQueryParams Params;
-  Params.AddIgnoredActor(this); // 자기 자신은 무시
-
-  // 라인 트레이스 발사
-  bool bHit = GetWorld()->LineTraceSingleByChannel
-  (
-    CameraHitResult,
-    CameraStart,
-    CameraEnd,
-    ECC_Visibility,
-    Params
-  );
-
-  // 맞았으면 그 지점(ImpactPoint)
-  // 안 맞았으면 허공의 끝점(CameraEnd)
-  FVector TargetLocation = bHit ?
-    CameraHitResult.ImpactPoint : CameraEnd;
-
-  // [발사 원점] 캐릭터의 오른손에서 시작
-  FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("hand_r"));
-
-  // 트레이스 궤적 그리기
-  // 맞았으면 빨간색, 아니면 초록색 선을 1초간 표시
-  FColor LineColor = bHit ? FColor::Red : FColor::Green;
-  DrawDebugLine
-  (
-    GetWorld(),
-    MuzzleLocation,
-    TargetLocation,
-    LineColor,
-    false,
-    1.f,
-    0,
-    1.f
-  );
-
-  if (bHit && CameraHitResult.GetActor())
-  {
-    // 맞은 지점에 점 찍기
-    DrawDebugPoint
-    (
-      GetWorld(),
-      TargetLocation,
-      10.f,
-      FColor::Yellow,
-      false,
-      1.f
-    );
-
-    // 적에게 데미지 전달
-    UGameplayStatics::ApplyPointDamage
-    (
-      CameraHitResult.GetActor(),
-      TestBaseDamage,
-      CameraForward,    // 공격 방향은 카메라 보는 방향
-      CameraHitResult,
-      GetController(),  // 공격자 컨트롤러
-      this,             // 데미지 원인 액터
-      UDamageType::StaticClass()
-    );
-  }
-}
-#pragma endregion
 
