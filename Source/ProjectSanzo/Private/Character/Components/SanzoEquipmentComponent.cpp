@@ -5,6 +5,8 @@
 
 USanzoEquipmentComponent::USanzoEquipmentComponent()
 {
+
+
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
