@@ -12,4 +12,9 @@ class PROJECTSANZO_API ASanzoRoom_Extermination : public ASanzoRoomBase
 public:
   virtual void BeginRoomSequence() override;
   virtual void EndRoomSequence() override;
+
+  // 적 처치
+  int32 TotalEnemyCount;
+  int32 CurrentEnemyCount;
+  void OnEnemyKilled();
 };

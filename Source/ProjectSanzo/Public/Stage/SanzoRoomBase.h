@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameplayTagContainer.h"
+#include "Stage/SanzoStageGate.h"
 #include "SanzoRoomBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnRoomCleared);
@@ -17,9 +18,6 @@ class PROJECTSANZO_API ASanzoRoomBase : public AActor
 public:
   ASanzoRoomBase();
 
-  UPROPERTY()
-  FGameplayTagContainer RoomStateTags;
-
   FOnRoomCleared OnRoomCleared;
 
   virtual void BeginPlay() override;
@@ -31,5 +29,8 @@ public:
   virtual void Tick(float DeltaTime) override;
 
   FTimerHandle RoomSequenceTimerHandle;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage")
+  ASanzoStageGate* StageGate;
 
 };

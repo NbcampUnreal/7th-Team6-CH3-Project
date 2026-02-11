@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Core/SanzoStageTypes.h"
 #include "Stage/SanzoRoomBase.h"
+#include "Stage/SanzoStagegate.h"
 #include "SanzoStageManager.generated.h"
 
 class ASanzoGameMode;
@@ -41,5 +42,22 @@ public:
   void StartStage();
   UFUNCTION()
   void OnRoomCleared();
+  void MoveToNextRoom();
 
+  // State
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+  FGameplayTag CurrentState;
+
+  UPROPERTY(EditDefaultsOnly, Category = "State")
+  FGameplayTag StageActivedTag;
+  UPROPERTY(EditDefaultsOnly, Category = "State")
+  FGameplayTag StageClearedTag;
+  UPROPERTY(EditDefaultsOnly, Category = "State")
+  FGameplayTag MoveNextTag;
+
+  UPROPERTY(EditAnywhere, Category = "Stage")
+  ASanzoStageGate* StageGate;
+
+  UFUNCTION()
+  void SetState(FGameplayTag NewState);
 };
