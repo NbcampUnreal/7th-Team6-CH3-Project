@@ -35,7 +35,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* WeaponImage;
 	//추후 함수 수정 필요
-	void UpdateHUD();
+	//void UpdateHUD();
 
 	//Game State로 부터 받아올 정보 연결
 	UPROPERTY(meta = (BindWidget))
@@ -43,10 +43,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* StageProgressBar;
-
-	UFUNCTION()
-	void UpdateStageProgressBar();
-
+	/*
+		UFUNCTION()
+		void UpdateStageProgressBar();
+	*/
 
 #pragma endregion 이준로
 };
