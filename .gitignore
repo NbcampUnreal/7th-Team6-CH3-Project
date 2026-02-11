@@ -83,6 +83,9 @@ Content/__ExternalActors__/Maps/L_EnemyTest/*
 Content/__ExternalObjects__/Maps/L_EnemyTest/*
 Content/Maps/L_EnemyTest.umap
 
+#Test
+Content/Test/*
+
 # JetBrains Rider
 .idea/
 *.sln.DotSettings.user
