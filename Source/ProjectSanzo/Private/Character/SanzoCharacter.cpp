@@ -50,6 +50,9 @@ ASanzoCharacter::ASanzoCharacter()
   CameraBoom->TargetArmLength = 400.0f;
   CameraBoom->bUsePawnControlRotation = true;
 
+  TargetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TargetMesh"));
+  TargetMesh->SetupAttachment(GetMesh());
+
   FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
