@@ -92,3 +92,8 @@ Content/__ExternalActors__/Test/*
 .idea/
 *.sln.DotSettings.user
 *.uproject.DotSettings.user
+
+# VS
+UpgradeLog*.htm
+UpgradeLog*.xml
+

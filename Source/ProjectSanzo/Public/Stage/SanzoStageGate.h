@@ -11,7 +11,7 @@ UCLASS()
 class PROJECTSANZO_API ASanzoStageGate : public AActor
 {
   GENERATED_BODY()
-
+#pragma region Stage Gate
 public:
   ASanzoStageGate();
 
@@ -43,4 +43,5 @@ private:
   );
 
   bool bIsOpened = false;
+#pragma endregion 최윤서
 };

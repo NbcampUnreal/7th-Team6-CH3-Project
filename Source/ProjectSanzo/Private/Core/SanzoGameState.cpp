@@ -1,6 +1,7 @@
 #include "Core/SanzoGameState.h"
 #include "Core/SanzoGameInstance.h"
 #include "Character/SanzoPlayerController.h"
+#include "Common/SanzoLog.h"
 
 ASanzoGameState::ASanzoGameState()
 {
