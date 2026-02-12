@@ -45,7 +45,7 @@ public:
   bool IsDead() const;
 #pragma endregion
 
-#pragma region Combat
+#pragma region EnemyTakeDamage
 public:
   // 데미지 처리 함수 오버라이드
   virtual float TakeDamage
@@ -55,6 +55,6 @@ public:
     class AController* EventInstigator,
     AActor* DamageCauser
   ) override;
-#pragma endregion DongJu Kim
+#pragma endregion 김동주
 
 };
