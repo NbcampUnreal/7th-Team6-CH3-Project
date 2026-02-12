@@ -1,6 +1,7 @@
 #include "Stage/SanzoStageManager.h"
 #include "Core/SanzoGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Common/SanzoLog.h"
 
 ASanzoStageManager::ASanzoStageManager()
 {
@@ -32,7 +33,7 @@ void ASanzoStageManager::Tick(float DeltaTime)
 
 void ASanzoStageManager::StartStage()
 {
-  UE_LOG(LogTemp, Warning, TEXT("SM: 스테이지 시작"));
+  UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 시작"));
   // 현재 스테이지 타입 가져오기
   if (SGM)
   {
@@ -43,18 +44,18 @@ void ASanzoStageManager::StartStage()
   switch (StageType)
   {
   case ESanzoStageType::None:
-      UE_LOG(LogTemp, Warning, TEXT("SM: 전투 타입 - 없음"));
+      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 없음"));
       return;
     case ESanzoStageType::Extermination:
-      UE_LOG(LogTemp, Warning, TEXT("SM: 전투 타입 - 섬멸전"));
+      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 섬멸전"));
       RoomClassToSpawn = ExterminationRoomClass;
       break;
     case ESanzoStageType::Survival:
-      UE_LOG(LogTemp, Warning, TEXT("SM: 전투 타입 - 버티기"));
+      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 버티기"));
       RoomClassToSpawn = SurvivalRoomClass;
       break;
     case ESanzoStageType::Boss:
-      UE_LOG(LogTemp, Warning, TEXT("SM: 전투 타입 - 보스"));
+      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 보스"));
       RoomClassToSpawn = BossRoomClass;
       break;
   }
@@ -79,7 +80,7 @@ void ASanzoStageManager::StartStage()
 
 void ASanzoStageManager::OnRoomCleared()
 {
-  UE_LOG(LogTemp, Warning, TEXT("SM: 스테이지 클리어"));
+  UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 클리어"));
   SetState(StageClearedTag);
 }
 

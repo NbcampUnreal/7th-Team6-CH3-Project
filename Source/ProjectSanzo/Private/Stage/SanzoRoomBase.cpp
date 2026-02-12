@@ -1,5 +1,6 @@
 #include "Stage/SanzoRoomBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Common/SanzoLog.h"
 
 ASanzoRoomBase::ASanzoRoomBase()
 {
@@ -20,18 +21,18 @@ void ASanzoRoomBase::BeginPlay()
 	if (FoundGates.Num() > 0)
 	{
 		StageGate = Cast<ASanzoStageGate>(FoundGates[0]);
-		UE_LOG(LogTemp, Warning, TEXT("RB: Gate Found"));
+		UE_LOG(LogCYS, Warning, TEXT("RB: Gate Found"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("RB: Gate Not Found"));
+		UE_LOG(LogCYS, Error, TEXT("RB: Gate Not Found"));
 	}
 }
 
 void ASanzoRoomBase::BeginRoomSequence()
 {
 	// 문 잠금, 스폰 시작
-	UE_LOG(LogTemp, Warning, TEXT("RB: 시퀀스 시작"));
+	UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 시작"));
 
 
 }
@@ -39,7 +40,7 @@ void ASanzoRoomBase::BeginRoomSequence()
 void ASanzoRoomBase::EndRoomSequence()
 {
     // 문 열기, 다음 방 개방 지시
-	UE_LOG(LogTemp, Warning, TEXT("RB: 시퀀스 종료"));
+	UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 종료"));
 }
 
 void ASanzoRoomBase::Tick(float DeltaTime)

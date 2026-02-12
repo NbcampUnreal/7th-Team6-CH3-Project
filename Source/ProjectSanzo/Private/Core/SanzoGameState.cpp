@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Common/SanzoLog.h"
 
 ASanzoGameState::ASanzoGameState()
 {

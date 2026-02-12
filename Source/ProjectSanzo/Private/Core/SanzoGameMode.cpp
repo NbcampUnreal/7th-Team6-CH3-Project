@@ -7,6 +7,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Stage/SanzoStageManager.h"
 #include "EngineUtils.h"
+#include "Common/SanzoLog.h"
 
 ASanzoGameMode::ASanzoGameMode()
 {
@@ -31,29 +32,29 @@ void ASanzoGameMode::InitStageType()
 {
   if (GetWorld()->GetMapName().Contains("Stage1"))
   {
-    UE_LOG(LogTemp, Warning, TEXT("GM: 스테이지 타입 설정 - 섬멸전"));
+    UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 타입 설정 - 섬멸전"));
     CurrentStageType = ESanzoStageType::Extermination;
   }
   else if (GetWorld()->GetMapName().Contains("Stage2"))
   {
-    UE_LOG(LogTemp, Warning, TEXT("GM: 스테이지 타입 설정 - 버티기"));
+    UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 타입 설정 - 버티기"));
     CurrentStageType = ESanzoStageType::Survival;
   }
   else if (GetWorld()->GetMapName().Contains("Stage3"))
   {
-    UE_LOG(LogTemp, Warning, TEXT("GM: 스테이지 타입 설정 - 보스전"));
+    UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 타입 설정 - 보스전"));
     CurrentStageType = ESanzoStageType::Boss;
   }
   else
   {
-    UE_LOG(LogTemp, Warning, TEXT("GM: 스테이지 타입 없음"));
+    UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 타입 없음"));
     CurrentStageType = ESanzoStageType::None;
   }
 }
 void ASanzoGameMode::StartStage()
 {
   // StageManager에게 스테이지 시작 지시
-  UE_LOG(LogTemp, Warning, TEXT("GM: 스테이지 시작"));
+  UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 시작"));
   ASanzoStageManager* SM = nullptr;
   for (TActorIterator<ASanzoStageManager> It(GetWorld()); It; ++It)
   {
@@ -67,7 +68,7 @@ void ASanzoGameMode::StartStage()
 }
 void ASanzoGameMode::OnStageCleared()
 {
-  UE_LOG(LogTemp, Warning, TEXT("GM: 스테이지 클리어"));
+  UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 클리어"));
   
   // 스테이지 이동
   USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GetGameInstance());
@@ -79,13 +80,13 @@ void ASanzoGameMode::OnStageCleared()
 // 업그레이드 선택 트리거, 캐릭터에서 호출
 void ASanzoGameMode::TriggerUpgradeSelection()
 {
-  UE_LOG(LogTemp, Warning, TEXT("GM: 캐릭터 성장 선택"));
+  UE_LOG(LogCYS, Warning, TEXT("GM: 캐릭터 성장 선택"));
 
   OnUpgradeSelected();
 }
 
 void ASanzoGameMode::OnUpgradeSelected()
 {
-  UE_LOG(LogTemp, Warning, TEXT("GM: 캐릭터 성장 선택 표시"));
+  UE_LOG(LogCYS, Warning, TEXT("GM: 캐릭터 성장 선택 표시"));
 
 }
