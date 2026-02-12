@@ -16,6 +16,6 @@ public:
   // 적 처치
   int32 TotalEnemyCount;
   int32 CurrentEnemyCount;
-  void OnEnemyKilled();
+  virtual void OnEnemyKilled() override;
 #pragma endregion 최윤서
 };

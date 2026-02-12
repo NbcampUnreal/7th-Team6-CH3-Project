@@ -24,6 +24,8 @@ public:
 
   virtual void BeginRoomSequence();
   virtual void EndRoomSequence();
+  virtual void OnEnemyKilled();
+
 
 public:
   virtual void Tick(float DeltaTime) override;

@@ -51,4 +51,8 @@ void ASanzoRoomBase::Tick(float DeltaTime)
 
 }
 
+void ASanzoRoomBase::OnEnemyKilled()
+{
+	// 기본은 아무것도 안 함
+}
 #pragma endregion 최윤서
