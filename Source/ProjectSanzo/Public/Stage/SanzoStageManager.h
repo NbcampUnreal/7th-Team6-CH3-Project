@@ -16,6 +16,7 @@ class PROJECTSANZO_API ASanzoStageManager : public AActor
   GENERATED_BODY()
 
 public:
+#pragma region 스테이지 관리
   ASanzoStageManager();
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
@@ -60,4 +61,5 @@ public:
 
   UFUNCTION()
   void SetState(FGameplayTag NewState);
+#pragma endregion 최윤서
 };

@@ -2,16 +2,17 @@
 #include "Stage/SanzoRoomBase.h"
 #include "Common/SanzoLog.h"
 
+#pragma region 섬멸전 배틀 흐름
 void ASanzoRoom_Extermination::BeginRoomSequence()
 {
   Super::BeginRoomSequence();
-  UE_LOG(LogCYS, Warning, TEXT("섬멸전: 시퀀스 시작"));
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 시퀀스 시작"));
 
   // 몬스터 스폰
   // 
   // 
   // 클리어 조건 달성 시 end
-  UE_LOG(LogCYS, Warning, TEXT("섬멸전: 클리어 조건 체크"));
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 체크"));
   // 더미 조건: 10초 후 클리어
   GetWorld()->GetTimerManager().SetTimer(
     RoomSequenceTimerHandle,
@@ -23,7 +24,7 @@ void ASanzoRoom_Extermination::BeginRoomSequence()
   //EndRoomSequence();
 }
 
-// 조건 클리어 시 함수 호출
+// 조건 클리어 시 호출 함수
 void ASanzoRoom_Extermination::EndRoomSequence()
 {
   Super::EndRoomSequence();
@@ -31,19 +32,22 @@ void ASanzoRoom_Extermination::EndRoomSequence()
   // 문 열림 호출
   if (!StageGate)
   {
-    UE_LOG(LogCYS, Error, TEXT("섬멸전: StageGate is null"));
+    UE_LOG(LogCYS, Error, TEXT("섬멸: StageGate is null"));
     return;
   }
   StageGate->OpenGate();
 }
+#pragma endregion 최윤서
 
+#pragma region 배틀 내 이벤트
 void ASanzoRoom_Extermination::OnEnemyKilled()
 {
   CurrentEnemyCount++;
-  UE_LOG(LogCYS, Warning, TEXT("섬멸전: 적 처치 %d / %d"), CurrentEnemyCount, TotalEnemyCount);
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 적 처치 %d / %d"), CurrentEnemyCount, TotalEnemyCount);
   if (CurrentEnemyCount >= TotalEnemyCount)
   {
-    UE_LOG(LogCYS, Warning, TEXT("섬멸전: 모든 적 처치 완료"));
+    UE_LOG(LogCYS, Warning, TEXT("섬멸: 모든 적 처치 완료"));
     EndRoomSequence();
   }
 }
+#pragma endregion 최윤서
