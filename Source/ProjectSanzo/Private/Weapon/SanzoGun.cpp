@@ -13,7 +13,21 @@ ASanzoGun::ASanzoGun()
 	MaxRange = 5000.0f;       // 사거리 50미터           
 	CurrentAmmo = 30;         // 시작 탄약
 	bInfiniteAmmo = false;
-	TracerTargetName = TEXT("Target");
+
+	// 라인트레이스 시작 위치 고정
+	if (FireStartLocation)
+	{
+		// Location (X, Y, Z)
+		FireStartLocation->SetRelativeLocation(FVector(0.0f, 50.0f, 11.5f));
+
+		// Rotation (X(Roll), Y(Pitch), Z(Yaw))
+		// C++ 생성자 FRotator(Pitch, Yaw, Roll) == (Y, Z, X)
+		FireStartLocation->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+
+		// Scale (X, Y, Z)
+		FireStartLocation->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+	}
+
 }
 
 void ASanzoGun::StartFire()
@@ -51,7 +65,7 @@ void ASanzoGun::Fire()
 		return;
 	}
 
-	CurrentAmmo--;
+	// CurrentAmmo--; 테스트용으로 꺼둠 후에 수정
 	PlayFireEffects();
 
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
@@ -81,6 +95,75 @@ void ASanzoGun::Fire()
 		QueryParams
 	);
 
+	// 근접에 적 있을 때 총구 앞에 적이 있으면 판정 우선
+	if (FireStartLocation)
+	{
+		FHitResult MuzzleHit;
+		FVector MuzzleStart = FireStartLocation->GetComponentLocation();
+		// 총구 정면으로 1.5미터 검사
+		FVector MuzzleEnd = MuzzleStart + (FireStartLocation->GetForwardVector() * 150.0f);
+
+		FCollisionQueryParams MuzzleParams;
+		MuzzleParams.AddIgnoredActor(this);
+		MuzzleParams.AddIgnoredActor(GetOwner());
+
+		bool bMuzzleHit = GetWorld()->LineTraceSingleByChannel(
+			MuzzleHit,
+			MuzzleStart,
+			MuzzleEnd,
+			ECC_Visibility,
+			MuzzleParams
+		);
+
+		if (bMuzzleHit && MuzzleHit.GetActor() && MuzzleHit.GetActor()->IsA(APawn::StaticClass()))
+		{
+			HitResult = MuzzleHit;
+			bHit = true;
+
+			// 디버그용 (보라색 선)
+			if (bShowDebugTrace)
+			{
+				DrawDebugLine(GetWorld(), MuzzleStart, MuzzleEnd, FColor::Magenta, false, 5.0f, 0, 0.5f);
+			}
+		}
+	}
+
+	// 디버그용 선 추가 
+	if (bShowDebugTrace)
+	{
+		FVector BeamEnd = bHit ? HitResult.ImpactPoint : End;
+
+		// 실제 트레이스선(초록색, 카메라 중앙)
+		DrawDebugLine(
+			GetWorld(),
+			Start,
+			BeamEnd,
+			FColor::Green,
+			false,
+			5.0f,
+			0,
+			0.5f
+		);
+
+		// 3. 눈속임선(빨간색, 총구에서 카메라 중앙)
+		if (FireStartLocation)
+		{
+			FVector MuzzleLocation = FireStartLocation->GetComponentLocation();
+
+			DrawDebugLine(
+				GetWorld(),
+				MuzzleLocation,
+				BeamEnd,
+				FColor::Red,
+				false,
+				5.0f,
+				0,
+				0.5f
+			);
+		}
+	}
+
+	// 트레이스 이펙트 스폰
 	if (TracerEffect && FireStartLocation)
 	{
 		FVector MuzzleLocation = FireStartLocation->GetComponentLocation();

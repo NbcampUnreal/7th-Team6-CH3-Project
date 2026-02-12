@@ -17,8 +17,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
 	UParticleSystem* TracerEffect;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
-	FName TracerTargetName;
+	// 디버그용 라인 트레이스
+	UPROPERTY(EditAnywhere, Category = "Gun|Debug")
+	bool bShowDebugTrace = false;
 
 	// 마우스 누름: 연사 타이머 시작
 	virtual void StartFire() override;
