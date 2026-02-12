@@ -91,3 +91,7 @@ Content/__ExternalActors__/Test/*
 # JetBrains Rider
 .idea/
 *.sln.DotSettings.user
+
+# VS
+UpgradeLog*.htm
+UpgradeLog*.xml
