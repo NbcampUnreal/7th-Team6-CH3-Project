@@ -3,6 +3,8 @@
 #include "Character/SanzoPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/SanzoMainWidget.h"
+#include "UI/SanzoHUDWidget.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
@@ -59,7 +61,7 @@ void ASanzoPlayerController::ShowGameHUD()
 
 	if (HUDWidgetClass)
 	{
-		HUDWidgetInstance = CreateWidget<UUserWidget>(this, HUDWidgetClass);
+		HUDWidgetInstance = CreateWidget<USanzoHUDWidget>(this, HUDWidgetClass);
 		if (HUDWidgetInstance)
 		{
 			HUDWidgetInstance->AddToViewport();
@@ -209,13 +211,13 @@ void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
 
 	if (MenuWidgetInstance)
 	{
-		MenuWidgetInstance->RemoveFromParent();
+		MenuWidgetInstance->Super::RemoveFromParent();
 		MenuWidgetInstance = nullptr;
 	}
 
 	if (MenuWidgetClass)
 	{
-		MenuWidgetInstance = CreateWidget<UUserWidget>(this, MenuWidgetClass);
+		MenuWidgetInstance = CreateWidget<USanzoMainWidget>(this, MenuWidgetClass);
 		if (MenuWidgetInstance)
 		{
 			MenuWidgetInstance->AddToViewport();
@@ -227,68 +229,16 @@ void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
 		{
 		case 0:
 			//메인 메뉴
-			if (UBorder* BackBoard = Cast<UBorder>(MenuWidgetInstance->GetWidgetFromName("BackBoard")))
-			{
-				BackBoard->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("StartButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("게임 시작")));
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("ExitButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("게임 종료")));
-			}
+			MenuWidgetInstance->SetMainMenuUI();
 			break;
 		case 1:
 			//스테이지 클리어
-			if (UImage* TitleImage = Cast<UImage>(MenuWidgetInstance->GetWidgetFromName("TitleImage")))
-			{
-				TitleImage->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UBorder* BackBoard = Cast<UBorder>(MenuWidgetInstance->GetWidgetFromName("BackBoard")))
-			{
-				BackBoard->SetVisibility(ESlateVisibility::Visible);
-			}
-			if (UTextBlock* TitleText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("TitleText"))))
-			{
-				TitleText->SetText(FText::FromString(TEXT("스테이지 클리어")));
-			}
-			if (UTextBlock* SubTitleText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("SubTitleText"))))
-			{
-				SubTitleText->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UButton* StartButton = Cast<UButton>(MenuWidgetInstance->GetWidgetFromName("StartButton")))
-			{
-				StartButton->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("ExitButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("다음 스테이지")));
-			}
+			//이후 StageManger 또는 GameState에서 정보 받아서 구현 필요.
+			MenuWidgetInstance->SetStageClearMenuUI(10.23f, 30);
 			break;
 		case 2:
 			//게임 오버
-			if (UImage* TitleImage = Cast<UImage>(MenuWidgetInstance->GetWidgetFromName("TitleImage")))
-			{
-				TitleImage->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UBorder* BackBoard = Cast<UBorder>(MenuWidgetInstance->GetWidgetFromName("BackBoard")))
-			{
-				BackBoard->SetVisibility(ESlateVisibility::Visible);
-			}
-			if (UTextBlock* TitleText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("TitleText"))))
-			{
-				TitleText->SetText(FText::FromString(TEXT("게임 오버")));
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("StartButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("다시 시작")));
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("ExitButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("메인 메뉴")));
-			}
+			MenuWidgetInstance->SetGameOverMenuUI();
 			break;
 		default:
 			break;

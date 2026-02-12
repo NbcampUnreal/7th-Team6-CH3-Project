@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+class USanzoMainWidget;
+class USanzoHUDWidget;
 class UInputMappingContext;
 
 UCLASS(abstract)
@@ -25,15 +27,18 @@ public:
 	ASanzoPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-	TSubclassOf<UUserWidget> HUDWidgetClass;
+	TSubclassOf<USanzoHUDWidget> HUDWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HUD")
-	UUserWidget* HUDWidgetInstance;
+	USanzoHUDWidget* HUDWidgetInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
-	TSubclassOf<UUserWidget> MenuWidgetClass;
+	TSubclassOf<USanzoMainWidget> MenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
-	UUserWidget* MenuWidgetInstance;
-
+	USanzoMainWidget* MenuWidgetInstance;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
+	//UUserWidget* MenuWidgetInstance;
+	
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> PopUpWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
