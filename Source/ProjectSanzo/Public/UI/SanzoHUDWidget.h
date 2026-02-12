@@ -21,7 +21,8 @@ protected:
 	UFUNCTION()
 	void HandleStatChanged(const FSanzoStatData& Data);
 
-	void UpdateStageProgressBar();
+	UFUNCTION()
+	void HandleStageProgressChanged(float percent);
 
 public:
 	//Stat Component 로 부터 받아올 정보 위젯 연결

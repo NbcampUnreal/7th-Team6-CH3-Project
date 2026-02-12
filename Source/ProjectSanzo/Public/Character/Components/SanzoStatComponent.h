@@ -8,6 +8,7 @@
 
 
 #pragma region UIStatData
+
 USTRUCT(BlueprintType)
 struct FSanzoStatData
 {
@@ -25,6 +26,7 @@ struct FSanzoStatData
 
 //정보 전달 할 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
+
 #pragma endregion 이준로
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -77,8 +79,12 @@ public:
 	float GetStamina() const { return CurrentStamina; }
 
 #pragma region UIDataTransfer
+
 	FOnStatChangedDelegate OnStatChanged;
+
 	void BroadCastStatUpdate();
+
 	FSanzoStatData MakeStatData() const;
+
 #pragma endregion 이준로
 };

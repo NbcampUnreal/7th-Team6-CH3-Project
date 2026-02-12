@@ -6,6 +6,7 @@
 #include "Character/Components/SanzoStatComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Core/SanzoGameState.h"
 
 void USanzoHUDWidget::NativeConstruct()
 {
@@ -21,6 +22,18 @@ void USanzoHUDWidget::NativeConstruct()
 			//this : 대상 객체, &USanzoHUDWidget::HandleStatChanged: 실행할 함수
 			StatComponent->OnStatChanged.AddDynamic(this, &USanzoHUDWidget::HandleStatChanged);
 		}
+	}
+
+	if (ASanzoGameState* GameState = GetWorld()->GetGameState<ASanzoGameState>())
+	{
+		if (StageText)
+		{
+			int32 StageInfo = GameState->CurrentStageIndex + 1;
+			StageText->SetText(FText::FromString(FString::Printf(TEXT("스테이지: %d"), StageInfo)));
+		}
+		//Delegate 등록
+		//this : 대상 객체, &USanzoHUDWidget::HandleStageProgressChanged: 실행할 함수
+		GameState->OnStageProgressChanged.AddDynamic(this, &USanzoHUDWidget::HandleStageProgressChanged);
 	}
 }
 
@@ -44,6 +57,10 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 	}
 }
 
-void USanzoHUDWidget::UpdateStageProgressBar()
+void USanzoHUDWidget::HandleStageProgressChanged(float percent)
 {
+	if (StageProgressBar)
+	{
+		StageProgressBar->SetPercent(percent);
+	}
 }
