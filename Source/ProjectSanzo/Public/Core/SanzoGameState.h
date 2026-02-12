@@ -38,12 +38,11 @@ public:
 #pragma endregion 최윤서
 
 #pragma region UI
-	
-	FTimerHandle HUDUpdateTimerHandle;
-	void UpdateHUD();
 
-	//임시 함수
-	//void StartStage();
+	FTimerHandle HUDUpdateTimerHandle;
+	//void UpdateHUD();
+
+	void OpenHUD();
 
 
 #pragma endregion 이준로
