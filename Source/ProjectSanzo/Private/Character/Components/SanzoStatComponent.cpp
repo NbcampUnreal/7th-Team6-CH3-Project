@@ -16,15 +16,14 @@ USanzoStatComponent::USanzoStatComponent()
 	SprintStaminaCostPerSecond = 5.f;
 
 	//테스트 코드
-	CurrentHealth = 50.f;
+	CurrentHealth = 100.f;
 	MaxHealth = 100.f;
 
-	CurrentExp = 20.f;
+	CurrentExp = 0.f;
 	MaxExp = 100.f;
-	Level = 32;
+	Level = 1;
 
 	PrimaryComponentTick.bCanEverTick = false;
-
 	// ...
 }
 
@@ -33,6 +32,9 @@ void USanzoStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+#pragma  region InitalBroadCast
+	BroadCastStatUpdate();
+#pragma endregion	이준로
 	// ...
 }
 

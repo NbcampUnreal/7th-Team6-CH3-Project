@@ -1,11 +1,13 @@
 #include "Stage/SanzoRoom_Survival.h"
+#include "Common/SanzoLog.h"
 
+#pragma region Battle Flow for Survival
 void ASanzoRoom_Survival::BeginRoomSequence()
 {
   Super::BeginRoomSequence();
-  UE_LOG(LogTemp, Warning, TEXT("버티기: 시퀀스 시작"));
+  UE_LOG(LogCYS, Warning, TEXT("방호: 시퀀스 시작"));
   // 클리어 조건 달성 시 end
-  UE_LOG(LogTemp, Warning, TEXT("버티기: 클리어 조건 체크"));
+  UE_LOG(LogCYS, Warning, TEXT("방호: 클리어 조건 체크"));
   // 더미 조건: 10초 후 클리어
   GetWorld()->GetTimerManager().SetTimer(
     RoomSequenceTimerHandle,
@@ -16,9 +18,12 @@ void ASanzoRoom_Survival::BeginRoomSequence()
   );
   //EndRoomSequence();
 }
-
 void ASanzoRoom_Survival::EndRoomSequence()
 {
   Super::EndRoomSequence();
 
 }
+#pragma endregion 최윤서
+
+#pragma region Battle Event
+#pragma endregion 최윤서
