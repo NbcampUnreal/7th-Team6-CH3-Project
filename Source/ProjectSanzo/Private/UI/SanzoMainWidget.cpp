@@ -24,7 +24,7 @@ void USanzoMainWidget::SetMainMenuUI()
 	}
 }
 
-void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScroe)
+void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScore)
 {
 	if (TitleImage)
 	{
@@ -46,7 +46,7 @@ void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScroe)
 	if (KillScoreText)
 	{
 		KillScoreText->SetVisibility(ESlateVisibility::Visible);
-		KillScoreText->SetText(FText::FromString((FString::Printf(TEXT("적 처치 수: %d"), KillScroe))));
+		KillScoreText->SetText(FText::FromString((FString::Printf(TEXT("적 처치 수: %d"), KillScore))));
 	}
 	if (TitleText)
 	{

@@ -18,7 +18,7 @@ public:
 	void SetMainMenuUI();
 
 	UFUNCTION()
-	void SetStageClearMenuUI(float ClearTime, int32 KillScroe);
+	void SetStageClearMenuUI(float ClearTime, int32 KillScore);
 
 	UFUNCTION()
 	void SetGameOverMenuUI();
