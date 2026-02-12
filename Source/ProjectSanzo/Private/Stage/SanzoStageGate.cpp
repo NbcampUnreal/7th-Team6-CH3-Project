@@ -1,4 +1,5 @@
 #include "Stage/SanzoStageGate.h"
+#include "Common/SanzoLog.h"
 
 ASanzoStageGate::ASanzoStageGate()
 {
@@ -20,7 +21,7 @@ ASanzoStageGate::ASanzoStageGate()
 void ASanzoStageGate::OpenGate()
 {
   if (bIsOpened) return;
-  UE_LOG(LogTemp, Warning, TEXT("SG: 문 열림"));
+  UE_LOG(LogCYS, Warning, TEXT("SG: 문 열림"));
   bIsOpened = true;
 }
 
@@ -45,7 +46,7 @@ void ASanzoStageGate::OnOverlapBegin(
 
   if (OtherActor && OtherActor->ActorHasTag("Player"))
   {
-    UE_LOG(LogTemp, Warning, TEXT("SG: 플레이어 들어감"));
+    UE_LOG(LogCYS, Warning, TEXT("SG: 플레이어 들어감"));
 
     // 여기서 StageManager에 다음 방 이동 요청
     OnGateEntered.Broadcast();
