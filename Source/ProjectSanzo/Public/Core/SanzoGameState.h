@@ -17,7 +17,7 @@ public:
 
   virtual void BeginPlay() override;
 
-#pragma region 실시간 상태 동기화
+#pragma region synchronization
   // 게임 상태
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
   FGameplayTagContainer GameStateTags;
@@ -38,12 +38,11 @@ public:
 #pragma endregion 최윤서
 
 #pragma region UI
-	
-	FTimerHandle HUDUpdateTimerHandle;
-	void UpdateHUD();
 
-	//임시 함수
-	//void StartStage();
+	FTimerHandle HUDUpdateTimerHandle;
+	//void UpdateHUD();
+
+	void OpenHUD();
 
 
 #pragma endregion 이준로
