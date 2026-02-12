@@ -23,7 +23,7 @@ ASanzoCharacter::ASanzoCharacter()
   
 #pragma region MovementInit 
   bUseControllerRotationPitch = false;
-  bUseControllerRotationYaw = false;
+  bUseControllerRotationYaw = true;
   bUseControllerRotationRoll = false;
 
   GetCharacterMovement()->bOrientRotationToMovement = true;
