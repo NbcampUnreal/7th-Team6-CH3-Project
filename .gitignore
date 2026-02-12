@@ -85,6 +85,8 @@ Content/Maps/L_EnemyTest.umap
 
 #Test
 Content/Test/*
+Content/__ExternalObjects__/Test/*
+Content/__ExternalActors__/Test/*
 
 # JetBrains Rider
 .idea/
