@@ -23,8 +23,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
 	UParticleSystem* TracerEffect;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
-	FName TracerTargetName;
+	// 디버그용 라인 트레이스
+	UPROPERTY(EditAnywhere, Category = "Gun|Debug")
+	bool bShowDebugTrace = false;
 
 
 
