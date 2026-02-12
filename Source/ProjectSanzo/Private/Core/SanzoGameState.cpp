@@ -10,7 +10,7 @@
 
 ASanzoGameState::ASanzoGameState()
 {
-  CurrentStageIndex = 0;
+	CurrentStageIndex = 0;
 }
 
 void ASanzoGameState::BeginPlay()
@@ -18,15 +18,18 @@ void ASanzoGameState::BeginPlay()
 	Super::BeginPlay();
 
 	//StartStage();
-if (UGameInstance* GI = GetGameInstance())
-  {
-    USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GI);
-    if (SGI)
-    {
-      //CurrentStageIndex = SGI->CurrentLevelIndex;
-    }
-  }
-  
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GI);
+		if (SGI)
+		{
+			//CurrentStageIndex = SGI->CurrentLevelIndex;
+		}
+	}
+
+	OpenHUD();
+
+	/*
 	GetWorldTimerManager().SetTimer(
 		HUDUpdateTimerHandle,
 		this,
@@ -34,10 +37,11 @@ if (UGameInstance* GI = GetGameInstance())
 		0.1f,
 		true
 	);
+	*/
 }
 
 #pragma region UI
-
+/*
 void ASanzoGameState::UpdateHUD()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
@@ -99,15 +103,14 @@ void ASanzoGameState::UpdateHUD()
 				/*
 				 *Stage 정보 등록 필요
 				 *Stage Progress Bar 등록 필요
-				 */
+				 
 			}
 		}
 	}
 }
+*/
 
-//테스트용 임시 함수
-/*
-void ASanzoGameState::StartStage()
+void ASanzoGameState::OpenHUD()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
@@ -117,5 +120,4 @@ void ASanzoGameState::StartStage()
 		}
 	}
 }
-*/
 #pragma endregion 이준로

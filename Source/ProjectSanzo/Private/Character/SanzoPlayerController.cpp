@@ -67,12 +67,13 @@ void ASanzoPlayerController::ShowGameHUD()
 			bShowMouseCursor = false;
 			SetInputMode(FInputModeGameOnly());
 		}
-
-		ASanzoGameState* SanzoGameState = GetWorld() ? GetWorld()->GetGameState<ASanzoGameState>() : nullptr;
-		if (SanzoGameState)
-		{
-			SanzoGameState->UpdateHUD();
-		}
+		/*
+				ASanzoGameState* SanzoGameState = GetWorld() ? GetWorld()->GetGameState<ASanzoGameState>() : nullptr;
+				if (SanzoGameState)
+				{
+					SanzoGameState->UpdateHUD();
+				}
+				*/
 	}
 }
 
