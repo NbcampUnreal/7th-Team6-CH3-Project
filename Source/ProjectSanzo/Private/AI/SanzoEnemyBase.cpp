@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Common/SanzoLog.h"
 
 
 ASanzoEnemyBase::ASanzoEnemyBase()
@@ -74,4 +75,34 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   }
 
   return FinalDamage;
+}
+
+void ASanzoEnemyBase::Attack()
+{
+  if (AttackMontage)
+  {
+    PlayAnimMontage(AttackMontage);
+  }
+}
+
+void ASanzoEnemyBase::Fire()
+{
+  if (ProjectileClass)
+  {
+    FVector SpawnLocation =
+      GetActorLocation() + (GetActorForwardVector() * 100.0f)
+      + FVector(0.0f, 0.0f, 50.0f);
+    FRotator SpawnRotation = GetActorRotation();
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = this;
+
+    GetWorld()->SpawnActor<AActor>(
+      ProjectileClass,
+      SpawnLocation,
+      SpawnRotation,
+      SpawnParams);
+    UE_LOG(LogKDJ, Log, TEXT("Enemy Fired Projectile!"));
+  }
 }

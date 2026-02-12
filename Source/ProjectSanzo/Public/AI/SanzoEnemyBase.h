@@ -57,4 +57,18 @@ public:
   ) override;
 #pragma endregion 김동주
 
+#pragma region EnemyAttack
+public:
+  void Attack();
+
+  UFUNCTION(BlueprintCallable, Category = "Combat")
+  void Fire();
+
+protected:
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+  TSubclassOf<AActor> ProjectileClass;
+
+  UPROPERTY(EditAnywhere, Category = "Combat")
+  UAnimMontage* AttackMontage;
+#pragma endregion 김동주
 };
