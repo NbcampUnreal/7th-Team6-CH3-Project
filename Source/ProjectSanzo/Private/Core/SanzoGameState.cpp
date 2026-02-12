@@ -22,6 +22,8 @@ void ASanzoGameState::BeginPlay()
 			//CurrentStageIndex = SGI->CurrentLevelIndex;
 		}
 	}
+
+
 	OpenHUD();
 
 	//테스트 코드
@@ -32,6 +34,7 @@ void ASanzoGameState::BeginPlay()
 		0.1f,
 		true
 	);
+	
 }
 
 #pragma region UI
@@ -44,6 +47,7 @@ void ASanzoGameState::UpdateStageProgressBar()
 		OnStageProgressChanged.Broadcast(Percent);
 	}
 }
+
 
 void ASanzoGameState::OpenHUD()
 {
