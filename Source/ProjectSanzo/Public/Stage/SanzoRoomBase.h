@@ -15,7 +15,7 @@ UCLASS()
 class PROJECTSANZO_API ASanzoRoomBase : public AActor
 {
   GENERATED_BODY()
-#pragma region 전투 Base
+#pragma region Room Base
 public:
   ASanzoRoomBase();
 

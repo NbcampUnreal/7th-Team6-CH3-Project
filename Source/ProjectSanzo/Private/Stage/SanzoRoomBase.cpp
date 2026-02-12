@@ -3,7 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
 
-#pragma region 전투 Base
+#pragma region Room Base
 
 ASanzoRoomBase::ASanzoRoomBase()
 {

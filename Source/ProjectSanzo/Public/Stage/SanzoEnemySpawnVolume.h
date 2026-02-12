@@ -5,7 +5,7 @@
 #include "Stage/EnemySpawnRow.h"
 #include "SanzoEnemySpawnVolume.generated.h"
 
-#pragma region 적 스폰
+#pragma region Enemy Spawn Volume
 class UBoxComponent;
 
 UCLASS()

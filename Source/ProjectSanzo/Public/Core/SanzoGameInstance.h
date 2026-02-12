@@ -13,7 +13,7 @@ class PROJECTSANZO_API USanzoGameInstance : public UGameInstance
 public:
   USanzoGameInstance();
 
-#pragma region 정보 저장 및 관리
+#pragma region Save & Load
 	// 스테이지 정보
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
 	TArray<TSoftObjectPtr<UWorld>> StageLevels;

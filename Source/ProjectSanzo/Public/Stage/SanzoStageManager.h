@@ -16,7 +16,7 @@ class PROJECTSANZO_API ASanzoStageManager : public AActor
   GENERATED_BODY()
 
 public:
-#pragma region 스테이지 관리
+#pragma region Stage Management
   ASanzoStageManager();
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")

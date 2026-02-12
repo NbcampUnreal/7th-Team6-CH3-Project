@@ -17,7 +17,7 @@ public:
 
   virtual void BeginPlay() override;
 
-#pragma region 실시간 상태 동기화
+#pragma region synchronization
   // 게임 상태
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
   FGameplayTagContainer GameStateTags;

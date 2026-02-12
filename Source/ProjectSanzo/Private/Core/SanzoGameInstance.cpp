@@ -8,7 +8,7 @@ USanzoGameInstance::USanzoGameInstance()
 
 }
 
-#pragma region 스테이지 이동
+#pragma region Stage Movement
 void USanzoGameInstance::MoveToNextStage()
 {
   // 스테이지 이동 전 정보 업데이트(save)
@@ -31,5 +31,5 @@ void USanzoGameInstance::MoveToNextStage()
 }
 #pragma endregion 최윤서
 
-#pragma region 정보 저장 및 관리
+#pragma region Save & Load
 #pragma endregion 최윤서

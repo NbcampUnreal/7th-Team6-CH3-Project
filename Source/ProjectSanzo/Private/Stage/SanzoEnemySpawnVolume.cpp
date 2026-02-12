@@ -4,7 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
-#pragma region 적 스폰
+#pragma region Enemy Spawn Volume
 
 ASanzoEnemySpawnVolume::ASanzoEnemySpawnVolume()
 {

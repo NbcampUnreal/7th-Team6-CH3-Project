@@ -1,7 +1,7 @@
 #include "Stage/SanzoRoom_Survival.h"
 #include "Common/SanzoLog.h"
 
-#pragma region 방호전 배틀 흐름
+#pragma region Battle Flow for Survival
 void ASanzoRoom_Survival::BeginRoomSequence()
 {
   Super::BeginRoomSequence();
@@ -25,5 +25,5 @@ void ASanzoRoom_Survival::EndRoomSequence()
 }
 #pragma endregion 최윤서
 
-#pragma region 배틀 내 이벤트
+#pragma region Battle Event
 #pragma endregion 최윤서

@@ -2,7 +2,7 @@
 #include "Stage/SanzoRoomBase.h"
 #include "Common/SanzoLog.h"
 
-#pragma region 섬멸전 배틀 흐름
+#pragma region Battle Flow for Extermination
 void ASanzoRoom_Extermination::BeginRoomSequence()
 {
   Super::BeginRoomSequence();
@@ -39,7 +39,7 @@ void ASanzoRoom_Extermination::EndRoomSequence()
 }
 #pragma endregion 최윤서
 
-#pragma region 배틀 내 이벤트
+#pragma region Battle Event
 void ASanzoRoom_Extermination::OnEnemyKilled()
 {
   CurrentEnemyCount++;

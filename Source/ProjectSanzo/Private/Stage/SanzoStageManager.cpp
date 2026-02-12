@@ -31,7 +31,7 @@ void ASanzoStageManager::Tick(float DeltaTime)
 
 }
 
-#pragma region 스테이지 관리
+#pragma region Stage Management
 
 void ASanzoStageManager::StartStage()
 {
@@ -95,7 +95,7 @@ void ASanzoStageManager::MoveToNextRoom()
 }
 #pragma endregion 최윤서
 
-#pragma region 스테이지 상태
+#pragma region Stage State Management
 
 void ASanzoStageManager::SetState(FGameplayTag NewState)
 {

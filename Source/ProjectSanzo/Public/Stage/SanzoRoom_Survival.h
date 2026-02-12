@@ -10,7 +10,7 @@ UCLASS()
 class PROJECTSANZO_API ASanzoRoom_Survival : public ASanzoRoomBase
 {
   GENERATED_BODY()
-#pragma region 방호전
+#pragma region Survival Room
 public:
   virtual void BeginRoomSequence() override;
   virtual void EndRoomSequence() override;
