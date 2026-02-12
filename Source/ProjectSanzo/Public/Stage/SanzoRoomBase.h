@@ -14,7 +14,7 @@ UCLASS()
 class PROJECTSANZO_API ASanzoRoomBase : public AActor
 {
   GENERATED_BODY()
-
+#pragma region 전투 Base
 public:
   ASanzoRoomBase();
 
@@ -32,5 +32,5 @@ public:
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage")
   ASanzoStageGate* StageGate;
-
+#pragma endregion 최윤서
 };

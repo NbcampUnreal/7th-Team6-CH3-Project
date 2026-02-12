@@ -31,6 +31,8 @@ void ASanzoStageManager::Tick(float DeltaTime)
 
 }
 
+#pragma region 스테이지 관리
+
 void ASanzoStageManager::StartStage()
 {
   UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 시작"));
@@ -91,6 +93,9 @@ void ASanzoStageManager::MoveToNextRoom()
     SGM->OnStageCleared();
   }
 }
+#pragma endregion 최윤서
+
+#pragma region 스테이지 상태
 
 void ASanzoStageManager::SetState(FGameplayTag NewState)
 {
@@ -111,3 +116,4 @@ void ASanzoStageManager::SetState(FGameplayTag NewState)
     MoveToNextRoom();
   }
 }
+#pragma endregion 최윤서

@@ -2,6 +2,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
 
+#pragma region 전투 Base
+
 ASanzoRoomBase::ASanzoRoomBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -49,3 +51,4 @@ void ASanzoRoomBase::Tick(float DeltaTime)
 
 }
 
+#pragma endregion 최윤서

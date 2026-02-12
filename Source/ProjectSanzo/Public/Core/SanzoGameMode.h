@@ -15,6 +15,7 @@ public:
 
   virtual void BeginPlay() override;
 
+#pragma region 스테이지 관리
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
   ESanzoStageType CurrentStageType;
 
@@ -27,4 +28,5 @@ public:
   // 성장
   void TriggerUpgradeSelection();
   void OnUpgradeSelected();
+#pragma endregion 최윤서
 };

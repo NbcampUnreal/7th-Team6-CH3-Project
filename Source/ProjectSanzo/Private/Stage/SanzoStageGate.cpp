@@ -1,6 +1,8 @@
 #include "Stage/SanzoStageGate.h"
 #include "Common/SanzoLog.h"
 
+#pragma region Stage Gate
+
 ASanzoStageGate::ASanzoStageGate()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -52,3 +54,5 @@ void ASanzoStageGate::OnOverlapBegin(
     OnGateEntered.Broadcast();
   }
 }
+
+#pragma endregion 최윤서
