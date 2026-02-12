@@ -9,6 +9,7 @@
 #include "SanzoRoomBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnRoomCleared);
+class ASanzoEnemySpawnVolume;
 
 UCLASS()
 class PROJECTSANZO_API ASanzoRoomBase : public AActor
@@ -25,7 +26,7 @@ public:
   virtual void BeginRoomSequence();
   virtual void EndRoomSequence();
   virtual void OnEnemyKilled();
-
+  virtual void EnemySpawned();
 
 public:
   virtual void Tick(float DeltaTime) override;
@@ -34,5 +35,8 @@ public:
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stage")
   ASanzoStageGate* StageGate;
+
+  UPROPERTY()
+  TArray<ASanzoEnemySpawnVolume*> SpawnVolumes;
 #pragma endregion 최윤서
 };

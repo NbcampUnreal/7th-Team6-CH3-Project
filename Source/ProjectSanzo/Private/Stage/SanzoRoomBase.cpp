@@ -1,4 +1,5 @@
 #include "Stage/SanzoRoomBase.h"
+#include "Stage/SanzoEnemySpawnVolume.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
 
@@ -14,6 +15,7 @@ void ASanzoRoomBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 문 찾기
 	TArray<AActor*> FoundGates;
 	UGameplayStatics::GetAllActorsOfClass(
 		GetWorld(),
@@ -29,6 +31,23 @@ void ASanzoRoomBase::BeginPlay()
 	{
 		UE_LOG(LogCYS, Error, TEXT("RB: Gate Not Found"));
 	}
+
+  // 스폰 볼륨 찾기
+	TArray<AActor*> FoundVolumes;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(), 
+		ASanzoEnemySpawnVolume::StaticClass(), 
+		FoundVolumes
+	);
+	for (AActor* Actor : FoundVolumes)
+	{
+		if (ASanzoEnemySpawnVolume* Volume = Cast<ASanzoEnemySpawnVolume>(Actor))
+		{
+			SpawnVolumes.Add(Volume);
+      UE_LOG(LogCYS, Warning, TEXT("RB: Spawn Volume Found"));
+		}
+	}
+
 }
 
 void ASanzoRoomBase::BeginRoomSequence()
@@ -54,5 +73,16 @@ void ASanzoRoomBase::Tick(float DeltaTime)
 void ASanzoRoomBase::OnEnemyKilled()
 {
 	// 기본은 아무것도 안 함
+}
+//  적 스폰 호출
+void ASanzoRoomBase::EnemySpawned()
+{
+	for(ASanzoEnemySpawnVolume* SpawnVolume:SpawnVolumes)
+	{
+		if (SpawnVolume)
+		{
+			SpawnVolume->SpawnRandomEnemy();
+		}
+  }
 }
 #pragma endregion 최윤서

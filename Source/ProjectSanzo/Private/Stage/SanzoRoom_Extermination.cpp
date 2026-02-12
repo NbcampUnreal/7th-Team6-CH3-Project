@@ -9,8 +9,8 @@ void ASanzoRoom_Extermination::BeginRoomSequence()
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 시퀀스 시작"));
 
   // 몬스터 스폰
-  // 
-  // 
+  EnemySpawned();
+
   // 클리어 조건 달성 시 end
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 체크"));
   // 더미 조건: 10초 후 클리어
