@@ -17,6 +17,7 @@ public:
 
   virtual void BeginPlay() override;
 
+#pragma region 실시간 상태 동기화
   // 게임 상태
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
   FGameplayTagContainer GameStateTags;
@@ -33,6 +34,8 @@ public:
   float CurrentCount;
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
   float TotalCount;
+
+#pragma endregion 최윤서
 
 #pragma region UI
 	
