@@ -211,7 +211,7 @@ void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
 
 	if (MenuWidgetInstance)
 	{
-		MenuWidgetInstance->Super::RemoveFromParent();
+		MenuWidgetInstance->RemoveFromParent();
 		MenuWidgetInstance = nullptr;
 	}
 
@@ -251,9 +251,10 @@ void ASanzoPlayerController::StartGame()
 	if (USanzoGameInstance* SanzoGameInstance = Cast<USanzoGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
 		//게임 시작시 초기화 필요한 값 입력
+		SanzoGameInstance->MoveToNextStage();
 	}
 	//임시 코드, 이후 첫번째 스테이지 맵으로 변경 필요
-	UGameplayStatics::OpenLevel(GetWorld(), FName("L_ThirdPerson"));
+	//UGameplayStatics::OpenLevel(GetWorld(), FName("L_TE"));
 	SetPause(false);
 }
 

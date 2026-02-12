@@ -46,7 +46,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
-	UUserWidget* GetHUDWidget() const { return HUDWidgetInstance; }
+	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
