@@ -8,7 +8,7 @@ UCLASS()
 class PROJECTSANZO_API ASanzoRoom_Extermination : public ASanzoRoomBase
 {
   GENERATED_BODY()
-
+#pragma region 섬멸전 
 public:
   virtual void BeginRoomSequence() override;
   virtual void EndRoomSequence() override;
@@ -17,4 +17,5 @@ public:
   int32 TotalEnemyCount;
   int32 CurrentEnemyCount;
   void OnEnemyKilled();
+#pragma endregion 최윤서
 };

@@ -26,7 +26,7 @@ void ASanzoGameMode::BeginPlay()
     StartStage();
   }
 }
-
+#pragma region 스테이지 관리
 // 맵 이름에 따라 스테이지 타입 설정
 void ASanzoGameMode::InitStageType()
 {
@@ -77,6 +77,9 @@ void ASanzoGameMode::OnStageCleared()
     SGI->MoveToNextStage();
   }
 }
+#pragma endregion 최윤서
+
+#pragma region 성장
 // 업그레이드 선택 트리거, 캐릭터에서 호출
 void ASanzoGameMode::TriggerUpgradeSelection()
 {
@@ -90,3 +93,4 @@ void ASanzoGameMode::OnUpgradeSelected()
   UE_LOG(LogCYS, Warning, TEXT("GM: 캐릭터 성장 선택 표시"));
 
 }
+#pragma endregion 최윤서

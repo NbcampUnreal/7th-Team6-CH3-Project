@@ -11,7 +11,7 @@ UCLASS()
 class PROJECTSANZO_API ASanzoStageGate : public AActor
 {
   GENERATED_BODY()
-#pragma region 스테이지 게이트
+#pragma region Stage Gate
 public:
   ASanzoStageGate();
 
