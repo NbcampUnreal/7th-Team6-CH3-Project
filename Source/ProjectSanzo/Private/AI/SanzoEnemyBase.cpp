@@ -80,8 +80,11 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 #pragma region Call RoomBase
     // 사망 SanzoRoomBase::OnEnemyKilled() 호출
-    UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
-    CurrentRoom->OnEnemyKilled();
+    if (CurrentRoom)
+    {
+      UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
+      CurrentRoom->OnEnemyKilled();
+    }
 #pragma endregion 최윤서
     // 캡슐 충돌 끄고 래그돌 실행
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
