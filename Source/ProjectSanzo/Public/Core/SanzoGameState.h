@@ -51,8 +51,7 @@ public:
 	void UpdateStageProgressBar();
 
 	void OpenHUD();
-	//테스트 코드
-	void AddCurrentCount();
+
 	FTimerHandle UpdateStageProgressBarTimer;
 #pragma endregion 이준로
 };
