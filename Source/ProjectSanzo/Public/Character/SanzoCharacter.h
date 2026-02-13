@@ -105,7 +105,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
   float SprintSpeed;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|State")
   FGameplayTagContainer GameplayTagContainer;
+
 protected:
 
   void Move(const FInputActionValue& Value);

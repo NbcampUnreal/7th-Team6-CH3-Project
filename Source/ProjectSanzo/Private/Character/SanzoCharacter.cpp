@@ -103,8 +103,12 @@ void ASanzoCharacter::BeginPlay()
 void ASanzoCharacter::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
-  AimTimeline.TickTimeline(DeltaTime);
 
+  if (AimTimeline.IsPlaying())
+  {
+    AimTimeline.TickTimeline(DeltaTime);
+  }
+  
 }
 
 #pragma region InputFunction
