@@ -40,10 +40,13 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float AttackRange = 150.f;
 
+  // 중복 사망 처리를 막기 위한 플래그
+  bool bIsDead = false;
+
 public:
   UFUNCTION(BlueprintCallable, Category = "Stats")
   bool IsDead() const;
-#pragma endregion
+#pragma endregion 김동주
 
 #pragma region EnemyTakeDamage
 public:
@@ -55,6 +58,9 @@ public:
     class AController* EventInstigator,
     AActor* DamageCauser
   ) override;
+
+protected:
+  virtual void Die();
 #pragma endregion 김동주
 
 #pragma region EnemyAttack
