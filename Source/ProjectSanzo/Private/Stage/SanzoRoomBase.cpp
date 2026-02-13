@@ -2,6 +2,7 @@
 #include "Stage/SanzoEnemySpawnVolume.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
+#include "Core/SanzoGameState.h"
 
 #pragma region Room Base
 
@@ -50,6 +51,12 @@ void ASanzoRoomBase::BeginPlay()
 		}
 	}
 
+	// Game State 찾기
+	ASanzoGameState* Found = Cast<ASanzoGameState>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoGameState::StaticClass()));
+	if (Found)
+	{
+		GameState = Found;
+	}
 }
 
 void ASanzoRoomBase::BeginRoomSequence()

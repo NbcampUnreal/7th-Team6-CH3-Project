@@ -1,6 +1,7 @@
 #include "Stage/SanzoRoom_Extermination.h"
 #include "Stage/SanzoRoomBase.h"
 #include "Common/SanzoLog.h"
+#include "Core/SanzoGameState.h"
 
 #pragma region Battle Flow for Extermination
 void ASanzoRoom_Extermination::BeginRoomSequence()
@@ -36,6 +37,10 @@ void ASanzoRoom_Extermination::EndRoomSequence()
 void ASanzoRoom_Extermination::OnEnemyKilled()
 {
   CurrentEnemyCount++;
+  if (GameState)
+  {
+    GameState->UpdateStageInfo(CurrentEnemyCount, TotalEnemyCount);
+  }
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 적 처치 %d / %d"), CurrentEnemyCount, TotalEnemyCount);
   if (CurrentEnemyCount >= TotalEnemyCount)
   {

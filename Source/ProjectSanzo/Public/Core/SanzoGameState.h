@@ -37,6 +37,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
   float TotalCount;
 
+  // 전투 정보 업데이트
+  void UpdateStageInfo(float Current, float Total);
+
 #pragma endregion 최윤서
 
 #pragma region UI
