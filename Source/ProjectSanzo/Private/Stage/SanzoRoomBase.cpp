@@ -9,6 +9,8 @@ ASanzoRoomBase::ASanzoRoomBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	TotalEnemyCount = 0;
+
 }
 
 void ASanzoRoomBase::BeginPlay()
@@ -74,6 +76,7 @@ void ASanzoRoomBase::OnEnemyKilled()
 {
 	// 기본은 아무것도 안 함
 }
+
 //  적 스폰 호출
 void ASanzoRoomBase::EnemySpawned()
 {
@@ -82,6 +85,7 @@ void ASanzoRoomBase::EnemySpawned()
 		if (SpawnVolume)
 		{
 			SpawnVolume->SpawnRandomEnemy();
+			TotalEnemyCount += 1;
 		}
   }
 }

@@ -38,5 +38,9 @@ public:
 
   UPROPERTY()
   TArray<ASanzoEnemySpawnVolume*> SpawnVolumes;
+
+  // 적 카운트
+  int32 TotalEnemyCount;
+
 #pragma endregion 최윤서
 };

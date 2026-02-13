@@ -10,17 +10,10 @@ void ASanzoRoom_Extermination::BeginRoomSequence()
 
   // 몬스터 스폰
   EnemySpawned();
-
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 현재 적 수 - %d"), TotalEnemyCount);
   // 클리어 조건 달성 시 end
-  UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 체크"));
-  // 더미 조건: 10초 후 클리어
-  GetWorld()->GetTimerManager().SetTimer(
-    RoomSequenceTimerHandle,
-    this,
-    &ASanzoRoom_Extermination::EndRoomSequence,
-    10.0f,
-    false
-  );
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 - 모든 적 처치"));
+  
   //EndRoomSequence();
 }
 
