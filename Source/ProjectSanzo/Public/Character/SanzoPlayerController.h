@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+struct FGameplayTag;
 class USanzoMainWidget;
 class USanzoHUDWidget;
 class UInputMappingContext;
@@ -35,15 +37,11 @@ public:
 	TSubclassOf<USanzoMainWidget> MenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
 	USanzoMainWidget* MenuWidgetInstance;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
-	//UUserWidget* MenuWidgetInstance;
-	
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> PopUpWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
 	UUserWidget* PopUpWidgetInstance;
-
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
@@ -60,7 +58,7 @@ public:
 	void ResumeGame();
 
 	UFUNCTION(BlueprintCallable, Category = "Menu")
-	void ShowMainUI(int32 CaseIndex);
+	void ShowMainUI(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
@@ -68,6 +66,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ExitGame();
 
+	//Tag
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag MainMenuTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag StageClearedTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GameOverTag;
 
 #pragma endregion 이준로
 };

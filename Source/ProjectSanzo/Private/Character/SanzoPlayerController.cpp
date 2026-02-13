@@ -39,7 +39,7 @@ void ASanzoPlayerController::BeginPlay()
 	FString CurrentMapName = GetWorld()->GetMapName();
 	if (CurrentMapName.Contains("L_MainMenu"))
 	{
-		ShowMainUI(0);
+		ShowMainUI(MainMenuTag);
 	}
 }
 
@@ -201,7 +201,7 @@ void ASanzoPlayerController::ResumeGame()
 	SetInputMode(FInputModeGameOnly());
 }
 
-void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
+void ASanzoPlayerController::ShowMainUI(FGameplayTag State)
 {
 	if (HUDWidgetInstance)
 	{
@@ -225,23 +225,22 @@ void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}
-		switch (CaseIndex)
+		
+		if (State == MainMenuTag)
 		{
-		case 0:
 			//메인 메뉴
 			MenuWidgetInstance->SetMainMenuUI();
-			break;
-		case 1:
+		}
+		if (State == StageClearedTag)
+		{
 			//스테이지 클리어
 			//이후 StageManger 또는 GameState에서 정보 받아서 구현 필요.
 			MenuWidgetInstance->SetStageClearMenuUI(10.23f, 30);
-			break;
-		case 2:
+		}
+		if (State == GameOverTag)
+		{
 			//게임 오버
 			MenuWidgetInstance->SetGameOverMenuUI();
-			break;
-		default:
-			break;
 		}
 	}
 }
