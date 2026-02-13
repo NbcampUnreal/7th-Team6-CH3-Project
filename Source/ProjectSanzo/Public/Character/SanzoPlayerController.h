@@ -19,6 +19,13 @@ protected:
 
 	virtual void BeginPlay() override;
 
+#pragma region CameraSettings
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
+	float MaxPitchAngle = 60.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
+  float MinPitchAngle = -60.0f;
+#pragma endregion 김형백
+
 #pragma region UI
 
 public:

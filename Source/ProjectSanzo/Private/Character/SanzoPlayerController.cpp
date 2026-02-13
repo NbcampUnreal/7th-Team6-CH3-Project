@@ -34,6 +34,10 @@ void ASanzoPlayerController::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+  PlayerCameraManager->ViewPitchMax = MaxPitchAngle;
+  PlayerCameraManager->ViewPitchMin = MinPitchAngle;
+
 	FString CurrentMapName = GetWorld()->GetMapName();
 	if (CurrentMapName.Contains("L_MainMenu"))
 	{
