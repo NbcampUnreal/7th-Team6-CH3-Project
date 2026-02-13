@@ -82,3 +82,17 @@ DerivedDataCache/*
 Content/__ExternalActors__/Maps/L_EnemyTest/*
 Content/__ExternalObjects__/Maps/L_EnemyTest/*
 Content/Maps/L_EnemyTest.umap
+
+#Test
+Content/Test/*
+Content/__ExternalObjects__/Test/*
+Content/__ExternalActors__/Test/*
+
+# JetBrains Rider
+.idea/
+*.sln.DotSettings.user
+*.uproject.DotSettings.user
+
+# VS
+UpgradeLog*.htm
+UpgradeLog*.xml
