@@ -3,9 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+struct FGameplayTag;
+class USanzoMainWidget;
+class USanzoHUDWidget;
 class UInputMappingContext;
 
 UCLASS(abstract)
@@ -25,23 +29,22 @@ public:
 	ASanzoPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-	TSubclassOf<UUserWidget> HUDWidgetClass;
+	TSubclassOf<USanzoHUDWidget> HUDWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HUD")
-	UUserWidget* HUDWidgetInstance;
+	USanzoHUDWidget* HUDWidgetInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
-	TSubclassOf<UUserWidget> MenuWidgetClass;
+	TSubclassOf<USanzoMainWidget> MenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
-	UUserWidget* MenuWidgetInstance;
+	USanzoMainWidget* MenuWidgetInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> PopUpWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
 	UUserWidget* PopUpWidgetInstance;
 
-
 	UFUNCTION(BlueprintCallable, Category = "HUD")
-	UUserWidget* GetHUDWidget() const { return HUDWidgetInstance; }
+	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
@@ -55,7 +58,7 @@ public:
 	void ResumeGame();
 
 	UFUNCTION(BlueprintCallable, Category = "Menu")
-	void ShowMainUI(int32 CaseIndex);
+	void ShowMainUI(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
@@ -63,6 +66,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ExitGame();
 
+	//Tag
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag MainMenuTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag StageClearedTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GameOverTag;
 
 #pragma endregion 이준로
 };

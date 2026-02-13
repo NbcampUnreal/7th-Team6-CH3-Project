@@ -3,6 +3,8 @@
 #include "Character/SanzoPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/SanzoMainWidget.h"
+#include "UI/SanzoHUDWidget.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
@@ -37,7 +39,7 @@ void ASanzoPlayerController::BeginPlay()
 	FString CurrentMapName = GetWorld()->GetMapName();
 	if (CurrentMapName.Contains("L_MainMenu"))
 	{
-		ShowMainUI(0);
+		ShowMainUI(MainMenuTag);
 	}
 }
 
@@ -59,7 +61,7 @@ void ASanzoPlayerController::ShowGameHUD()
 
 	if (HUDWidgetClass)
 	{
-		HUDWidgetInstance = CreateWidget<UUserWidget>(this, HUDWidgetClass);
+		HUDWidgetInstance = CreateWidget<USanzoHUDWidget>(this, HUDWidgetClass);
 		if (HUDWidgetInstance)
 		{
 			HUDWidgetInstance->AddToViewport();
@@ -199,7 +201,7 @@ void ASanzoPlayerController::ResumeGame()
 	SetInputMode(FInputModeGameOnly());
 }
 
-void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
+void ASanzoPlayerController::ShowMainUI(FGameplayTag State)
 {
 	if (HUDWidgetInstance)
 	{
@@ -215,7 +217,7 @@ void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
 
 	if (MenuWidgetClass)
 	{
-		MenuWidgetInstance = CreateWidget<UUserWidget>(this, MenuWidgetClass);
+		MenuWidgetInstance = CreateWidget<USanzoMainWidget>(this, MenuWidgetClass);
 		if (MenuWidgetInstance)
 		{
 			MenuWidgetInstance->AddToViewport();
@@ -223,75 +225,22 @@ void ASanzoPlayerController::ShowMainUI(int32 CaseIndex)
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}
-		switch (CaseIndex)
+		
+		if (State == MainMenuTag)
 		{
-		case 0:
 			//메인 메뉴
-			if (UBorder* BackBoard = Cast<UBorder>(MenuWidgetInstance->GetWidgetFromName("BackBoard")))
-			{
-				BackBoard->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("StartButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("게임 시작")));
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("ExitButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("게임 종료")));
-			}
-			break;
-		case 1:
+			MenuWidgetInstance->SetMainMenuUI();
+		}
+		if (State == StageClearedTag)
+		{
 			//스테이지 클리어
-			if (UImage* TitleImage = Cast<UImage>(MenuWidgetInstance->GetWidgetFromName("TitleImage")))
-			{
-				TitleImage->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UBorder* BackBoard = Cast<UBorder>(MenuWidgetInstance->GetWidgetFromName("BackBoard")))
-			{
-				BackBoard->SetVisibility(ESlateVisibility::Visible);
-			}
-			if (UTextBlock* TitleText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("TitleText"))))
-			{
-				TitleText->SetText(FText::FromString(TEXT("스테이지 클리어")));
-			}
-			if (UTextBlock* SubTitleText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("SubTitleText"))))
-			{
-				SubTitleText->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UButton* StartButton = Cast<UButton>(MenuWidgetInstance->GetWidgetFromName("StartButton")))
-			{
-				StartButton->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("ExitButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("다음 스테이지")));
-			}
-			break;
-		case 2:
+			//이후 StageManger 또는 GameState에서 정보 받아서 구현 필요.
+			MenuWidgetInstance->SetStageClearMenuUI(10.23f, 30);
+		}
+		if (State == GameOverTag)
+		{
 			//게임 오버
-			if (UImage* TitleImage = Cast<UImage>(MenuWidgetInstance->GetWidgetFromName("TitleImage")))
-			{
-				TitleImage->SetVisibility(ESlateVisibility::Hidden);
-			}
-			if (UBorder* BackBoard = Cast<UBorder>(MenuWidgetInstance->GetWidgetFromName("BackBoard")))
-			{
-				BackBoard->SetVisibility(ESlateVisibility::Visible);
-			}
-			if (UTextBlock* TitleText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("TitleText"))))
-			{
-				TitleText->SetText(FText::FromString(TEXT("게임 오버")));
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("StartButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("다시 시작")));
-			}
-			if (UTextBlock* ButtonText = Cast<UTextBlock>(MenuWidgetInstance->GetWidgetFromName(TEXT("ExitButton"))))
-			{
-				ButtonText->SetText(FText::FromString(TEXT("메인 메뉴")));
-			}
-			break;
-		default:
-			break;
+			MenuWidgetInstance->SetGameOverMenuUI();
 		}
 	}
 }
@@ -301,9 +250,10 @@ void ASanzoPlayerController::StartGame()
 	if (USanzoGameInstance* SanzoGameInstance = Cast<USanzoGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
 		//게임 시작시 초기화 필요한 값 입력
+		SanzoGameInstance->MoveToNextStage();
 	}
 	//임시 코드, 이후 첫번째 스테이지 맵으로 변경 필요
-	UGameplayStatics::OpenLevel(GetWorld(), FName("L_ThirdPerson"));
+	//UGameplayStatics::OpenLevel(GetWorld(), FName("L_TE"));
 	SetPause(false);
 }
 
