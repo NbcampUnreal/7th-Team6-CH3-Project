@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "SanzoEnemyBase.generated.h"
 
 class UBehaviorTree;
+class ASanzoRoomBase;
 
 UCLASS()
 class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter
@@ -57,4 +58,8 @@ public:
   ) override;
 #pragma endregion 김동주
 
+#pragma region RoomBase Instance
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
+  ASanzoRoomBase* CurrentRoom;
+#pragma endregion 최윤서
 };

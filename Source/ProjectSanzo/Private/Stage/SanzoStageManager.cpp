@@ -23,6 +23,10 @@ void ASanzoStageManager::BeginPlay()
       &ASanzoStageManager::MoveToNextRoom
     );
   }
+  else
+  {
+    UE_LOG(LogCYS, Error, TEXT("SM: Stage gate 연결 안됨."));
+  }
 }
 
 void ASanzoStageManager::Tick(float DeltaTime)

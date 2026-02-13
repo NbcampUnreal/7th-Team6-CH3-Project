@@ -2,12 +2,15 @@
 #include "Stage/SanzoEnemySpawnVolume.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
+#include "Core/SanzoGameState.h"
 
 #pragma region Room Base
 
 ASanzoRoomBase::ASanzoRoomBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	TotalEnemyCount = 0;
 
 }
 
@@ -48,6 +51,12 @@ void ASanzoRoomBase::BeginPlay()
 		}
 	}
 
+	// Game State 찾기
+	ASanzoGameState* Found = Cast<ASanzoGameState>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoGameState::StaticClass()));
+	if (Found)
+	{
+		GameState = Found;
+	}
 }
 
 void ASanzoRoomBase::BeginRoomSequence()
@@ -74,6 +83,7 @@ void ASanzoRoomBase::OnEnemyKilled()
 {
 	// 기본은 아무것도 안 함
 }
+
 //  적 스폰 호출
 void ASanzoRoomBase::EnemySpawned()
 {
@@ -82,6 +92,7 @@ void ASanzoRoomBase::EnemySpawned()
 		if (SpawnVolume)
 		{
 			SpawnVolume->SpawnRandomEnemy();
+			TotalEnemyCount += 1;
 		}
   }
 }
