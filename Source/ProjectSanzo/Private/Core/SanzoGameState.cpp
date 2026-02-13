@@ -7,7 +7,7 @@ ASanzoGameState::ASanzoGameState()
 {
 	CurrentStageIndex = 0;
 	CurrentCount = 0;
-	TotalCount = 100.f;
+	TotalCount = 0;
 }
 
 void ASanzoGameState::BeginPlay()
@@ -22,20 +22,19 @@ void ASanzoGameState::BeginPlay()
 			//CurrentStageIndex = SGI->CurrentLevelIndex;
 		}
 	}
-
-
-	OpenHUD();
-
-	//테스트 코드
-	GetWorldTimerManager().SetTimer(
-		UpdateStageProgressBarTimer,
-		this,
-		&ASanzoGameState::AddCurrentCount,
-		0.1f,
-		true
-	);
 	
+	OpenHUD();
 }
+
+#pragma region UpdateStage
+void ASanzoGameState::UpdateStageInfo(float Current, float Total)
+{
+	//UE_LOG(LogCYS, Warning, TEXT("GS: 전투 정보 업데이트"));
+	CurrentCount = Current;
+	TotalCount = Total;
+	UpdateStageProgressBar();
+}
+#pragma endregion 최윤서
 
 #pragma region UI
 
@@ -48,27 +47,15 @@ void ASanzoGameState::UpdateStageProgressBar()
 	}
 }
 
-
 void ASanzoGameState::OpenHUD()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
 		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
 		{
+			UpdateStageProgressBar();
 			SanzoPlayerController->ShowGameHUD();
 		}
-	}
-}
-
-//테스트 코드
-void ASanzoGameState::AddCurrentCount()
-{
-	CurrentCount++;
-	UpdateStageProgressBar();
-
-	if (CurrentCount >= TotalCount)
-	{
-		CurrentCount = 0;
 	}
 }
 #pragma endregion 이준로

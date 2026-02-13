@@ -87,4 +87,9 @@ public:
 	FSanzoStatData MakeStatData() const;
 
 #pragma endregion 이준로
+
+#pragma region PlayerApplyDamage
+  void ApplyDamage(float DamageAmount);
+  bool IsDead() const;
+#pragma endregion 김동주
 };

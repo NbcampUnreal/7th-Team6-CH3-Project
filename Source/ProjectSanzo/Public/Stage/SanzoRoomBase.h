@@ -10,6 +10,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnRoomCleared);
 class ASanzoEnemySpawnVolume;
+class ASanzoGameState;
 
 UCLASS()
 class PROJECTSANZO_API ASanzoRoomBase : public AActor
@@ -38,5 +39,12 @@ public:
 
   UPROPERTY()
   TArray<ASanzoEnemySpawnVolume*> SpawnVolumes;
+
+  // 적 카운트
+  int32 TotalEnemyCount;
+
+  // 전투 정보 State에 전달
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Core")
+  ASanzoGameState* GameState;
 #pragma endregion 최윤서
 };

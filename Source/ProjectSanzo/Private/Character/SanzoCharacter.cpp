@@ -18,6 +18,7 @@
 #include "Weapon/SanzoGun.h"
 #include "Curves/CurveFloat.h"
 
+#include "Common/SanzoLog.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -271,3 +272,29 @@ void ASanzoCharacter::PlayAimTimeLine()
 #pragma endregion 김형백
 
 #pragma endregion 김형백
+
+
+#pragma region PlayerTakeDamage
+float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+  float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+  if (StatComp)
+  {
+    StatComp->ApplyDamage(FinalDamage);
+    if (GEngine)
+    {
+      FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
+      GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
+    }
+
+    if (StatComp->IsDead())
+    {
+      UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
+      // TO-DO: 플레이어 래그돌, 게임 오버 UI 호출, 조작 불가 등 처리
+    }
+  }
+
+  return FinalDamage;
+}
+#pragma endregion 김동주

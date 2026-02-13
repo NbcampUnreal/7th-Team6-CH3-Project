@@ -14,7 +14,6 @@ public:
   virtual void EndRoomSequence() override;
 
   // 적 처치
-  int32 TotalEnemyCount;
   int32 CurrentEnemyCount;
   virtual void OnEnemyKilled() override;
 #pragma endregion 최윤서

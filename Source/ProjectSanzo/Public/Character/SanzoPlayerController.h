@@ -3,9 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+class USanzoPopUpWidget;
+struct FGameplayTag;
+class USanzoMainWidget;
+class USanzoHUDWidget;
 class UInputMappingContext;
 
 UCLASS(abstract)
@@ -32,37 +37,36 @@ public:
 	ASanzoPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-	TSubclassOf<UUserWidget> HUDWidgetClass;
+	TSubclassOf<USanzoHUDWidget> HUDWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "HUD")
-	UUserWidget* HUDWidgetInstance;
+	USanzoHUDWidget* HUDWidgetInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
-	TSubclassOf<UUserWidget> MenuWidgetClass;
+	TSubclassOf<USanzoMainWidget> MenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
-	UUserWidget* MenuWidgetInstance;
+	USanzoMainWidget* MenuWidgetInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
-	TSubclassOf<UUserWidget> PopUpWidgetClass;
+	TSubclassOf<USanzoPopUpWidget> PopUpWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
-	UUserWidget* PopUpWidgetInstance;
-
+	USanzoPopUpWidget* PopUpWidgetInstance;
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
-	UUserWidget* GetHUDWidget() const { return HUDWidgetInstance; }
+	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
 
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
-	UUserWidget* GetPopUpWidget() const { return PopUpWidgetInstance; }
+	USanzoPopUpWidget* GetPopUpWidget() const { return PopUpWidgetInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
-	void ShowPopUp(bool bIsLevelUp);
+	void ShowPopUp(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ResumeGame();
 
 	UFUNCTION(BlueprintCallable, Category = "Menu")
-	void ShowMainUI(int32 CaseIndex);
+	void ShowMainUI(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
@@ -70,6 +74,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ExitGame();
 
+	//Tag
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag MainMenuTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag StageClearedTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GameOverTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GamePauseTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GameUpgradeTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GamePlayingTag;
 
 #pragma endregion 이준로
 };

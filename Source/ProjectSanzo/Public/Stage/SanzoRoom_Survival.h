@@ -12,8 +12,13 @@ class PROJECTSANZO_API ASanzoRoom_Survival : public ASanzoRoomBase
   GENERATED_BODY()
 #pragma region Survival Room
 public:
+  ASanzoRoom_Survival();
   virtual void BeginRoomSequence() override;
   virtual void EndRoomSequence() override;
 
+  // 시간
+  float CurrentTime;
+  float TotalTime;
+  void UpdateTime();
 #pragma endregion 최윤서
 };

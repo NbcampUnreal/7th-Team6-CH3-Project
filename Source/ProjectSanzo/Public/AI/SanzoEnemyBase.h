@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "SanzoEnemyBase.generated.h"
 
+class UWidgetComponent;
 class UBehaviorTree;
+class ASanzoRoomBase;
 
 UCLASS()
 class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter
@@ -40,10 +42,13 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float AttackRange = 150.f;
 
+  // 중복 사망 처리를 막기 위한 플래그
+  bool bIsDead = false;
+
 public:
   UFUNCTION(BlueprintCallable, Category = "Stats")
   bool IsDead() const;
-#pragma endregion
+#pragma endregion 김동주
 
 #pragma region EnemyTakeDamage
 public:
@@ -55,6 +60,43 @@ public:
     class AController* EventInstigator,
     AActor* DamageCauser
   ) override;
+
+protected:
+  virtual void Die();
 #pragma endregion 김동주
 
+#pragma region EnemyAttack
+public:
+  void Attack();
+
+  UFUNCTION(BlueprintCallable, Category = "Combat")
+  void Fire();
+
+protected:
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+  TSubclassOf<AActor> ProjectileClass;
+
+  UPROPERTY(EditAnywhere, Category = "Combat")
+  UAnimMontage* AttackMontage;
+#pragma endregion 김동주
+
+#pragma region RoomBase Instance
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
+  ASanzoRoomBase* CurrentRoom;
+#pragma endregion 최윤서
+	
+#pragma region OverHeadUI
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UWidgetComponent* OverHeadHPBar;
+	
+	FTimerHandle OverHeadHPBarUpdateTimerHandle;
+	
+	void UpdateOverHeadHPBar();
+	
+	void MakeOverHeadHPBar3D();
+	
+#pragma endregion 이준로
+	
 };

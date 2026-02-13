@@ -1,6 +1,7 @@
 #include "Stage/SanzoRoom_Extermination.h"
 #include "Stage/SanzoRoomBase.h"
 #include "Common/SanzoLog.h"
+#include "Core/SanzoGameState.h"
 
 #pragma region Battle Flow for Extermination
 void ASanzoRoom_Extermination::BeginRoomSequence()
@@ -8,19 +9,12 @@ void ASanzoRoom_Extermination::BeginRoomSequence()
   Super::BeginRoomSequence();
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 시퀀스 시작"));
 
-  // 몬스터 스폰
+  // 적 스폰
   EnemySpawned();
-
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 현재 적 수 - %d"), TotalEnemyCount);
   // 클리어 조건 달성 시 end
-  UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 체크"));
-  // 더미 조건: 10초 후 클리어
-  GetWorld()->GetTimerManager().SetTimer(
-    RoomSequenceTimerHandle,
-    this,
-    &ASanzoRoom_Extermination::EndRoomSequence,
-    10.0f,
-    false
-  );
+  UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 - 모든 적 처치"));
+  
   //EndRoomSequence();
 }
 
@@ -43,6 +37,10 @@ void ASanzoRoom_Extermination::EndRoomSequence()
 void ASanzoRoom_Extermination::OnEnemyKilled()
 {
   CurrentEnemyCount++;
+  if (GameState)
+  {
+    GameState->UpdateStageInfo(CurrentEnemyCount, TotalEnemyCount);
+  }
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 적 처치 %d / %d"), CurrentEnemyCount, TotalEnemyCount);
   if (CurrentEnemyCount >= TotalEnemyCount)
   {
