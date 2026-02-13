@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+class USanzoPopUpWidget;
 struct FGameplayTag;
 class USanzoMainWidget;
 class USanzoHUDWidget;
@@ -39,9 +40,9 @@ public:
 	USanzoMainWidget* MenuWidgetInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
-	TSubclassOf<UUserWidget> PopUpWidgetClass;
+	TSubclassOf<USanzoPopUpWidget> PopUpWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
-	UUserWidget* PopUpWidgetInstance;
+	USanzoPopUpWidget* PopUpWidgetInstance;
 
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
@@ -50,10 +51,10 @@ public:
 	void ShowGameHUD();
 
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
-	UUserWidget* GetPopUpWidget() const { return PopUpWidgetInstance; }
+	USanzoPopUpWidget* GetPopUpWidget() const { return PopUpWidgetInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
-	void ShowPopUp(bool bIsLevelUp);
+	void ShowPopUp(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ResumeGame();
 
@@ -73,6 +74,12 @@ public:
 	FGameplayTag StageClearedTag;
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag GameOverTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GamePauseTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GameUpgradeTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GamePlayingTag;
 
 #pragma endregion 이준로
 };
