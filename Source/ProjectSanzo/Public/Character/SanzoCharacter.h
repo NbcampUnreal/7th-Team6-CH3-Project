@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "GameplayTagContainer.h"
-#include "Common/SanzoLog.h"
+#include "Components/TimelineComponent.h"
 #include "SanzoCharacter.generated.h"
 
 class USpringArmComponent;
@@ -17,6 +17,8 @@ struct FInputActionValue;
 class USanzoStatComponent;
 class USanzoParryComponent;
 class USanzoEquipmentComponent;
+
+
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -34,6 +36,9 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputMappingContext* DefaultMappingContext;
 
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  USkeletalMeshComponent* TargetMesh;
+
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Components", meta = (AllowPrivateAccess = "true"))
   USanzoStatComponent* StatComp;
 
@@ -44,7 +49,6 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   USanzoEquipmentComponent* EquipmentComp;
 
 #pragma endregion 김형백
-
 #pragma region InputActions
   /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
    UInputAction* JumpAction;*/
@@ -70,6 +74,26 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
 
 #pragma endregion 김형백
 
+
+#pragma region Aiming
+public:
+  FTimeline AimTimeline;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AimingTimeLine")
+  UCurveFloat* AimCurve;
+
+  UFUNCTION()
+  void TimelineUpdateCallBack(float Value);
+  UFUNCTION()
+  void TimelineFinishedCallBack();
+  UFUNCTION()
+  void PlayAimTimeLine();
+
+  bool bIsAiming;
+
+#pragma endregion 김형백
+  
+
+
 public:
   ASanzoCharacter();
 
@@ -80,7 +104,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
   float SprintSpeed;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|State")
   FGameplayTagContainer GameplayTagContainer;
+
 protected:
 
   void Move(const FInputActionValue& Value);
@@ -97,9 +123,15 @@ protected:
 
   void Dodge(const FInputActionValue& Value);
 
+  void AimStart(const FInputActionValue& Value);
+
+  void AimStop(const FInputActionValue& Value);
+
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-  virtual void BeginPlay();
+  virtual void BeginPlay() override;
+
+  virtual void Tick(float DeltaTime) override;
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
