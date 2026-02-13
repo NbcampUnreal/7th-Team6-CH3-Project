@@ -40,7 +40,7 @@ void ASanzoGameState::BeginPlay()
 #pragma region UpdateStage
 void ASanzoGameState::UpdateStageInfo(float Current, float Total)
 {
-	UE_LOG(LogCYS, Warning, TEXT("GS: 전투 정보 업데이트"));
+	//UE_LOG(LogCYS, Warning, TEXT("GS: 전투 정보 업데이트"));
 	CurrentCount = Current;
 	TotalCount = Total;
 	UpdateStageProgressBar();

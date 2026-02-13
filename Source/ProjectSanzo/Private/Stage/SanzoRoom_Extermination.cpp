@@ -9,7 +9,7 @@ void ASanzoRoom_Extermination::BeginRoomSequence()
   Super::BeginRoomSequence();
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 시퀀스 시작"));
 
-  // 몬스터 스폰
+  // 적 스폰
   EnemySpawned();
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 현재 적 수 - %d"), TotalEnemyCount);
   // 클리어 조건 달성 시 end
