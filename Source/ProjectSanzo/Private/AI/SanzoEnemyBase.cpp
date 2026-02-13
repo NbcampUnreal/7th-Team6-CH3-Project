@@ -35,6 +35,7 @@ void ASanzoEnemyBase::BeginPlay()
   {
     CurrentRoom = Found;
   }
+#pragma endregion 최윤서
 }
 
 //void ASanzoEnemyBase::Tick(float DeltaTime)
