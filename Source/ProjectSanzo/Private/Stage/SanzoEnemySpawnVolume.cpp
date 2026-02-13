@@ -3,6 +3,7 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "Common/SanzoLog.h"
 
 #pragma region Enemy Spawn Volume
 
@@ -32,7 +33,11 @@ void ASanzoEnemySpawnVolume::SpawnRandomEnemy()
 // 데이터 테이블에서 확률 기반으로 적을 선택
 FEnemySpawnRow* ASanzoEnemySpawnVolume::GetRandomEnemy() const
 {
-  if (!EnemyDataTable) return nullptr;
+  if (!EnemyDataTable)
+  {
+    UE_LOG(LogCYS, Error, TEXT("[%s] EV: Data Table 연결 안됨"), *GetActorNameOrLabel());
+    return nullptr;
+  }
 
   TArray<FEnemySpawnRow*> AllRows;
   static const FString ContextString(TEXT("Enemy Spawn Context"));
