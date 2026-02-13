@@ -22,7 +22,7 @@ void ASanzoGameState::BeginPlay()
 			//CurrentStageIndex = SGI->CurrentLevelIndex;
 		}
 	}
-
+	
 	OpenHUD();
 }
 
@@ -53,6 +53,7 @@ void ASanzoGameState::OpenHUD()
 	{
 		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
 		{
+			UpdateStageProgressBar();
 			SanzoPlayerController->ShowGameHUD();
 		}
 	}

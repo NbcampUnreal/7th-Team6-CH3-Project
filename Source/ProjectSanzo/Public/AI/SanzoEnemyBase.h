@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "SanzoEnemyBase.generated.h"
 
+class UWidgetComponent;
 class UBehaviorTree;
 class ASanzoRoomBase;
 
@@ -83,4 +84,19 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
   ASanzoRoomBase* CurrentRoom;
 #pragma endregion 최윤서
+	
+#pragma region OverHeadUI
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UWidgetComponent* OverHeadHPBar;
+	
+	FTimerHandle OverHeadHPBarUpdateTimerHandle;
+	
+	void UpdateOverHeadHPBar();
+	
+	void MakeOverHeadHPBar3D();
+	
+#pragma endregion 이준로
+	
 };
