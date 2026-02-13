@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "GameplayTagContainer.h"
+#include "Components/TimelineComponent.h"
 #include "SanzoCharacter.generated.h"
 
 
@@ -17,6 +18,8 @@ struct FInputActionValue;
 class USanzoStatComponent;
 class USanzoParryComponent;
 class USanzoEquipmentComponent;
+
+
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -47,7 +50,6 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   USanzoEquipmentComponent* EquipmentComp;
 
 #pragma endregion 김형백
-
 #pragma region InputActions
  /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* JumpAction;*/
@@ -72,6 +74,26 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   
 
 #pragma endregion 김형백
+
+
+#pragma region Aiming
+public:
+  FTimeline AimTimeline;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AimingTimeLine")
+  UCurveFloat* AimCurve;
+
+  UFUNCTION()
+  void TimelineUpdateCallBack(float Value);
+  UFUNCTION()
+  void TimelineFinishedCallBack();
+  UFUNCTION()
+  void PlayAimTimeLine();
+
+  bool bIsAiming;
+
+#pragma endregion 김형백
+  
+
 
 public:
   ASanzoCharacter();
@@ -100,9 +122,15 @@ protected:
 
   void Dodge(const FInputActionValue& Value);
 
+  void AimStart(const FInputActionValue& Value);
+
+  void AimStop(const FInputActionValue& Value);
+
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-  virtual void BeginPlay();
+  virtual void BeginPlay() override;
+
+  virtual void Tick(float DeltaTime) override;
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

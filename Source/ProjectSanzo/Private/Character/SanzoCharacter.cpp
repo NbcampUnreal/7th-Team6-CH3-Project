@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/SanzoCharacter.h"
+#include "Character/SanzoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -15,8 +16,12 @@
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
 #include "Weapon/SanzoGun.h"
+#include "Curves/CurveFloat.h"
+
 
 DEFINE_LOG_CATEGORY(LogSanzo);
+
+
 
 ASanzoCharacter::ASanzoCharacter()
 {
@@ -63,7 +68,8 @@ ASanzoCharacter::ASanzoCharacter()
   
 #pragma endregion 김형백 
 
-  
+  //틱켜키
+  PrimaryActorTick.bCanEverTick = true;
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -79,9 +85,30 @@ void ASanzoCharacter::BeginPlay()
     }
   }
 
+  if (AimCurve)
+  {
+    //델리게이트 바인딩
+    FOnTimelineFloat TimelineCallback;
+    TimelineCallback.BindUFunction(this, FName("TimelineUpdateCallBack"));
+    FOnTimelineEvent TimelineFinishedCallback;
+    TimelineFinishedCallback.BindUFunction(this, FName("TimelineFinishedCallBack"));
+
+    //타임라인과 커브 연결
+    AimTimeline.AddInterpFloat(AimCurve, TimelineCallback);
+    AimTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
+
+  }
+}
+
+void ASanzoCharacter::Tick(float DeltaTime)
+{
+  Super::Tick(DeltaTime);
+  AimTimeline.TickTimeline(DeltaTime);
+
 }
 
 #pragma region InputFunction
+
 void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
   if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
@@ -95,6 +122,9 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopSprint); 
     EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ASanzoCharacter::FireStart);
     EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopFire);
+    EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &ASanzoCharacter::Dodge);
+    EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ASanzoCharacter::AimStart);
+    EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
   }
   else
   {
@@ -127,7 +157,9 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
   if (Controller != nullptr)
   {
     AddControllerYawInput(LookAxisVector.X);
+    
     AddControllerPitchInput(LookAxisVector.Y);
+    
   }
 }
 
@@ -193,4 +225,43 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
   
 }
+
+void ASanzoCharacter::AimStart(const FInputActionValue& Value)
+{
+  if(bIsAiming)
+  {
+    return;
+  }
+  
+  PlayAimTimeLine();
+  bIsAiming = true;
+}
+
+void ASanzoCharacter::AimStop(const FInputActionValue& Value)
+{
+  PlayAimTimeLine();
+  bIsAiming = false;
+}
+
+void ASanzoCharacter::TimelineUpdateCallBack(float Value)
+{
+  CameraBoom->TargetArmLength = Value;
+}
+
+void ASanzoCharacter::TimelineFinishedCallBack()
+{
+}
+
+void ASanzoCharacter::PlayAimTimeLine()
+{
+  if (AimCurve && !bIsAiming)
+  {
+    AimTimeline.Play(); 
+  }
+  if (AimCurve && bIsAiming)
+  {
+    AimTimeline.Reverse();
+  }
+}
+
 #pragma endregion 김형백
