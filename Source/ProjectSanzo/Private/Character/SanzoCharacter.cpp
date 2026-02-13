@@ -225,7 +225,7 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
   
 }
-
+#pragma region AimingFunction
 void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 {
   if(bIsAiming)
@@ -246,6 +246,7 @@ void ASanzoCharacter::AimStop(const FInputActionValue& Value)
 void ASanzoCharacter::TimelineUpdateCallBack(float Value)
 {
   CameraBoom->TargetArmLength = Value;
+  
 }
 
 void ASanzoCharacter::TimelineFinishedCallBack()
@@ -263,5 +264,6 @@ void ASanzoCharacter::PlayAimTimeLine()
     AimTimeline.Reverse();
   }
 }
+#pragma endregion 김형백
 
 #pragma endregion 김형백
