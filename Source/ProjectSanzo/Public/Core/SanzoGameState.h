@@ -1,4 +1,4 @@
-﻿// 실시간 상태 동기화
+// 실시간 상태 동기화
 
 #pragma once
 
@@ -30,18 +30,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
 	int32 CurrentStageIndex;
 
-	// 전투 정보
+	// 실시간 전투 정보
 	// 섬멸전일때는 적 수, 버티기일때는 생존 시간
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float CurrentCount;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float TotalCount;
 
-#pragma endregion 최윤서
+	// 전투 결과 정보
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+  int32 TotalKillCount;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+  float TotalSurvivalTime;
 
   // 전투 정보 업데이트
   void UpdateStageInfo(float Current, float Total);
-
+  void UpdateStageResult(int32 KillCount, float SurvivalTime);
 #pragma endregion 최윤서
 
 #pragma region UI

@@ -34,6 +34,12 @@ void ASanzoGameState::UpdateStageInfo(float Current, float Total)
 	TotalCount = Total;
 	UpdateStageProgressBar();
 }
+void ASanzoGameState::UpdateStageResult(int KillCount, float SurvivalTime)
+{
+  UE_LOG(LogCYS, Warning, TEXT("GS: 전투 결과 정보 업데이트"));
+  TotalKillCount = KillCount;
+  TotalSurvivalTime = SurvivalTime;
+}
 #pragma endregion 최윤서
 
 #pragma region UI
