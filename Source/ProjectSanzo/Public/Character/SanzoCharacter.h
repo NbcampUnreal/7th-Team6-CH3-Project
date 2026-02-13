@@ -6,8 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "GameplayTagContainer.h"
+#include "Common/SanzoLog.h"
 #include "SanzoCharacter.generated.h"
-
 
 class USpringArmComponent;
 class UCameraComponent;
@@ -46,8 +46,8 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
 #pragma endregion 김형백
 
 #pragma region InputActions
- /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-  UInputAction* JumpAction;*/
+  /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+   UInputAction* JumpAction;*/
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* MoveAction;
@@ -66,7 +66,7 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* AimAction;
-  
+
 
 #pragma endregion 김형백
 
@@ -105,5 +105,13 @@ public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
   FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+#pragma region PlayerTakeDamage
+public:
+  virtual float TakeDamage(
+    float DamageAmount,
+    struct FDamageEvent const& DamageEvent,
+    class AController* EventInstigator,
+    AActor* DamageCauser) override;
+#pragma endregion 김동주
 
 };

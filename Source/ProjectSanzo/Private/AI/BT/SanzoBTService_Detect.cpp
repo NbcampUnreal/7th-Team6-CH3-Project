@@ -36,10 +36,17 @@ void USanzoBTService_Detect::TickNode(
     // 타겟 발견 시 -> 달리기
     AIChar->GetCharacterMovement()->MaxWalkSpeed = ChaseSpeed;
 
-    float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), Target->GetActorLocation());
-    if (Distance > 1200.0f)
+    float Distance = FVector::Dist(
+      ControllingPawn->GetActorLocation(),
+      Target->GetActorLocation()
+    );
+
+    Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), Distance);
+
+    if (Distance > 1500.0f)
     {
       Blackboard->SetValueAsObject(TEXT("TargetActor"), nullptr);
+      Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), 99999.f);
     }
   }
   else

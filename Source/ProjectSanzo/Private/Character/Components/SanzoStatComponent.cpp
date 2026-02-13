@@ -2,6 +2,7 @@
 
 
 #include "Character/Components/SanzoStatComponent.h"
+#include "Common/SanzoLog.h"
 
 USanzoStatComponent::USanzoStatComponent()
 {
@@ -40,7 +41,7 @@ void USanzoStatComponent::BeginPlay()
 
 
 void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                        FActorComponentTickFunction* ThisTickFunction)
+  FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -66,7 +67,6 @@ void USanzoStatComponent::BroadCastStatUpdate()
 		OnStatChanged.Broadcast(MakeStatData());
 	}
 }
-
 // 변경 스탯 구조체 저장 함수
 FSanzoStatData USanzoStatComponent::MakeStatData() const
 {
@@ -79,3 +79,18 @@ FSanzoStatData USanzoStatComponent::MakeStatData() const
 	return Data;
 }
 #pragma endregion 이준로
+
+#pragma region PlayerApplyDamage
+void USanzoStatComponent::ApplyDamage(float DamageAmount)
+{
+  CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.f, MaxHealth);
+  BroadCastStatUpdate();
+
+  UE_LOG(LogKDJ, Warning, TEXT("StatComponent: Health Reduced. Current Health: %f"), CurrentHealth);
+}
+
+bool USanzoStatComponent::IsDead() const
+{
+  return CurrentHealth <= 0.f;
+}
+#pragma endregion 김동주

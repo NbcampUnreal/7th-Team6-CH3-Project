@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Common/SanzoLog.h"
+#include "BrainComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Stage/SanzoRoomBase.h"
 
@@ -28,6 +29,7 @@ void ASanzoEnemyBase::BeginPlay()
 {
   Super::BeginPlay();
   CurrentHP = MaxHP;
+  bIsDead = false;
 
 #pragma region Find RoomBase
   ASanzoRoomBase* Found = Cast<ASanzoRoomBase>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoRoomBase::StaticClass()));
@@ -52,13 +54,14 @@ void ASanzoEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 bool ASanzoEnemyBase::IsDead() const
 {
-  return CurrentHP <= 0.f;
+  return bIsDead;
 }
 
 float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-  float FinalDamage = DamageAmount;
+  if (bIsDead) return 0.f;
 
+  float FinalDamage = DamageAmount;
   CurrentHP = FMath::Clamp(CurrentHP - FinalDamage, 0.f, MaxHP);
 
   if (GEngine)
@@ -70,26 +73,74 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, Message);
   }
 
-  UE_LOG(LogTemp, Warning, TEXT("Enemy Took Damage: %f"), FinalDamage);
+  UE_LOG(LogKDJ, Warning, TEXT("Enemy Took Damage: %f"), FinalDamage);
 
   // 사망 처리
-  if (CurrentHP <= 0.f)
+  if (CurrentHP <= 0.f && !bIsDead)
   {
-    // TO-DO: 사망 처리 함수 호출 (SanzoRoomBase::OnEnemyKilled() 호출, 사망 애니메이션 몽타주 재생 등)
-    UE_LOG(LogTemp, Error, TEXT("Enemy Died!"));
+    Die();
+  }
 
-#pragma region Call RoomBase
+  return FinalDamage;
+}
+
+void ASanzoEnemyBase::Die()
+{
+  bIsDead = true;
+  UE_LOG(LogKDJ, Error, TEXT("Enemy Died! Engaging Ragdoll."));
+
+  // TO-DO: Room에 사망 알림
+  #pragma region Call RoomBase
     // 사망 SanzoRoomBase::OnEnemyKilled() 호출
     if (CurrentRoom)
     {
       UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
       CurrentRoom->OnEnemyKilled();
     }
-#pragma endregion 최윤서
-    // 캡슐 충돌 끄고 래그돌 실행
-    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    GetMesh()->SetSimulatePhysics(true);
+  #pragma endregion 최윤서
+
+  // AI 로직 정지
+  AAIController* AICon = Cast<AAIController>(GetController());
+  if (AICon && AICon->GetBrainComponent())
+  {
+    AICon->GetBrainComponent()->StopLogic("Dead");
   }
 
-  return FinalDamage;
+  // 충돌 끄기 및 래그돌(물리) 실행
+  GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+  GetMesh()->SetSimulatePhysics(true);
+
+  // 일정 시간 후 액터 제거
+  SetLifeSpan(5.f);
+}
+
+void ASanzoEnemyBase::Attack()
+{
+  if (AttackMontage && !bIsDead)
+  {
+    PlayAnimMontage(AttackMontage);
+  }
+}
+
+void ASanzoEnemyBase::Fire()
+{
+  if (ProjectileClass && !bIsDead)
+  {
+    FVector SpawnLocation =
+      GetActorLocation() + (GetActorForwardVector() * 100.f)
+      + FVector(0.f, 0.f, 50.f);
+    FRotator SpawnRotation = GetActorRotation();
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = this;
+
+    GetWorld()->SpawnActor<AActor>(
+      ProjectileClass,
+      SpawnLocation,
+      SpawnRotation,
+      SpawnParams);
+    UE_LOG(LogKDJ, Log, TEXT("Enemy Fired Projectile!"));
+  }
 }

@@ -7,7 +7,7 @@ ASanzoGameState::ASanzoGameState()
 {
 	CurrentStageIndex = 0;
 	CurrentCount = 0;
-	TotalCount = 100.f;
+	TotalCount = 0;
 }
 
 void ASanzoGameState::BeginPlay()
@@ -23,18 +23,7 @@ void ASanzoGameState::BeginPlay()
 		}
 	}
 
-
 	OpenHUD();
-
-	//테스트 코드
-	GetWorldTimerManager().SetTimer(
-		UpdateStageProgressBarTimer,
-		this,
-		&ASanzoGameState::AddCurrentCount,
-		0.1f,
-		true
-	);
-	
 }
 
 #pragma region UpdateStage
@@ -48,17 +37,6 @@ void ASanzoGameState::UpdateStageInfo(float Current, float Total)
 #pragma endregion 최윤서
 
 #pragma region UI
-
-void ASanzoGameState::UpdateStageProgressBar()
-{
-	float Percent = (TotalCount > 0) ? (CurrentCount / TotalCount) : 0.0f;
-	if (OnStageProgressChanged.IsBound())
-	{
-		OnStageProgressChanged.Broadcast(Percent);
-	}
-}
-
-
 void ASanzoGameState::OpenHUD()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
