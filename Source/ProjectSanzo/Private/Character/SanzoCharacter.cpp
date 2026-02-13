@@ -24,7 +24,7 @@ ASanzoCharacter::ASanzoCharacter()
   
 #pragma region MovementInit 
   bUseControllerRotationPitch = false;
-  bUseControllerRotationYaw = false;
+  bUseControllerRotationYaw = true;
   bUseControllerRotationRoll = false;
 
   GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -55,9 +55,10 @@ ASanzoCharacter::ASanzoCharacter()
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
 
+  EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
   StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
   ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
-  EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
+  
 #pragma endregion 김형백 
 
   
@@ -78,6 +79,7 @@ void ASanzoCharacter::BeginPlay()
 
 }
 
+#pragma region InputFunction
 void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
   if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
@@ -89,6 +91,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Look);
     EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::SprintStart);
     EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopSprint); 
+    EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ASanzoCharacter::FireStart);
+    EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopFire);
   }
   else
   {
@@ -156,19 +160,38 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 
 void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 {
-
-  //TODO : 발사 구현 (무기 클래스에서 발사 함수 호출)
+  
+  if(EquipmentComp)
+  {
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Component extists"));
+    if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
+    {
+      GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
+      Weapon->StartFire();
+      
+    }
+  }
 }
 
 void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 {
-  //TODO : 발사 중지 구현 (무기 클래스에서 발사 중지 함수 호출)
+  if (EquipmentComp)
+  {
+    
+    if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
+    {
+      
+      Weapon->StopFire();
+
+    }
+  }
 }
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
   
 }
+#pragma endregion 김형백
 
 #pragma region PlayerTakeDamage
 float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

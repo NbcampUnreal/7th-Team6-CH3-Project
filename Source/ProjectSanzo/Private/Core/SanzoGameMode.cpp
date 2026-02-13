@@ -26,7 +26,7 @@ void ASanzoGameMode::BeginPlay()
     StartStage();
   }
 }
-#pragma region 스테이지 관리
+#pragma region Stage Management
 // 맵 이름에 따라 스테이지 타입 설정
 void ASanzoGameMode::InitStageType()
 {
@@ -79,7 +79,7 @@ void ASanzoGameMode::OnStageCleared()
 }
 #pragma endregion 최윤서
 
-#pragma region 성장
+#pragma region Upgrade Management
 // 업그레이드 선택 트리거, 캐릭터에서 호출
 void ASanzoGameMode::TriggerUpgradeSelection()
 {

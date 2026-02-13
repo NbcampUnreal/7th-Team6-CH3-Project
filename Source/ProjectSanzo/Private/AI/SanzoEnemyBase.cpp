@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AI/SanzoEnemyBase.h"
 #include "AI/SanzoAIController.h"
@@ -7,6 +7,8 @@
 #include "Engine/DamageEvents.h"
 #include "Common/SanzoLog.h"
 #include "BrainComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Stage/SanzoRoomBase.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -28,6 +30,14 @@ void ASanzoEnemyBase::BeginPlay()
   Super::BeginPlay();
   CurrentHP = MaxHP;
   bIsDead = false;
+
+#pragma region Find RoomBase
+  ASanzoRoomBase* Found = Cast<ASanzoRoomBase>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoRoomBase::StaticClass()));
+  if (Found)
+  {
+    CurrentRoom = Found;
+  }
+#pragma endregion 최윤서
 }
 
 //void ASanzoEnemyBase::Tick(float DeltaTime)
@@ -80,6 +90,14 @@ void ASanzoEnemyBase::Die()
   UE_LOG(LogKDJ, Error, TEXT("Enemy Died! Engaging Ragdoll."));
 
   // TO-DO: Room에 사망 알림
+  #pragma region Call RoomBase
+    // 사망 SanzoRoomBase::OnEnemyKilled() 호출
+    if (CurrentRoom)
+    {
+      UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
+      CurrentRoom->OnEnemyKilled();
+    }
+  #pragma endregion 최윤서
 
   // AI 로직 정지
   AAIController* AICon = Cast<AAIController>(GetController());

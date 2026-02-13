@@ -1,12 +1,16 @@
 #include "Stage/SanzoRoomBase.h"
+#include "Stage/SanzoEnemySpawnVolume.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
+#include "Core/SanzoGameState.h"
 
-#pragma region 전투 Base
+#pragma region Room Base
 
 ASanzoRoomBase::ASanzoRoomBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	TotalEnemyCount = 0;
 
 }
 
@@ -14,6 +18,7 @@ void ASanzoRoomBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 문 찾기
 	TArray<AActor*> FoundGates;
 	UGameplayStatics::GetAllActorsOfClass(
 		GetWorld(),
@@ -28,6 +33,29 @@ void ASanzoRoomBase::BeginPlay()
 	else
 	{
 		UE_LOG(LogCYS, Error, TEXT("RB: Gate Not Found"));
+	}
+
+  // 스폰 볼륨 찾기
+	TArray<AActor*> FoundVolumes;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(), 
+		ASanzoEnemySpawnVolume::StaticClass(), 
+		FoundVolumes
+	);
+	for (AActor* Actor : FoundVolumes)
+	{
+		if (ASanzoEnemySpawnVolume* Volume = Cast<ASanzoEnemySpawnVolume>(Actor))
+		{
+			SpawnVolumes.Add(Volume);
+      UE_LOG(LogCYS, Warning, TEXT("RB: Spawn Volume Found"));
+		}
+	}
+
+	// Game State 찾기
+	ASanzoGameState* Found = Cast<ASanzoGameState>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoGameState::StaticClass()));
+	if (Found)
+	{
+		GameState = Found;
 	}
 }
 
@@ -51,4 +79,21 @@ void ASanzoRoomBase::Tick(float DeltaTime)
 
 }
 
+void ASanzoRoomBase::OnEnemyKilled()
+{
+	// 기본은 아무것도 안 함
+}
+
+//  적 스폰 호출
+void ASanzoRoomBase::EnemySpawned()
+{
+	for(ASanzoEnemySpawnVolume* SpawnVolume:SpawnVolumes)
+	{
+		if (SpawnVolume)
+		{
+			SpawnVolume->SpawnRandomEnemy();
+			TotalEnemyCount += 1;
+		}
+  }
+}
 #pragma endregion 최윤서

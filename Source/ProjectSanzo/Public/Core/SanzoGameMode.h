@@ -15,7 +15,7 @@ public:
 
   virtual void BeginPlay() override;
 
-#pragma region 스테이지 관리
+#pragma region Stage Management
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
   ESanzoStageType CurrentStageType;
 

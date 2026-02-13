@@ -7,6 +7,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "SanzoGameState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStageProgressChangedDelegate, float, StageProgressPercent);
+
 UCLASS()
 class PROJECTSANZO_API ASanzoGameState : public AGameStateBase
 {
@@ -17,7 +19,7 @@ public:
 
 	virtual void BeginPlay() override;
 
-#pragma region 실시간 상태 동기화
+#pragma region synchronization
   // 게임 상태
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
   FGameplayTagContainer GameStateTags;
@@ -37,13 +39,20 @@ public:
 
 #pragma endregion 최윤서
 
+  // 전투 정보 업데이트
+  void UpdateStageInfo(float Current, float Total);
+
+#pragma endregion 최윤서
+
 #pragma region UI
 
-	FTimerHandle HUDUpdateTimerHandle;
-	//void UpdateHUD();
+	FOnStageProgressChangedDelegate OnStageProgressChanged;
+
+	void UpdateStageProgressBar();
 
 	void OpenHUD();
-
-
+	//테스트 코드
+	void AddCurrentCount();
+	FTimerHandle UpdateStageProgressBarTimer;
 #pragma endregion 이준로
 };
