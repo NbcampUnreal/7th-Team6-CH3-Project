@@ -61,13 +61,13 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, Message);
   }
 
-  UE_LOG(LogTemp, Warning, TEXT("Enemy Took Damage: %f"), FinalDamage);
+  UE_LOG(LogKDJ, Warning, TEXT("Enemy Took Damage: %f"), FinalDamage);
 
   // 사망 처리
   if (CurrentHP <= 0.f)
   {
     // TO-DO: 사망 처리 함수 호출 (SanzoRoomBase::OnEnemyKilled() 호출, 사망 애니메이션 몽타주 재생 등)
-    UE_LOG(LogTemp, Error, TEXT("Enemy Died!"));
+    UE_LOG(LogKDJ, Error, TEXT("Enemy Died!"));
 
     // 캡슐 충돌 끄고 래그돌 실행
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
