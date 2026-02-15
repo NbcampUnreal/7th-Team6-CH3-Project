@@ -5,6 +5,7 @@
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
 
 void USanzoPopUpWidget::NativeConstruct()
 {
@@ -16,14 +17,17 @@ void USanzoPopUpWidget::NativeConstruct()
 	if (UpgradeButton_1)
 	{
 		UpgradeButtons.Add(UpgradeButton_1);
+		UpgradeButton_1->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton1Clicked);
 	}
 	if (UpgradeButton_2)
 	{
 		UpgradeButtons.Add(UpgradeButton_2);
+		UpgradeButton_2->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton2Clicked);
 	}
 	if (UpgradeButton_3)
 	{
 		UpgradeButtons.Add(UpgradeButton_3);
+		UpgradeButton_1->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton3Clicked);
 	}
 
 	if (UpgradeText_1)
@@ -39,6 +43,10 @@ void USanzoPopUpWidget::NativeConstruct()
 		UpgradeTexts.Add(UpgradeText_3);
 	}
 }
+
+void USanzoPopUpWidget::OnUpgradeButton1Clicked() { ProcessUpgradeButtonClicked(0); }
+void USanzoPopUpWidget::OnUpgradeButton2Clicked() { ProcessUpgradeButtonClicked(1); }
+void USanzoPopUpWidget::OnUpgradeButton3Clicked() { ProcessUpgradeButtonClicked(2); } 
 
 void USanzoPopUpWidget::SetPauseUI()
 {
@@ -99,9 +107,28 @@ void USanzoPopUpWidget::SetUpgradeUI()
 	{
 		UpgradeListBorder->SetVisibility(ESlateVisibility::Hidden);
 	}
-	for (int32 i = 0; i < UpgradeButtons.Num(); i++)
+	
+	USanzoUpgradeSubsystem* UpgradeSubsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
+	if (UpgradeSubsystem)
 	{
-		SetUpgradeButton(i);
+		CurrentOptions = UpgradeSubsystem->GeneratedRandomOptions();
+		for (int32 i = 0; i < UpgradeButtons.Num(); i++)
+		{
+			SetUpgradeButton(i, CurrentOptions[i]);
+		}
+	}
+}
+
+void USanzoPopUpWidget::ProcessUpgradeButtonClicked(int32 Index)
+{
+	if (!CurrentOptions.IsValidIndex(Index)) return;
+	
+	FUpgradeOption SelectedOption = CurrentOptions[Index];
+	
+	USanzoUpgradeSubsystem* UpgradeSubsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
+	if (UpgradeSubsystem)
+	{
+		UpgradeSubsystem->ProcessSelectedUpgrade(SelectedOption);
 	}
 }
 
@@ -142,36 +169,40 @@ void USanzoPopUpWidget::SetUpgradeListText()
 	}
 }
 
-void USanzoPopUpWidget::SetUpgradeButton(int32 index)
+void USanzoPopUpWidget::SetUpgradeButton(int32 index, const FUpgradeOption& option)
 {
-	if (UpgradeButtons[index])
+	if (UpgradeButtons.IsValidIndex(index) && UpgradeButtons[index])
 	{
 		UpgradeButtons[index]->SetVisibility(ESlateVisibility::Visible);
-		//임시 값
-		int32 RandValue = FMath::RandRange(10, 100);
-		UpgradeButtons[index]->SetBackgroundColor(GetColorByRarity(RandValue));
-		if (UpgradeTexts[index])
+		UpgradeButtons[index]->SetBackgroundColor(GetColorByRarity(option.Rarity));
+		
+		if (UpgradeTexts.IsValidIndex(index) && UpgradeTexts[index])
 		{
-			//테스트 코드
-			UpgradeTexts[index]->SetText(FText::FromString(FString::Printf(TEXT("공격력 + %d"), RandValue)));
+			FText DisplayText = FText::Format(FText::FromString("{0} + {1}"),
+				option.DisplayName, FText::AsNumber(option.Value)
+				);
+			UpgradeTexts[index]->SetText(DisplayText);
 		}
 	}
 }
 
-//임시
-FLinearColor USanzoPopUpWidget::GetColorByRarity(int32 Value)
+FLinearColor USanzoPopUpWidget::GetColorByRarity(EUpgradeRarity Rarity)
 {
-	if (Value > 85)
+	switch (Rarity)
 	{
+	case EUpgradeRarity::Legend:
 		return FLinearColor(1.0f, 0.72f, 0.0f);
-	}
-	if (Value > 50)
-	{
+
+	case EUpgradeRarity::Epic:
 		return FLinearColor(0.6f, 0.2f, 0.9f);
-	}
-	if (Value > 25)
-	{
+
+	case EUpgradeRarity::Rare:
 		return FLinearColor(0.0f, 0.4f, 0.9f);
+
+	case EUpgradeRarity::Common:
+		return FLinearColor(0.5f,0.5f,0.5f);
+		
+	default:
+		return FLinearColor::Black;
 	}
-	return FLinearColor::White;
 }
