@@ -27,7 +27,7 @@ void USanzoPopUpWidget::NativeConstruct()
 	if (UpgradeButton_3)
 	{
 		UpgradeButtons.Add(UpgradeButton_3);
-		UpgradeButton_1->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton3Clicked);
+		UpgradeButton_3->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton3Clicked);
 	}
 
 	if (UpgradeText_1)
