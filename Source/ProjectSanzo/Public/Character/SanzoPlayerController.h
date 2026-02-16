@@ -34,6 +34,7 @@ protected:
 #pragma region UI
 
 public:
+
 	ASanzoPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
@@ -63,8 +64,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ShowPopUp(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
+	void OnPopUpClosed(FGameplayTag State);
+	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ResumeGame();
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainUI(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "Menu")

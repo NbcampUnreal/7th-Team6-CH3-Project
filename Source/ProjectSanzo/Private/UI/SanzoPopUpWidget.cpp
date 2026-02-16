@@ -5,48 +5,59 @@
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
+#include "UI/SanzoUpgradeButtonWidget.h"
 
 void USanzoPopUpWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	UpgradeButtons.Empty();
-	UpgradeTexts.Empty();
+	GamePlayingTag = FGameplayTag::RequestGameplayTag(FName("Game.State.Playing"));
+	MainMenuTag = FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu"));
+	
+	if (ResumeButton)
+	{
+		ResumeButton->OnClicked.AddDynamic(this,&ThisClass::HandleResumeButtonClicked);
+	}
+	
+	if (MainMenuButton)
+	{
+		MainMenuButton->OnClicked.AddDynamic(this, &ThisClass::HandleMenuButtonClicked);
+	}
 
 	if (UpgradeButton_1)
 	{
 		UpgradeButtons.Add(UpgradeButton_1);
-		UpgradeButton_1->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton1Clicked);
 	}
 	if (UpgradeButton_2)
 	{
 		UpgradeButtons.Add(UpgradeButton_2);
-		UpgradeButton_2->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton2Clicked);
 	}
 	if (UpgradeButton_3)
 	{
 		UpgradeButtons.Add(UpgradeButton_3);
-		UpgradeButton_3->OnClicked.AddDynamic(this,&USanzoPopUpWidget::OnUpgradeButton3Clicked);
 	}
-
-	if (UpgradeText_1)
+	for (auto* UpgradeButton : UpgradeButtons)
 	{
-		UpgradeTexts.Add(UpgradeText_1);
-	}
-	if (UpgradeText_2)
-	{
-		UpgradeTexts.Add(UpgradeText_2);
-	}
-	if (UpgradeText_3)
-	{
-		UpgradeTexts.Add(UpgradeText_3);
+		UpgradeButton->OnUpgradeButtonClicked.AddDynamic(this,&ThisClass::HandleUpgradeSelected);
 	}
 }
 
-void USanzoPopUpWidget::OnUpgradeButton1Clicked() { ProcessUpgradeButtonClicked(0); }
-void USanzoPopUpWidget::OnUpgradeButton2Clicked() { ProcessUpgradeButtonClicked(1); }
-void USanzoPopUpWidget::OnUpgradeButton3Clicked() { ProcessUpgradeButtonClicked(2); } 
+void USanzoPopUpWidget::SetPopUpUI(FGameplayTag GameState)
+{
+	CurrentState = GameState;
+	
+	if (GameState == FGameplayTag::RequestGameplayTag(FName("Game.State.Paused")))
+	{
+		SetPauseUI();
+	}
+	if (GameState == FGameplayTag::RequestGameplayTag(FName("Game.State.UpgradeSelecting")))
+	{
+		SetUpgradeUI();
+	}
+}
 
 void USanzoPopUpWidget::SetPauseUI()
 {
@@ -108,6 +119,11 @@ void USanzoPopUpWidget::SetUpgradeUI()
 		UpgradeListBorder->SetVisibility(ESlateVisibility::Hidden);
 	}
 	
+	if (UpgradeButtonBox)
+	{
+		UpgradeButtonBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	}
+	
 	USanzoUpgradeSubsystem* UpgradeSubsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
 	if (UpgradeSubsystem)
 	{
@@ -122,17 +138,25 @@ void USanzoPopUpWidget::SetUpgradeUI()
 	}
 }
 
-void USanzoPopUpWidget::ProcessUpgradeButtonClicked(int32 Index)
+void USanzoPopUpWidget::HandleUpgradeSelected(const FUpgradeOption& SelectedUpgrade)
 {
-	if (!CurrentOptions.IsValidIndex(Index)) return;
-	
-	FUpgradeOption SelectedOption = CurrentOptions[Index];
-	
 	USanzoUpgradeSubsystem* UpgradeSubsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
 	if (UpgradeSubsystem)
 	{
-		UpgradeSubsystem->ProcessSelectedUpgrade(SelectedOption);
+		UpgradeSubsystem->ProcessSelectedUpgrade(SelectedUpgrade);
 	}
+	
+	OnButtonClicked.Broadcast(GamePlayingTag);	
+}
+
+void USanzoPopUpWidget::HandleMenuButtonClicked()
+{
+	OnButtonClicked.Broadcast(MainMenuTag);
+}
+
+void USanzoPopUpWidget::HandleResumeButtonClicked()
+{
+	OnButtonClicked.Broadcast(GamePlayingTag);
 }
 
 void USanzoPopUpWidget::SetStatusText()
@@ -172,40 +196,10 @@ void USanzoPopUpWidget::SetUpgradeListText()
 	}
 }
 
-void USanzoPopUpWidget::SetUpgradeButton(int32 index, const FUpgradeOption& option)
+void USanzoPopUpWidget::SetUpgradeButton(int32 Index, const FUpgradeOption& Option)
 {
-	if (UpgradeButtons.IsValidIndex(index) && UpgradeButtons[index])
+	if (UpgradeButtons.IsValidIndex(Index))
 	{
-		UpgradeButtons[index]->SetVisibility(ESlateVisibility::Visible);
-		UpgradeButtons[index]->SetBackgroundColor(GetColorByRarity(option.Rarity));
-		
-		if (UpgradeTexts.IsValidIndex(index) && UpgradeTexts[index])
-		{
-			FText DisplayText = FText::Format(FText::FromString("{0} + {1}"),
-				option.DisplayName, FText::AsNumber(option.Value)
-				);
-			UpgradeTexts[index]->SetText(DisplayText);
-		}
-	}
-}
-
-FLinearColor USanzoPopUpWidget::GetColorByRarity(EUpgradeRarity Rarity)
-{
-	switch (Rarity)
-	{
-	case EUpgradeRarity::Legend:
-		return FLinearColor(1.0f, 0.72f, 0.0f);
-
-	case EUpgradeRarity::Epic:
-		return FLinearColor(0.6f, 0.2f, 0.9f);
-
-	case EUpgradeRarity::Rare:
-		return FLinearColor(0.0f, 0.4f, 0.9f);
-
-	case EUpgradeRarity::Common:
-		return FLinearColor(0.5f,0.5f,0.5f);
-		
-	default:
-		return FLinearColor::Black;
+		UpgradeButtons[Index]->SetUpgradeButton(Option);
 	}
 }

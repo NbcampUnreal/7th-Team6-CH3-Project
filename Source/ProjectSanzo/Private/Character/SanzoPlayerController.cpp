@@ -85,21 +85,29 @@ void ASanzoPlayerController::ShowPopUp(FGameplayTag State)
 		{
 			if (PopUpWidgetInstance)
 			{
+				PopUpWidgetInstance->OnButtonClicked.AddDynamic(this, &ThisClass::OnPopUpClosed);
+				
 				PopUpWidgetInstance->AddToViewport();
 
 				SetPause(true);
 				bShowMouseCursor = true;
 				SetInputMode(FInputModeUIOnly());
 			}
+			
+			PopUpWidgetInstance->SetPopUpUI(State);
 		}
-		if (State == GameUpgradeTag)
-		{
-			PopUpWidgetInstance->SetUpgradeUI();
-		}
-		if (State == GamePauseTag)
-		{
-			PopUpWidgetInstance->SetPauseUI();
-		}
+	}
+}
+
+void ASanzoPlayerController::OnPopUpClosed(FGameplayTag State)
+{
+	if (State == MainMenuTag)
+	{
+		ReturnMainMenu();
+	}
+	if (State == GamePlayingTag)
+	{
+		ResumeGame();
 	}
 }
 
