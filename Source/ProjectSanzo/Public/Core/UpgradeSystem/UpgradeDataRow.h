@@ -31,6 +31,7 @@ enum class EUpgradeType : uint8
 {
 	MaxHealth,
 	MaxStamina,
+	Beauty,
 	Damage,
 	FireRate,
 	Exp
@@ -57,9 +58,18 @@ public:
 	//옵션 값
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Value;
+	//옵션 최대값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float LimitValue;
 	//레어도
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EUpgradeRarity Rarity;
+	//스폰 가중치
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 SpawnWeight;	
+	//업그레이드 이미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<UTexture2D> IconTexture;
 };
 
 //선택된 업그레이드 옵션 Struct
@@ -87,4 +97,8 @@ public:
 	//레어도
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EUpgradeRarity Rarity;
+	//업그레이드 이미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<UTexture2D> IconTexture;
+	
 };
