@@ -1,6 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "AI/SanzoEnemyBase.h"
+﻿#include "AI/SanzoEnemyBase.h"
 #include "AI/SanzoAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -12,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Stage/SanzoRoomBase.h"
+#include "Components/SkeletalMeshComponent.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -26,19 +25,25 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   GetCharacterMovement()->bOrientRotationToMovement = true;
 
   GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-	
+
+  // 적 무기 컴포넌트 설정
+  WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+  // 오른손 뼈(hand_r)에 무기를 기본적으로 부착
+  WeaponMesh->SetupAttachment(GetMesh(), TEXT("hand_r"));
+  WeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
 #pragma region OverHeadUI
-	
-	OverHeadHPBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverHeadWidget"));
-	
-	OverHeadHPBar->SetupAttachment(GetCapsuleComponent());
-	
-	OverHeadHPBar->SetRelativeLocation(FVector(0.0f, 0.0f, 115.0f));
-	
-	OverHeadHPBar->SetRelativeScale3D(FVector(.15f,0.15f,0.15f));
-	
+
+  OverHeadHPBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverHeadWidget"));
+
+  OverHeadHPBar->SetupAttachment(GetCapsuleComponent());
+
+  OverHeadHPBar->SetRelativeLocation(FVector(0.0f, 0.0f, 115.0f));
+
+  OverHeadHPBar->SetRelativeScale3D(FVector(.15f, 0.15f, 0.15f));
+
 #pragma endregion 이준로
-	
+
 }
 
 void ASanzoEnemyBase::BeginPlay()
@@ -46,20 +51,20 @@ void ASanzoEnemyBase::BeginPlay()
   Super::BeginPlay();
   CurrentHP = MaxHP;
   bIsDead = false;
-	
+
 #pragma region OverHeadUI
-	
-	UpdateOverHeadHPBar();
-	
-	GetWorldTimerManager().SetTimer(
-		OverHeadHPBarUpdateTimerHandle,
-		this,
-		&ASanzoEnemyBase::MakeOverHeadHPBar3D,
-		0.01f,
-		true
-	);
+
+  UpdateOverHeadHPBar();
+
+  GetWorldTimerManager().SetTimer(
+    OverHeadHPBarUpdateTimerHandle,
+    this,
+    &ASanzoEnemyBase::MakeOverHeadHPBar3D,
+    0.01f,
+    true
+  );
 #pragma endregion 이준로
-	
+
 #pragma region Find RoomBase
   ASanzoRoomBase* Found = Cast<ASanzoRoomBase>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoRoomBase::StaticClass()));
   if (Found)
@@ -68,12 +73,6 @@ void ASanzoEnemyBase::BeginPlay()
   }
 #pragma endregion 최윤서
 }
-
-//void ASanzoEnemyBase::Tick(float DeltaTime)
-//{
-//  Super::Tick(DeltaTime);
-//
-//}
 
 void ASanzoEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -86,6 +85,11 @@ bool ASanzoEnemyBase::IsDead() const
   return bIsDead;
 }
 
+float ASanzoEnemyBase::GetAttackRange() const
+{
+  return AttackRange;
+}
+
 float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
   if (bIsDead) return 0.f;
@@ -93,9 +97,9 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   float FinalDamage = DamageAmount;
   CurrentHP = FMath::Clamp(CurrentHP - FinalDamage, 0.f, MaxHP);
 
-	//HP바 갱신
-	UpdateOverHeadHPBar();
-	
+  //HP바 갱신
+  UpdateOverHeadHPBar();
+
   if (GEngine)
   {
     FString Message = FString::Printf(TEXT("[Enemy Recieved] Damage: %.1f | HP Left: %.1f"),
@@ -122,14 +126,14 @@ void ASanzoEnemyBase::Die()
   UE_LOG(LogKDJ, Error, TEXT("Enemy Died! Engaging Ragdoll."));
 
   // TO-DO: Room에 사망 알림
-  #pragma region Call RoomBase
-    // 사망 SanzoRoomBase::OnEnemyKilled() 호출
-    if (CurrentRoom)
-    {
-      UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
-      CurrentRoom->OnEnemyKilled();
-    }
-  #pragma endregion 최윤서
+#pragma region Call RoomBase
+  // 사망 SanzoRoomBase::OnEnemyKilled() 호출
+  if (CurrentRoom)
+  {
+    UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
+    CurrentRoom->OnEnemyKilled();
+  }
+#pragma endregion 최윤서
 
   // AI 로직 정지
   AAIController* AICon = Cast<AAIController>(GetController());
@@ -137,16 +141,16 @@ void ASanzoEnemyBase::Die()
   {
     AICon->GetBrainComponent()->StopLogic("Dead");
   }
- #pragma region OverHeadUI
-	//HPBar 숨기기
-	if (OverHeadHPBar)
-	{
-		OverHeadHPBar->SetVisibility(false);
-	}
-	//TimerHandle 초기화
-	GetWorldTimerManager().ClearTimer(OverHeadHPBarUpdateTimerHandle);
-	
- #pragma endregion 이
+#pragma region OverHeadUI
+  //HPBar 숨기기
+  if (OverHeadHPBar)
+  {
+    OverHeadHPBar->SetVisibility(false);
+  }
+  //TimerHandle 초기화
+  GetWorldTimerManager().ClearTimer(OverHeadHPBarUpdateTimerHandle);
+
+#pragma endregion 이준로
   // 충돌 끄기 및 래그돌(물리) 실행
   GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
@@ -164,65 +168,44 @@ void ASanzoEnemyBase::Attack()
   }
 }
 
-void ASanzoEnemyBase::Fire()
-{
-  if (ProjectileClass && !bIsDead)
-  {
-    FVector SpawnLocation =
-      GetActorLocation() + (GetActorForwardVector() * 100.f)
-      + FVector(0.f, 0.f, 50.f);
-    FRotator SpawnRotation = GetActorRotation();
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    SpawnParams.Instigator = this;
-
-    GetWorld()->SpawnActor<AActor>(
-      ProjectileClass,
-      SpawnLocation,
-      SpawnRotation,
-      SpawnParams);
-    UE_LOG(LogKDJ, Log, TEXT("Enemy Fired Projectile!"));
-  }
-}
 #pragma region OverHeadUI
 
 void ASanzoEnemyBase::UpdateOverHeadHPBar()
 {
-	if (!OverHeadHPBar) return;
-	
-	UUserWidget* OverHeadHPBarInstance = OverHeadHPBar->GetUserWidgetObject();
-	if (!OverHeadHPBarInstance) return;
-	
-	if (UProgressBar* HealthBar = Cast<UProgressBar>(OverHeadHPBarInstance->GetWidgetFromName(TEXT("HealthBar"))))
-	{
-		if (MaxHP > 0.f)
-		{
-			float HealthPercent = CurrentHP / MaxHP;
-			if (HealthPercent >= 1.f)
-			{
-				OverHeadHPBar->SetVisibility(false);
-			}
-			else
-			{
-				OverHeadHPBar->SetVisibility(true);
-			}
-			HealthBar->SetPercent(HealthPercent);
-		}
-	}	
+  if (!OverHeadHPBar) return;
+
+  UUserWidget* OverHeadHPBarInstance = OverHeadHPBar->GetUserWidgetObject();
+  if (!OverHeadHPBarInstance) return;
+
+  if (UProgressBar* HealthBar = Cast<UProgressBar>(OverHeadHPBarInstance->GetWidgetFromName(TEXT("HealthBar"))))
+  {
+    if (MaxHP > 0.f)
+    {
+      float HealthPercent = CurrentHP / MaxHP;
+      if (HealthPercent >= 1.f)
+      {
+        OverHeadHPBar->SetVisibility(false);
+      }
+      else
+      {
+        OverHeadHPBar->SetVisibility(true);
+      }
+      HealthBar->SetPercent(HealthPercent);
+    }
+  }
 }
 
 void ASanzoEnemyBase::MakeOverHeadHPBar3D()
 {
-	if (!OverHeadHPBar) return;
-	
-	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	if (!CameraManager) return;
-	
-	FVector CameraLocation = CameraManager->GetCameraLocation();
-	FVector WidgetLocation = OverHeadHPBar->GetComponentLocation();
-	
-	FRotator LookCameraRotation = UKismetMathLibrary::FindLookAtRotation(WidgetLocation, CameraLocation);
-	OverHeadHPBar->SetWorldRotation(LookCameraRotation);
+  if (!OverHeadHPBar) return;
+
+  APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+  if (!CameraManager) return;
+
+  FVector CameraLocation = CameraManager->GetCameraLocation();
+  FVector WidgetLocation = OverHeadHPBar->GetComponentLocation();
+
+  FRotator LookCameraRotation = UKismetMathLibrary::FindLookAtRotation(WidgetLocation, CameraLocation);
+  OverHeadHPBar->SetWorldRotation(LookCameraRotation);
 }
 #pragma endregion 이준로

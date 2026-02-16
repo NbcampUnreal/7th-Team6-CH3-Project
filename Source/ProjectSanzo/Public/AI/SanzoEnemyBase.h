@@ -1,9 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AI/Interface/SanzoEnemyInterface.h"
 #include "SanzoEnemyBase.generated.h"
 
 class UWidgetComponent;
@@ -11,7 +10,7 @@ class UBehaviorTree;
 class ASanzoRoomBase;
 
 UCLASS()
-class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter
+class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter, public ISanzoEnemyInterface
 {
   GENERATED_BODY()
 
@@ -22,8 +21,6 @@ protected:
   virtual void BeginPlay() override;
 
 public:
-  //virtual void Tick(float DeltaTime) override;
-
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
@@ -47,7 +44,9 @@ protected:
 
 public:
   UFUNCTION(BlueprintCallable, Category = "Stats")
-  bool IsDead() const;
+  virtual bool IsDead() const override;
+
+  virtual float GetAttackRange() const override;
 #pragma endregion 김동주
 
 #pragma region EnemyTakeDamage
@@ -67,36 +66,33 @@ protected:
 
 #pragma region EnemyAttack
 public:
-  void Attack();
-
-  UFUNCTION(BlueprintCallable, Category = "Combat")
-  void Fire();
+  virtual void Attack() override;
 
 protected:
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-  TSubclassOf<AActor> ProjectileClass;
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+  TObjectPtr<class USkeletalMeshComponent> WeaponMesh;
 
-  UPROPERTY(EditAnywhere, Category = "Combat")
-  UAnimMontage* AttackMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+  TObjectPtr<class UAnimMontage> AttackMontage;
 #pragma endregion 김동주
 
 #pragma region RoomBase Instance
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
   ASanzoRoomBase* CurrentRoom;
 #pragma endregion 최윤서
-	
+
 #pragma region OverHeadUI
-	
+
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	UWidgetComponent* OverHeadHPBar;
-	
-	FTimerHandle OverHeadHPBarUpdateTimerHandle;
-	
-	void UpdateOverHeadHPBar();
-	
-	void MakeOverHeadHPBar3D();
-	
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+  UWidgetComponent* OverHeadHPBar;
+
+  FTimerHandle OverHeadHPBarUpdateTimerHandle;
+
+  void UpdateOverHeadHPBar();
+
+  void MakeOverHeadHPBar3D();
+
 #pragma endregion 이준로
-	
+
 };
