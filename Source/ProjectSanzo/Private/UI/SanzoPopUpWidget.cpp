@@ -114,7 +114,10 @@ void USanzoPopUpWidget::SetUpgradeUI()
 		CurrentOptions = UpgradeSubsystem->GeneratedRandomOptions();
 		for (int32 i = 0; i < UpgradeButtons.Num(); i++)
 		{
-			SetUpgradeButton(i, CurrentOptions[i]);
+			if (CurrentOptions.IsValidIndex(i))
+			{
+				SetUpgradeButton(i, CurrentOptions[i]);
+			}
 		}
 	}
 }

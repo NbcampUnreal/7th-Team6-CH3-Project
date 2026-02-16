@@ -102,3 +102,27 @@ public:
 	TSoftObjectPtr<UTexture2D> IconTexture;
 	
 };
+
+//두개의 변수 확인용 키 값 스트럭쳐
+USTRUCT(BlueprintType)
+struct FUpgradeStatKey
+{
+	GENERATED_BODY()
+	
+	EUpgradeTarget Target;
+	EUpgradeType Type;
+	
+	FUpgradeStatKey() : Target(EUpgradeTarget::Character), Type(EUpgradeType::MaxHealth) {}
+	FUpgradeStatKey(EUpgradeTarget InputTarget, EUpgradeType InputType)	: Target(InputTarget), Type(InputType) {}
+	
+	bool operator==(const FUpgradeStatKey& Other) const
+	{
+		return Target == Other.Target && Type == Other.Type;
+	}
+	
+	friend uint32 GetTypeHash(const FUpgradeStatKey& Key)
+	{
+		return HashCombine(GetTypeHash(Key.Target), GetTypeHash(Key.Type));
+	}
+	
+};

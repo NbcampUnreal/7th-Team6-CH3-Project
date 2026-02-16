@@ -32,6 +32,11 @@ protected:
 	UDataTable* UpgradeDataTable;
 	
 private:
+	EUpgradeRarity RollRarity();
+	
+	FUpgradeOption ConvertToOption(const FUpgradeDataRow* SelectedRow);
+	
+	TMap<FUpgradeStatKey, float> UpgradeTotalMap;
 	//선택된 업그레이드 기록용
 	UPROPERTY()
 	TArray<FUpgradeOption> UpgradeHistory;
