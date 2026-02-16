@@ -17,8 +17,8 @@ public:
   virtual void EndRoomSequence() override;
 
   // 시간
-  float CurrentTime;
   float TotalTime;
-  void UpdateTime();
+  virtual void UpdateTime() override;
+
 #pragma endregion 최윤서
 };

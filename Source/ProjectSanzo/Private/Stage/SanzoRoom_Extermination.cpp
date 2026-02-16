@@ -14,15 +14,19 @@ void ASanzoRoom_Extermination::BeginRoomSequence()
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 현재 적 수 - %d"), TotalEnemyCount);
   // 클리어 조건 달성 시 end
   UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 - 모든 적 처치"));
-  
-  //EndRoomSequence();
+  GetWorldTimerManager().SetTimer(
+    RoomSequenceTimerHandle,
+    this,
+    &ASanzoRoom_Extermination::UpdateTime,
+    0.1,
+    true
+  );
 }
 
 // 조건 클리어 시 호출 함수
 void ASanzoRoom_Extermination::EndRoomSequence()
 {
   Super::EndRoomSequence();
-  OnRoomCleared.Broadcast();
   // 문 열림 호출
   if (!StageGate)
   {
@@ -36,7 +40,7 @@ void ASanzoRoom_Extermination::EndRoomSequence()
 #pragma region Battle Event
 void ASanzoRoom_Extermination::OnEnemyKilled()
 {
-  CurrentEnemyCount++;
+  Super::OnEnemyKilled();
   if (GameState)
   {
     GameState->UpdateStageInfo(CurrentEnemyCount, TotalEnemyCount);
