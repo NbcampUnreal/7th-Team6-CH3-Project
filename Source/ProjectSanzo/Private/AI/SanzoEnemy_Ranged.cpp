@@ -86,19 +86,21 @@ void ASanzoEnemy_Ranged::FireHitScan()
     AActor* HitActor = HitResult.GetActor();
     if (HitActor)
     {
-      UGameplayStatics::ApplyDamage(
-        HitActor,
-        ShootDamage,
-        GetController(),
-        this,
-        UDamageType::StaticClass()
-      );
-    }
-
-    // 피격 위치에 이펙트 생성
-    if (HitEffect)
-    {
-      UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+      if (!HitActor->IsA<ASanzoEnemyBase>())
+      {
+        UGameplayStatics::ApplyDamage(
+          HitActor,
+          ShootDamage,
+          GetController(),
+          this,
+          UDamageType::StaticClass()
+        );
+      }
+      // 피격 위치에 이펙트 생성
+      if (HitEffect)
+      {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+      }
     }
 
     // [디버그용] 명중 시 초록색 선 출력
