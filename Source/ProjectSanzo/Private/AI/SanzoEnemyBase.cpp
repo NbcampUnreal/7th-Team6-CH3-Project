@@ -14,8 +14,6 @@
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
-  PrimaryActorTick.bCanEverTick = false;
-
   AIControllerClass = ASanzoAIController::StaticClass();
   // 맵에 놓거나 스폰되면 자동 빙의
   AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
