@@ -27,15 +27,19 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 	
 	if (UpgradeText && !InputOption.DisplayName.IsEmpty())
 	{
-		FText DisplayText = FText::Format(FText::FromString("{0} + {1}"),
+		FText DisplayText = FText::Format(FText::FromString("{0}{1}"),
 			InputOption.DisplayName,
-			InputOption.Value == 0 ? FText::FromString("") : FText::AsNumber(InputOption.Value)
+			InputOption.Value == 0 ? FText::FromString("") : (FText::Format(FText::FromString(" + {0}"), FText::AsNumber(InputOption.Value)))
 			);
 		UpgradeText->SetText(DisplayText);
 	}
 	
 	if (UpgradeIcon)
 	{
+		if (InputOption.IconTexture.IsNull())
+		{
+			UpgradeIcon->SetVisibility(ESlateVisibility::Hidden);
+		}
 		UpgradeIcon->SetBrushFromTexture(InputOption.IconTexture.LoadSynchronous());
 	}
 	
