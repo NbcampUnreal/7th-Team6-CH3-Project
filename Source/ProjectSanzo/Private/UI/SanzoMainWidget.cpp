@@ -8,6 +8,45 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
+void USanzoMainWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	StartGameTag = FGameplayTag::RequestGameplayTag(FName("Game.State.Playing"));
+	QuitGameTag = FGameplayTag::RequestGameplayTag(FName("Game.State.Quit"));
+	NextStageTag = FGameplayTag::RequestGameplayTag(FName("Room.State.MoveNext"));
+	ReturnMainMenuTag = FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu"));
+	
+	if (StartButton)
+	{
+		StartButton->OnClicked.AddDynamic(this,&ThisClass::HandleStartButtonClicked);
+	}
+	if (ExitButton)
+	{
+		ExitButton->OnClicked.AddDynamic(this,&ThisClass::HandleExitButtonClicked);
+	}
+	
+}
+
+void USanzoMainWidget::SetMainUI(FGameplayTag State, float ClearTime, int32 KillScore)
+{
+	CurrentState = State;
+	
+	if (State == FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu")))
+	{
+		SetMainMenuUI();
+	}
+	//스테이지 클리어서 넘어가는 태그 확인 필요
+	if (State == FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")))
+	{
+		SetStageClearMenuUI(ClearTime, KillScore);
+	}
+	if (State == FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")))
+	{
+		SetGameOverMenuUI();
+	}
+}
+
 void USanzoMainWidget::SetMainMenuUI()
 {
 	if (BackBoard)
@@ -80,5 +119,26 @@ void USanzoMainWidget::SetGameOverMenuUI()
 	if (ExitText)
 	{
 		ExitText->SetText(FText::FromString(TEXT("메인 메뉴")));
+	}
+}
+
+void USanzoMainWidget::HandleStartButtonClicked()
+{
+	OnButtonClicked.Broadcast(StartGameTag);
+}
+
+void USanzoMainWidget::HandleExitButtonClicked()
+{
+	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu")))
+	{
+		OnButtonClicked.Broadcast(QuitGameTag);
+	}
+	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")))
+	{
+		OnButtonClicked.Broadcast(NextStageTag);
+	}
+	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")))
+	{
+		OnButtonClicked.Broadcast(ReturnMainMenuTag);
 	}
 }

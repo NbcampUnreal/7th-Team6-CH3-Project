@@ -8,7 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "SanzoPopUpWidget.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnButtonClicked, FGameplayTag, CurrentState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPopUpUIButtonClicked, FGameplayTag, CurrentState);
 
 UCLASS()
 class PROJECTSANZO_API USanzoPopUpWidget : public UUserWidget
@@ -25,7 +25,7 @@ public:
 	UPROPERTY()
 	TArray<FUpgradeOption> CurrentOptions;
 	
-	FOnButtonClicked OnButtonClicked;
+	FOnPopUpUIButtonClicked OnButtonClicked;
 	
 protected:
 	
