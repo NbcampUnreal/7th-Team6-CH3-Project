@@ -57,7 +57,7 @@ void ASanzoStageManager::StartStage()
       RoomClassToSpawn = ExterminationRoomClass;
       break;
     case ESanzoStageType::Survival:
-      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 버티기"));
+      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 방호전"));
       RoomClassToSpawn = SurvivalRoomClass;
       break;
     case ESanzoStageType::Boss:

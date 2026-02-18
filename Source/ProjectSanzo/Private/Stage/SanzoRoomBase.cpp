@@ -11,7 +11,8 @@ ASanzoRoomBase::ASanzoRoomBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	TotalEnemyCount = 0;
-
+  CurrentEnemyCount = 0;
+  CurrentTime = 0.0f;
 }
 
 void ASanzoRoomBase::BeginPlay()
@@ -69,8 +70,17 @@ void ASanzoRoomBase::BeginRoomSequence()
 
 void ASanzoRoomBase::EndRoomSequence()
 {
-    // 문 열기, 다음 방 개방 지시
+	// 클리어 알림
+	OnRoomCleared.Broadcast();
+  // 타이머 정지
+	GetWorld()->GetTimerManager().ClearTimer(RoomSequenceTimerHandle);
+
+    // 문 열기
 	UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 종료"));
+	if(GameState)
+	{
+		GameState->UpdateStageResult(CurrentEnemyCount, CurrentTime);
+  }
 }
 
 void ASanzoRoomBase::Tick(float DeltaTime)
@@ -81,7 +91,14 @@ void ASanzoRoomBase::Tick(float DeltaTime)
 
 void ASanzoRoomBase::OnEnemyKilled()
 {
-	// 기본은 아무것도 안 함
+	// 처치 수 카운트
+	CurrentEnemyCount++;
+}
+
+void ASanzoRoomBase::UpdateTime()
+{
+  // 시간 업데이트
+	CurrentTime += 0.1;
 }
 
 //  적 스폰 호출

@@ -37,7 +37,7 @@ void ASanzoGameMode::InitStageType()
   }
   else if (GetWorld()->GetMapName().Contains("Stage2"))
   {
-    UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 타입 설정 - 버티기"));
+    UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 타입 설정 - 방호전"));
     CurrentStageType = ESanzoStageType::Survival;
   }
   else if (GetWorld()->GetMapName().Contains("Stage3"))

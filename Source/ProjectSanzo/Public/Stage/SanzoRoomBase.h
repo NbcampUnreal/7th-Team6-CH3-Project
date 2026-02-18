@@ -42,6 +42,11 @@ public:
 
   // 적 카운트
   int32 TotalEnemyCount;
+  int32 CurrentEnemyCount;
+
+  // 시간
+  float CurrentTime;
+  virtual void UpdateTime();
 
   // 전투 정보 State에 전달
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Core")

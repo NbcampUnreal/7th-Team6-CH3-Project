@@ -27,7 +27,6 @@ void ASanzoRoom_Survival::BeginRoomSequence()
 void ASanzoRoom_Survival::EndRoomSequence()
 {
   Super::EndRoomSequence();
-  OnRoomCleared.Broadcast();
   // 문 열림 호출
   if (!StageGate)
   {
@@ -41,7 +40,7 @@ void ASanzoRoom_Survival::EndRoomSequence()
 #pragma region Battle Event
 void ASanzoRoom_Survival::UpdateTime()
 {
-  CurrentTime += 0.1;
+  Super::UpdateTime();
   if (GameState)
   {
     GameState->UpdateStageInfo(CurrentTime, TotalTime);
@@ -49,7 +48,6 @@ void ASanzoRoom_Survival::UpdateTime()
   if (CurrentTime > TotalTime)
   {
     UE_LOG(LogCYS, Warning, TEXT("방호: 시간 끝"));
-    GetWorld()->GetTimerManager().ClearTimer(RoomSequenceTimerHandle);
     EndRoomSequence();
   }
 }
