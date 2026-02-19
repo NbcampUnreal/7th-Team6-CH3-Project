@@ -26,10 +26,24 @@ protected:
   USceneComponent* Root;
 
   UPROPERTY(VisibleAnywhere)
-  UStaticMeshComponent* GateMesh;
+  UStaticMeshComponent* GateMeshL;
+  UPROPERTY(VisibleAnywhere)
+  UStaticMeshComponent* GateMeshR;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+  USoundBase* OpenSound;
+  UPROPERTY(EditAnywhere, Category = "Effects")
+  USoundAttenuation* OpenSoundAttenuation;
 
   UPROPERTY(VisibleAnywhere)
   UBoxComponent* TriggerBox;
+
+  FTimerHandle DoorTimer;
+
+  float RotateSpeed = 180.f;   // deg/sec
+  float RotatedAmount = 0.f;   // 누적 회전량
+  float TargetAngle = 90.f;
+
 
 private:
   UFUNCTION()
@@ -41,6 +55,8 @@ private:
     bool bFromSweep,
     const FHitResult& SweepResult
   );
+
+  void RotateDoor();
 
   bool bIsOpened = false;
 #pragma endregion 최윤서
