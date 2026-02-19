@@ -70,13 +70,25 @@ void ASanzoGameMode::OnStageCleared()
 {
   UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 클리어"));
   
-  // 스테이지 이동
-  USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GetGameInstance());
-  if (SGI)
-  {
-    SGI->MoveToNextStage();
-  }
+	ASanzoGameState* SanzoGameState = GetWorld() ? GetWorld()->GetGameState<ASanzoGameState>() : nullptr;
+	if (SanzoGameState)
+	{
+		UE_LOG(LogLJR, Warning, TEXT("SM: 결과창 띄우기"));
+		SanzoGameState->OpenStageClearUI(FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")));
+	}
 }
+
+//함수 분리
+void ASanzoGameMode::MoveToNextStage()
+{
+	// 스테이지 이동
+	USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GetGameInstance());
+	if (SGI)
+	{
+		SGI->MoveToNextStage();
+	}
+}
+
 #pragma endregion 최윤서
 
 #pragma region Upgrade Management

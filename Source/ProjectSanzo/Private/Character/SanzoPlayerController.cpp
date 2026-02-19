@@ -7,8 +7,9 @@
 #include "UI/SanzoHUDWidget.h"
 #include "UI/SanzoPopUpWidget.h"
 #include "Core/SanzoGameInstance.h"
-#include "Core/SanzoGameState.h"
+#include "Core/SanzoGameMode.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/GameMode.h"
 #include "Kismet/GameplayStatics.h"
 
 ASanzoPlayerController::ASanzoPlayerController()
@@ -167,6 +168,18 @@ void ASanzoPlayerController::OnMainClosed(FGameplayTag State)
 	if (State == QuitGameTag)
 	{
 		QuitGame();
+	}
+	if (State == FGameplayTag::RequestGameplayTag(FName("Room.State.MoveNext")))
+	{
+		AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
+		if (GameMode)
+		{
+			ASanzoGameMode* SanzoGameMode = Cast<ASanzoGameMode>(GameMode);
+			if (SanzoGameMode)
+			{
+				SanzoGameMode->MoveToNextStage();
+			}
+		}
 	}
 }
 

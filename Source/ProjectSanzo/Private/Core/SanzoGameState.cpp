@@ -64,4 +64,15 @@ void ASanzoGameState::OpenHUD()
 		}
 	}
 }
+
+void ASanzoGameState::OpenStageClearUI(FGameplayTag State)
+{
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
+		{
+			SanzoPlayerController->ShowMainUI(State,TotalSurvivalTime,TotalKillCount );
+		}
+	}
+}
 #pragma endregion 이준로
