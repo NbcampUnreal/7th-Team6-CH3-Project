@@ -80,18 +80,18 @@ void ASanzoGun::Fire()
 
 	FVector Start = CameraLocation;
 	FVector End = Start + (CameraRotation.Vector() * MaxRange);
-	
+
 	// 라인트레이스 시작될 때 쏜 무기와 무기 들고있는 플레이어 판정 제외
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);           
+	QueryParams.AddIgnoredActor(this);
 	QueryParams.AddIgnoredActor(GetOwner());
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(
 		HitResult,
 		Start,
 		End,
-		ECC_Visibility, 
+		ECC_Visibility,
 		QueryParams
 	);
 
@@ -145,7 +145,7 @@ void ASanzoGun::Fire()
 			0.5f
 		);
 
-		// 3. 눈속임선(빨간색, 총구에서 카메라 중앙)
+		// 눈속임선(빨간색, 총구에서 카메라 중앙)
 		if (FireStartLocation)
 		{
 			FVector MuzzleLocation = FireStartLocation->GetComponentLocation();
@@ -182,11 +182,12 @@ void ASanzoGun::Fire()
 			true
 		);
 	}
-	
+
 	// 데미지 적용
 	if (bHit)
 	{
 		ApplyDamageToTarget(HitResult.GetActor(), HitResult);
+		PlayImpactEffects(HitResult);
 	}
 }
 

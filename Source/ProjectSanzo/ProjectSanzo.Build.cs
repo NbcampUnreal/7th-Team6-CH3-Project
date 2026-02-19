@@ -8,7 +8,7 @@ public class ProjectSanzo : ModuleRules
   {
     PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-    PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayTags", "NavigationSystem", "GameplayTasks", "AIModule" });
+    PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayTags", "NavigationSystem", "GameplayTasks", "AIModule", "Niagara" });
 
     PrivateDependencyModuleNames.AddRange(new string[] { });
 
