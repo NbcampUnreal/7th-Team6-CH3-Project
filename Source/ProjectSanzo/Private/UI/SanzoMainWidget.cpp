@@ -79,8 +79,18 @@ void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScore)
 	}
 	if (ClearTimeText)
 	{
+		//전체 분, 초 계산
+		int32 TotalSeconds = FMath::FloorToInt(ClearTime);
+		int32 Minutes = TotalSeconds / 60;
+		int32 Seconds = TotalSeconds % 60;
+		
+		//밀리 초 계산
+		int32 MilliSeconds = FMath::FloorToInt((ClearTime- TotalSeconds) * 100);
+		
+		FString TimeText = FString::Printf(TEXT("%02d : %02d . %02d"), Minutes, Seconds, MilliSeconds);
+		
 		ClearTimeText->SetVisibility(ESlateVisibility::Visible);
-		ClearTimeText->SetText(FText::FromString(FString::Printf(TEXT("클리어 시간: %f"),ClearTime)));
+		ClearTimeText->SetText(FText::Format(FText::FromString(TEXT("클리어 시간: {0}")), FText::FromString(TimeText)));
 	}
 	if (KillScoreText)
 	{

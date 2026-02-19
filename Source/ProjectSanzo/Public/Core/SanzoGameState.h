@@ -55,6 +55,8 @@ public:
 	void UpdateStageProgressBar();
 
 	void OpenHUD();
+	
+	void OpenStageClearUI(FGameplayTag State);
 
 	FTimerHandle UpdateStageProgressBarTimer;
 #pragma endregion 이준로

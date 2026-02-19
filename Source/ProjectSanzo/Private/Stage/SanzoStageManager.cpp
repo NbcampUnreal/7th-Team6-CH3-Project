@@ -1,7 +1,10 @@
 #include "Stage/SanzoStageManager.h"
+
+#include "Character/SanzoPlayerController.h"
 #include "Core/SanzoGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
+#include "Core/SanzoGameState.h"
 
 ASanzoStageManager::ASanzoStageManager()
 {

@@ -24,6 +24,7 @@ public:
   // 스테이지 흐름
   void StartStage();
   void OnStageCleared();
+	void MoveToNextStage();
 
   // 성장
   void TriggerUpgradeSelection();
