@@ -69,8 +69,16 @@ ASanzoCharacter::ASanzoCharacter()
   
 #pragma endregion 김형백 
 
+  AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.State.Aiming"));
+  SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.State.Sprint"));
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
+}
+
+void ASanzoCharacter::PostInitializeComponents()
+{
+  Super::PostInitializeComponents();
+
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -170,13 +178,29 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
 
 void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 {
+  bool bShouldMove = !(GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero());
+  if(CharacterGameplayTags.HasTag(AimingTag))
+  {
+    StopSprint(Value);
+    return;
+  }
 
-  if(GetCharacterMovement())
+  if (!bShouldMove)
+  {
+    StopSprint(Value);
+    return;
+  }
+
+  if(GetCharacterMovement() && bShouldMove)
   {
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
     GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-    //TODO : 스태미너 감소 시작
+
+    //달리기 태그 추가
+    CharacterGameplayTags.AddTag(SprintTag);
+    StatComp->ConsumeStamina(.1f);
+    
    
     
     GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
@@ -191,6 +215,9 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
     GetCharacterMovement()->bOrientRotationToMovement = false;
     bUseControllerRotationYaw = true;
     GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+
+    CharacterGameplayTags.RemoveTag(SprintTag);
+
     //TODO : 스태미너 감소 중지
     GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
       FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
@@ -199,7 +226,7 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 
 void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 {
-  
+
   if(EquipmentComp)
   {
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Component extists"));
@@ -210,6 +237,13 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
       
     }
   }
+
+  if (CharacterGameplayTags.HasTag(SprintTag))
+  {
+    StopFire(Value);
+    return;
+  }
+
 }
 
 void ASanzoCharacter::StopFire(const FInputActionValue& Value)
@@ -233,6 +267,7 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 #pragma region AimingFunction
 void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 {
+  CharacterGameplayTags.AddTag(AimingTag);
   if(bIsAiming)
   {
     return;
@@ -244,6 +279,7 @@ void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 
 void ASanzoCharacter::AimStop(const FInputActionValue& Value)
 {
+  CharacterGameplayTags.RemoveTag(AimingTag);
   PlayAimTimeLine();
   bIsAiming = false;
 }

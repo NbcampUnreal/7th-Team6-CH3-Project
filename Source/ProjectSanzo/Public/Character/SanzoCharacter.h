@@ -104,8 +104,14 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
   float SprintSpeed;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|State")
-  FGameplayTagContainer GameplayTagContainer;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Tags")
+  FGameplayTagContainer CharacterGameplayTags;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Tags")
+  FGameplayTag AimingTag;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Tags")
+  FGameplayTag SprintTag;
 
 protected:
 
@@ -129,9 +135,13 @@ protected:
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+  virtual void PostInitializeComponents() override;
   virtual void BeginPlay() override;
 
+
   virtual void Tick(float DeltaTime) override;
+
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

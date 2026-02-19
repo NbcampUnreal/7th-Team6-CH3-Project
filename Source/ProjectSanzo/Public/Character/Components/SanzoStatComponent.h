@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "SanzoStatComponent.generated.h"
 
 
@@ -26,7 +27,7 @@ struct FSanzoStatData
 
 //정보 전달 할 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
-
+DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&, State);
 #pragma endregion 이준로
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -43,28 +44,12 @@ protected:
 	//stamina 관련 변수
 	float CurrentStamina;
 	float MaxStamina;
-	float StaminaRegenRate;
-	float StaminaConsumptionRate;
-	float StaminaThresholdForActions;
-	float StaminaRegenDelay;
-	float TimeSinceLastStaminaUse;
-	float DodgeStaminaCost;
-	float SprintStaminaCostPerSecond;
+
 
 	//Health 관련 변수
 	float CurrentHealth;
 	float MaxHealth;
-	//float HealthRegenRate;
-	//float TimeSinceLastHealthLoss;
-	//float HealthRegenDelay;
 
-	//float PoisonDamagePerSecond;
-	//float TimeSinceLastPoisonDamage;
-	//float PoisonDuration;
-	//float TimeSincePoisoned;
-	//float Defense;
-	//float AttackPower;
-	//float CriticalHitChance;
 
 	//Exp 관련 변수
 	float CurrentExp;
@@ -77,6 +62,7 @@ public:
 
 	void ConsumeStamina(float Amount);
 	float GetStamina() const { return CurrentStamina; }
+	bool bCanSprint();
 
 #pragma region UIDataTransfer
 
