@@ -121,7 +121,7 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
   FGameplayTag ExhaustedTag;
 
-  FTimerHandle SprintStaminaTimerHandle;
+ 
 
   bool CheckTags(const FGameplayTag& TagsToCheck);
 
@@ -150,10 +150,11 @@ protected:
 
   virtual void PostInitializeComponents() override;
   virtual void BeginPlay() override;
-
-
   virtual void Tick(float DeltaTime) override;
+  virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+  FTimerHandle SprintStaminaTimerHandle;
+  FTimerHandle ExhaustionRecoveryTimerHandle;
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

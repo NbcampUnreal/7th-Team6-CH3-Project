@@ -129,6 +129,22 @@ void ASanzoCharacter::Tick(float DeltaTime)
       GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
 }
 
+void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+  Super::EndPlay(EndPlayReason);
+
+  //스테이지 이동시 타이머 제거
+  if(GetWorld()->GetTimerManager().IsTimerActive(SprintStaminaTimerHandle))
+  {
+    GetWorld()->GetTimerManager().ClearTimer(SprintStaminaTimerHandle);
+  }
+  
+  if(GetWorld()->GetTimerManager().IsTimerActive(ExhaustionRecoveryTimerHandle))
+  {
+    GetWorld()->GetTimerManager().ClearTimer(ExhaustionRecoveryTimerHandle);
+  }
+}
+
 #pragma region InputFunction
 
 void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -213,6 +229,23 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
     if (StatComp)
     {
       StatComp->RequestConsumeStaminaForSprint(true);
+      if(StatComp->bIsExhausted)
+      {
+        CharacterGameplayTags.AddTag(ExhaustedTag);
+        GetWorld()->GetTimerManager().SetTimer(
+          ExhaustionRecoveryTimerHandle, 
+          [this]()
+        {
+          CharacterGameplayTags.RemoveTag(ExhaustedTag);
+          if (StatComp)
+          {
+            StatComp->bIsExhausted = false;
+          }
+        }, 
+        3.f, 
+        false);
+        StopSprint(Value);
+      }
     }
   }
   

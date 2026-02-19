@@ -42,6 +42,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+  virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	//stamina 관련 변수
 	float CurrentStamina;
@@ -72,6 +73,7 @@ public:
 	FOnTagCheckDelegate TagCheckDelegate;
 	//캐릭터에서 사용할 질문함수
 	void RequestConsumeStaminaForSprint(bool bShouldConsume);
+	bool bIsExhausted;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -83,7 +85,6 @@ public:
 
 	bool bCanSprint();
 	//태그확인용 델리게이
-
   bool CheckTag(const FGameplayTag& Tag) const;
 
 	
