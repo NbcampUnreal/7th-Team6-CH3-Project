@@ -43,28 +43,12 @@ protected:
 	//stamina 관련 변수
 	float CurrentStamina;
 	float MaxStamina;
-	float StaminaRegenRate;
-	float StaminaConsumptionRate;
-	float StaminaThresholdForActions;
-	float StaminaRegenDelay;
-	float TimeSinceLastStaminaUse;
-	float DodgeStaminaCost;
-	float SprintStaminaCostPerSecond;
+
 
 	//Health 관련 변수
 	float CurrentHealth;
 	float MaxHealth;
-	//float HealthRegenRate;
-	//float TimeSinceLastHealthLoss;
-	//float HealthRegenDelay;
 
-	//float PoisonDamagePerSecond;
-	//float TimeSinceLastPoisonDamage;
-	//float PoisonDuration;
-	//float TimeSincePoisoned;
-	//float Defense;
-	//float AttackPower;
-	//float CriticalHitChance;
 
 	//Exp 관련 변수
 	float CurrentExp;
@@ -77,6 +61,7 @@ public:
 
 	void ConsumeStamina(float Amount);
 	float GetStamina() const { return CurrentStamina; }
+	bool bCanSprint();
 
 #pragma region UIDataTransfer
 

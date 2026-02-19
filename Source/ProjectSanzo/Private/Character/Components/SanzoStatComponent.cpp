@@ -8,13 +8,7 @@ USanzoStatComponent::USanzoStatComponent()
 {
 	CurrentStamina = 100.f;
 	MaxStamina = 100.f;
-	StaminaRegenRate = 5.f;
-	StaminaConsumptionRate = 10.f;
-	StaminaThresholdForActions = 20.f;
-	StaminaRegenDelay = 2.f;
-	TimeSinceLastStaminaUse = 0.f;
-	DodgeStaminaCost = 15.f;
-	SprintStaminaCostPerSecond = 5.f;
+
 
 	//테스트 코드
 	CurrentHealth = 100.f;
@@ -24,7 +18,7 @@ USanzoStatComponent::USanzoStatComponent()
 	MaxExp = 100.f;
 	Level = 1;
 
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	// ...
 }
 
@@ -33,6 +27,7 @@ void USanzoStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 #pragma  region InitalBroadCast
 	BroadCastStatUpdate();
 #pragma endregion	이준로
@@ -45,17 +40,34 @@ void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if(CurrentStamina<= MaxStamina)
+	{
+    CurrentStamina = FMath::Clamp(CurrentStamina + (5.f * DeltaTime), 0.f, MaxStamina);	
+			
+  }
+
+
+
 	// ...
 }
 
 void USanzoStatComponent::ConsumeStamina(float Amount)
 {
-	CurrentStamina -= Amount;
+
+  if (Amount <= 0.f)
+  {
+    CurrentStamina = 0.f;
+    return;
+  }
+  CurrentStamina -= Amount;
+}
+
+bool USanzoStatComponent::bCanSprint()
+{
+	
 
 
-	if (Amount <= 0.f)
-	{
-	}
+	return false;
 }
 #pragma region UIUpdateBroadCastStat
 // 스탯 변경 방송 함수
