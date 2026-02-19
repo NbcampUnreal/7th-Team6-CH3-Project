@@ -88,7 +88,7 @@ public:
   UFUNCTION()
   void PlayAimTimeLine();
 
-  bool bIsAiming;
+  
 
 #pragma endregion 김형백
   
@@ -103,15 +103,27 @@ public:
   float SprintSpeedMultiplier;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
   float SprintSpeed;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
+  float AimingSpeed;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
+  float AimingSpeedMultiplier;  
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Tags")
   FGameplayTagContainer CharacterGameplayTags;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Tags")
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
   FGameplayTag AimingTag;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Tags")
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
   FGameplayTag SprintTag;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
+  FGameplayTag AttackTag;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
+  FGameplayTag ExhaustedTag;
+
+  FTimerHandle SprintStaminaTimerHandle;
+
+  bool CheckTags(const FGameplayTag& TagsToCheck);
 
 protected:
 
@@ -155,5 +167,7 @@ public:
     class AController* EventInstigator,
     AActor* DamageCauser) override;
 #pragma endregion 김동주
+
+
 
 };

@@ -2,13 +2,20 @@
 
 
 #include "Character/Components/SanzoStatComponent.h"
+#include "TimerManager.h"
 #include "Common/SanzoLog.h"
 
 USanzoStatComponent::USanzoStatComponent()
 {
+	AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Aiming"));
+	SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Sprint"));
+	AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Attack"));
+	ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("Character.Status.Exhausted"));
+
 	CurrentStamina = 100.f;
 	MaxStamina = 100.f;
-
+	StaminaRestoreAmount = 10.f; //초당 회복량
+  SprintStaminaCost = 10.f; //Sprint 초당 소모량
 
 	//테스트 코드
 	CurrentHealth = 100.f;
@@ -17,6 +24,11 @@ USanzoStatComponent::USanzoStatComponent()
 	CurrentExp = 0.f;
 	MaxExp = 100.f;
 	Level = 1;
+
+
+
+	
+
 
 	PrimaryComponentTick.bCanEverTick = true;
 	// ...
@@ -27,6 +39,16 @@ void USanzoStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//스태미나 지속 회복
+  GetWorld()->GetTimerManager().SetTimer(
+		StaminaRestoreHandle, 
+		[this]() //인자(회복량)를 받아야 해서 람다로 변환
+		{
+      RestoreStamina(StaminaRestoreAmount * 0.01f);
+				BroadCastStatUpdate();
+		},
+		0.01f, 
+		true);
 	
 #pragma  region InitalBroadCast
 	BroadCastStatUpdate();
@@ -35,16 +57,34 @@ void USanzoStatComponent::BeginPlay()
 }
 
 
+void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
+{
+  bool bIsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(SprintStaminaCostHandle);
+	if(bShouldConsume == true && !bIsTimerActive) //true면서 타이머가없을때	
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			SprintStaminaCostHandle, 
+			[this]()
+			{
+				ConsumeStamina(SprintStaminaCost * 0.01f);
+				BroadCastStatUpdate();
+			},
+			0.01f, 
+      true);
+	}
+	else if(!bShouldConsume && bIsTimerActive)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(SprintStaminaCostHandle);
+	}
+}
+
+
 void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
   FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(CurrentStamina<= MaxStamina)
-	{
-    CurrentStamina = FMath::Clamp(CurrentStamina + (5.f * DeltaTime), 0.f, MaxStamina);	
-			
-  }
+	
 
 
 
@@ -53,22 +93,47 @@ void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void USanzoStatComponent::ConsumeStamina(float Amount)
 {
-
-  if (Amount <= 0.f)
+	CurrentStamina -= Amount;
+  if (CurrentStamina <= 0.f)
   {
     CurrentStamina = 0.f;
     return;
   }
-  CurrentStamina -= Amount;
+  
+	BroadCastStatUpdate();
+}
+
+void USanzoStatComponent::RestoreStamina(float Amount)
+{
+	//행동 중이면 회복 중지
+	if (CheckTag(FGameplayTag::RequestGameplayTag(FName("Character.Action"))))
+	{
+		return;
+	}
+	if (CurrentStamina <= MaxStamina)
+	{
+
+		CurrentStamina = FMath::Clamp(CurrentStamina + Amount, 0.f, MaxStamina);
+		BroadCastStatUpdate();
+	}
 }
 
 bool USanzoStatComponent::bCanSprint()
 {
-	
 
 
 	return false;
 }
+
+bool USanzoStatComponent::CheckTag(const FGameplayTag& Tag) const
+{
+	if(TagCheckDelegate.IsBound())
+	{
+		return TagCheckDelegate.Execute(Tag);
+  }
+  return false;
+}
+
 #pragma region UIUpdateBroadCastStat
 // 스탯 변경 방송 함수
 // 스탯 변경되는 모든 함수 끝에 붙여주셔야 합니다!

@@ -27,8 +27,10 @@ struct FSanzoStatData
 
 //정보 전달 할 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
-DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
+
 #pragma endregion 이준로
+
+DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTSANZO_API USanzoStatComponent : public UActorComponent
@@ -44,26 +46,47 @@ protected:
 	//stamina 관련 변수
 	float CurrentStamina;
 	float MaxStamina;
-
-
+  float StaminaRestoreAmount;
+  float SprintStaminaCost;
+	//스태미나 지속회복 핸들
+	FTimerHandle StaminaRestoreHandle;
+  FTimerHandle SprintStaminaCostHandle;
 	//Health 관련 변수
 	float CurrentHealth;
 	float MaxHealth;
-
 
 	//Exp 관련 변수
 	float CurrentExp;
 	float MaxExp;
 	int32 Level;
 
+	
+	FGameplayTag AimingTag;
+	FGameplayTag SprintTag;
+	FGameplayTag AttackTag;
+	FGameplayTag ExhaustedTag;
+	void ConsumeStamina(float Amount);
+	void RestoreStamina(float Amount);
+	
+public:
+	FOnTagCheckDelegate TagCheckDelegate;
+	//캐릭터에서 사용할 질문함수
+	void RequestConsumeStaminaForSprint(bool bShouldConsume);
+
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
-	void ConsumeStamina(float Amount);
-	float GetStamina() const { return CurrentStamina; }
-	bool bCanSprint();
 
+	float GetStamina() const { return CurrentStamina; }
+
+
+	bool bCanSprint();
+	//태그확인용 델리게이
+
+  bool CheckTag(const FGameplayTag& Tag) const;
+
+	
 #pragma region UIDataTransfer
 
 	FOnStatChangedDelegate OnStatChanged;

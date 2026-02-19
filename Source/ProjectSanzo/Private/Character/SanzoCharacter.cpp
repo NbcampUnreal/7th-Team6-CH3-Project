@@ -39,8 +39,9 @@ ASanzoCharacter::ASanzoCharacter()
 
   NomalSpeed = 500.f;
   SprintSpeedMultiplier = 1.8f;
+  AimingSpeedMultiplier = 0.7f;
   SprintSpeed = NomalSpeed * SprintSpeedMultiplier; 
-
+  AimingSpeed = NomalSpeed * AimingSpeedMultiplier;
   GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
   //게임패드 아날로그 스틱 최소이동속도
   GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -69,8 +70,11 @@ ASanzoCharacter::ASanzoCharacter()
   
 #pragma endregion 김형백 
 
-  AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.State.Aiming"));
-  SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.State.Sprint"));
+  //태그캐싱
+  AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Aiming"));
+  SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Sprint"));
+  AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Attack"));
+  ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("Character.Status.Exhausted"));
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
 }
@@ -78,7 +82,8 @@ ASanzoCharacter::ASanzoCharacter()
 void ASanzoCharacter::PostInitializeComponents()
 {
   Super::PostInitializeComponents();
-
+  //태그확인용 델리게이 바인딩
+  StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -118,6 +123,10 @@ void ASanzoCharacter::Tick(float DeltaTime)
     AimTimeline.TickTimeline(DeltaTime);
   }
   
+  //확인용 지울예정
+  GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
+    FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), 
+      GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
 }
 
 #pragma region InputFunction
@@ -144,6 +153,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     UE_LOG(LogSanzo, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
   }
 }
+
+
 
 void ASanzoCharacter::Move(const FInputActionValue& Value)
 {
@@ -179,17 +190,16 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
 void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 {
   bool bShouldMove = !(GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero());
-  if(CharacterGameplayTags.HasTag(AimingTag))
+  bool bHasAttackTag = CharacterGameplayTags.HasTag(AttackTag);   
+  bool bHasAimingTag = CharacterGameplayTags.HasTag(AimingTag); 
+  bool bIsExhausted = CharacterGameplayTags.HasTag(ExhaustedTag);
+  
+  if(bHasAimingTag||bHasAttackTag||!bShouldMove||bIsExhausted)
   {
     StopSprint(Value);
     return;
   }
 
-  if (!bShouldMove)
-  {
-    StopSprint(Value);
-    return;
-  }
 
   if(GetCharacterMovement() && bShouldMove)
   {
@@ -199,13 +209,13 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 
     //달리기 태그 추가
     CharacterGameplayTags.AddTag(SprintTag);
-    StatComp->ConsumeStamina(.1f);
-    
-   
-    
-    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
-      FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
+    //스태미나소모
+    if (StatComp)
+    {
+      StatComp->RequestConsumeStaminaForSprint(true);
+    }
   }
+  
 }
 
 void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
@@ -216,24 +226,31 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
     bUseControllerRotationYaw = true;
     GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
 
+    if (CharacterGameplayTags.HasTag(AimingTag))
+    {
+      GetCharacterMovement()->MaxWalkSpeed = AimingSpeed;
+    }
+    if (StatComp)
+    {
+      StatComp->RequestConsumeStaminaForSprint(false);
+    }
     CharacterGameplayTags.RemoveTag(SprintTag);
 
-    //TODO : 스태미너 감소 중지
-    GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
-      FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
   }
 }
 
 void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 {
-  if (CharacterGameplayTags.HasTag(SprintTag))
-  {
-    StopFire(Value);
-    return;
-  }
+  //if (CharacterGameplayTags.HasTag(SprintTag))
+  //{
+  //  StopFire(Value);
+  //  return;
+  //} 이제 달릴때 쏘면 멈추고 쏩니다
 
   if(EquipmentComp)
   {
+    CharacterGameplayTags.AddTag(AttackTag);
+
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Component extists"));
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
@@ -251,12 +268,10 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 {
   if (EquipmentComp)
   {
-    
+    CharacterGameplayTags.RemoveTag(AttackTag);
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
-      
       Weapon->StopFire();
-
     }
   }
 }
@@ -268,21 +283,22 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 #pragma region AimingFunction
 void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 {
-  CharacterGameplayTags.AddTag(AimingTag);
-  if(bIsAiming)
+  
+  if(CharacterGameplayTags.HasTag(AimingTag))
   {
     return;
   }
-  
+  GetCharacterMovement()->MaxWalkSpeed = AimingSpeed;
   PlayAimTimeLine();
-  bIsAiming = true;
+  CharacterGameplayTags.AddTag(AimingTag);
 }
 
 void ASanzoCharacter::AimStop(const FInputActionValue& Value)
 {
-  CharacterGameplayTags.RemoveTag(AimingTag);
+  
+  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
   PlayAimTimeLine();
-  bIsAiming = false;
+  CharacterGameplayTags.RemoveTag(AimingTag);
 }
 
 void ASanzoCharacter::TimelineUpdateCallBack(float Value)
@@ -297,11 +313,11 @@ void ASanzoCharacter::TimelineFinishedCallBack()
 
 void ASanzoCharacter::PlayAimTimeLine()
 {
-  if (AimCurve && !bIsAiming)
+  if (AimCurve && !CharacterGameplayTags.HasTag(AimingTag))
   {
     AimTimeline.Play(); 
   }
-  if (AimCurve && bIsAiming)
+  if (AimCurve && CharacterGameplayTags.HasTag(AimingTag))
   {
     AimTimeline.Reverse();
   }
@@ -310,6 +326,12 @@ void ASanzoCharacter::PlayAimTimeLine()
 
 #pragma endregion 김형백
 
+
+bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
+{
+  return CharacterGameplayTags.HasTag(TagsToCheck);
+  
+}
 
 #pragma region PlayerTakeDamage
 float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
