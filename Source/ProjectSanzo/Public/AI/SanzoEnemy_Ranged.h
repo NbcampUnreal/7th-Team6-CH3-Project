@@ -25,6 +25,10 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Combat|Aim")
   void StopAiming();
 
+  // 조준 취소
+  void CancelAiming();
+
+  // 조준 재개
   void ResumeAiming();
 protected:
   // 원거리 적 전용 공격력
@@ -63,6 +67,10 @@ protected:
 
   FTimerHandle AimTimerHandle;
 
-  // 조준 시작 시점의 플레이어 높이
-  float LockedAimPitch = 0.f;
+  // 조준 고정 플래그
+  bool bIsAimLocked = false;
+  // 조준 고정된 위치
+  FVector LockedTraceEnd;
+  // 조준 고정된 각도
+  FRotator LockedAimRotation;
 };

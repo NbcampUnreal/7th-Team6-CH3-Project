@@ -26,9 +26,7 @@ void ASanzoEnemy_Ranged::FireHitScan()
 {
   if (IsDead() || !WeaponMesh) return;
 
-  // 발사 시작 위치와 방향 설정
   FVector TraceStart = GetActorLocation();
-  FRotator TraceRotation = GetActorRotation();
 
   if (WeaponMesh->DoesSocketExist(TEXT("MuzzleFlash")))
   {
@@ -39,9 +37,8 @@ void ASanzoEnemy_Ranged::FireHitScan()
     TraceStart = GetActorLocation() + (GetActorForwardVector() * 50.0f) + FVector(0.f, 0.f, 50.f);
   }
 
-  FRotator AimRotation = GetActorRotation();
-  AimRotation.Pitch = LockedAimPitch;
-  FVector TraceEnd = TraceStart + (AimRotation.Vector() * AttackRange);
+  FRotator TraceRotation = LockedAimRotation;
+  FVector TraceEnd = TraceStart + (LockedAimRotation.Vector() * AttackRange);
 
   // 발사 이펙트 및 사운드 재생
   if (MuzzleFlashEffect)
@@ -133,14 +130,59 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
       TraceStart = WeaponMesh->GetSocketLocation(TEXT("MuzzleFlash"));
     }
 
-    FRotator AimRotation = GetActorRotation();
-    AimRotation.Pitch = LockedAimPitch;
+    ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (PlayerCharacter)
+    {
+      // 플레이어 위치 계산
+      FVector PlayerCenter = PlayerCharacter->GetActorLocation() + FVector(0.f, 0.f, 30.f);
 
-    float TargetPitch = FRotator::NormalizeAxis(LockedAimPitch);
-    AimPitch = FMath::FInterpTo(AimPitch, TargetPitch, DeltaTime, 15.0f);
+      // 매 프레임 총구에서 플레이어까지 가상의 선을 쏴서 벽이 있는지 검사
+      FHitResult SightHit;
+      FCollisionQueryParams Params;
+      Params.AddIgnoredActor(this);
 
-    FVector TargetLocation = TraceStart + (AimRotation.Vector() * AttackRange);
+      bool bHitSomething = GetWorld()->LineTraceSingleByChannel(SightHit, TraceStart, PlayerCenter, ECC_Visibility, Params);
 
+      if (bHitSomething)
+      {
+        AActor* HitActor = SightHit.GetActor();
+        // 맞은 것이 플레이어나 동료 적이 아니라면
+        if (HitActor && !HitActor->ActorHasTag("Player") && !HitActor->IsA<ASanzoEnemyBase>())
+        {
+          // 조준을 즉시 취소
+          CancelAiming();
+          return;
+        }
+      }
+
+      if (!bIsAimLocked)
+      {
+        FVector DirectionToPlayer = (PlayerCenter - TraceStart).GetSafeNormal();
+        FRotator TargetRot = DirectionToPlayer.Rotation();
+
+        // 적 몸통(Yaw)을 플레이어 쪽으로 자연스럽게 회전
+        FRotator NewRot = GetActorRotation();
+        NewRot.Yaw = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 8.0f).Yaw;
+        SetActorRotation(NewRot);
+
+        // 에임 오프셋용 상하 각도(Pitch) 자연스럽게 적용
+        float TargetPitch = FRotator::NormalizeAxis(TargetRot.Pitch);
+        AimPitch = FMath::FInterpTo(AimPitch, TargetPitch, DeltaTime, 15.0f);
+
+        // 나중에 쏠 방향과 레이저 끝점 갱신 (추적 중)
+        LockedAimRotation = TargetRot;
+        LockedTraceEnd = TraceStart + (DirectionToPlayer * AttackRange);
+      }
+
+      // 점멸 타이밍이 되면 조준을 락(Lock)
+      if (CurrentAimTime >= BlinkStartTime)
+      {
+        bIsAimLocked = true;
+      }
+    }
+
+
+    // 조준선 그리기 설정
     bool bDrawLaser = true;
     float LineThickness = 2.0f;
     FColor LaserColor = FColor::Yellow;
@@ -158,12 +200,22 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
       uint8 GreenValue = FMath::Lerp(255.0f, 0.0f, Alpha);
       LaserColor = FColor(255, GreenValue, 0);
     }
-
     if (bDrawLaser)
     {
-      DrawDebugLine(GetWorld(), TraceStart, TargetLocation, LaserColor, false, 0.0f, 0, LineThickness);
+      DrawDebugLine(
+        GetWorld(),
+        TraceStart,
+        LockedTraceEnd,
+        LaserColor,
+        false,
+        0.0f,
+        0,
+        LineThickness
+      );
     }
-
+  }
+  else
+  {
     AimPitch = FMath::FInterpTo(AimPitch, 0.f, DeltaTime, 10.0f);
   }
 }
@@ -172,23 +224,7 @@ void ASanzoEnemy_Ranged::StartAiming()
 {
   bIsAiming = true;
   CurrentAimTime = 0.f;
-
-  FVector TraceStart = GetActorLocation();
-  if (WeaponMesh && WeaponMesh->DoesSocketExist(TEXT("MuzzleFlash")))
-  {
-    TraceStart = WeaponMesh->GetSocketLocation(TEXT("MuzzleFlash"));
-  }
-  ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-  if (PlayerCharacter)
-  {
-    FVector PlayerCenter = PlayerCharacter->GetActorLocation() + FVector(0.f, 0.f, 30.f);
-    FVector DirectionToPlayer = (PlayerCenter - TraceStart).GetSafeNormal();
-    LockedAimPitch = DirectionToPlayer.Rotation().Pitch;
-  }
-  else
-  {
-    LockedAimPitch = GetActorRotation().Pitch;
-  }
+  bIsAimLocked = false;
 
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
@@ -219,4 +255,18 @@ void ASanzoEnemy_Ranged::StopAiming()
   CurrentAimTime = 0.f;
 
   GetWorldTimerManager().ClearTimer(AimTimerHandle);
+}
+
+void ASanzoEnemy_Ranged::CancelAiming()
+{
+  bIsAiming = false;
+  bIsAimLocked = false;
+  CurrentAimTime = 0.f;
+
+  GetWorldTimerManager().ClearTimer(AimTimerHandle);
+
+  if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+  {
+    AnimInstance->Montage_Stop(0.2f, AttackMontage);
+  }
 }
