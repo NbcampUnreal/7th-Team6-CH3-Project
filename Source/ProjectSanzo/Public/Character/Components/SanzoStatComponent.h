@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "SanzoStatComponent.generated.h"
 
 
@@ -26,7 +27,7 @@ struct FSanzoStatData
 
 //정보 전달 할 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
-
+DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&, State);
 #pragma endregion 이준로
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))

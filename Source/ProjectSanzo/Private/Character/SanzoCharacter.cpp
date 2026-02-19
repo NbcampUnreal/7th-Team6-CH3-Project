@@ -75,6 +75,12 @@ ASanzoCharacter::ASanzoCharacter()
   PrimaryActorTick.bCanEverTick = true;
 }
 
+void ASanzoCharacter::PostInitializeComponents()
+{
+  Super::PostInitializeComponents();
+
+}
+
 void ASanzoCharacter::BeginPlay()
 {
 
@@ -178,9 +184,11 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
     StopSprint(Value);
     return;
   }
+
   if (!bShouldMove)
   {
     StopSprint(Value);
+    return;
   }
 
   if(GetCharacterMovement() && bShouldMove)
@@ -218,10 +226,6 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 
 void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 {
-  if(CharacterGameplayTags.HasTag(SprintTag))
-  {
-    return;
-  }
 
   if(EquipmentComp)
   {
@@ -233,6 +237,13 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
       
     }
   }
+
+  if (CharacterGameplayTags.HasTag(SprintTag))
+  {
+    StopFire(Value);
+    return;
+  }
+
 }
 
 void ASanzoCharacter::StopFire(const FInputActionValue& Value)
