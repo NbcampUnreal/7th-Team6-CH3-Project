@@ -226,6 +226,11 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 
 void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 {
+  if (CharacterGameplayTags.HasTag(SprintTag))
+  {
+    StopFire(Value);
+    return;
+  }
 
   if(EquipmentComp)
   {
@@ -238,11 +243,7 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
     }
   }
 
-  if (CharacterGameplayTags.HasTag(SprintTag))
-  {
-    StopFire(Value);
-    return;
-  }
+
 
 }
 
