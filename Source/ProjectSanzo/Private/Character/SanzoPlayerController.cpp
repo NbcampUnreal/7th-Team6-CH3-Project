@@ -85,21 +85,29 @@ void ASanzoPlayerController::ShowPopUp(FGameplayTag State)
 		{
 			if (PopUpWidgetInstance)
 			{
+				PopUpWidgetInstance->OnButtonClicked.AddDynamic(this, &ThisClass::OnPopUpClosed);
+				
 				PopUpWidgetInstance->AddToViewport();
 
 				SetPause(true);
 				bShowMouseCursor = true;
 				SetInputMode(FInputModeUIOnly());
 			}
+			
+			PopUpWidgetInstance->SetPopUpUI(State);
 		}
-		if (State == GameUpgradeTag)
-		{
-			PopUpWidgetInstance->SetUpgradeUI();
-		}
-		if (State == GamePauseTag)
-		{
-			PopUpWidgetInstance->SetPauseUI();
-		}
+	}
+}
+
+void ASanzoPlayerController::OnPopUpClosed(FGameplayTag State)
+{
+	if (State == MainMenuTag)
+	{
+		ReturnMainMenu();
+	}
+	if (State == GamePlayingTag)
+	{
+		ResumeGame();
 	}
 }
 
@@ -116,7 +124,7 @@ void ASanzoPlayerController::ResumeGame()
 	SetInputMode(FInputModeGameOnly());
 }
 
-void ASanzoPlayerController::ShowMainUI(FGameplayTag State)
+void ASanzoPlayerController::ShowMainUI(FGameplayTag State, float ClearTime, int32 KillScore)
 {
 	if (HUDWidgetInstance)
 	{
@@ -135,28 +143,30 @@ void ASanzoPlayerController::ShowMainUI(FGameplayTag State)
 		MenuWidgetInstance = CreateWidget<USanzoMainWidget>(this, MenuWidgetClass);
 		if (MenuWidgetInstance)
 		{
+			MenuWidgetInstance->OnButtonClicked.AddDynamic(this, &ThisClass::OnMainClosed);
 			MenuWidgetInstance->AddToViewport();
-
+			
+			SetPause(true);
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}
+		MenuWidgetInstance->SetMainUI(State, ClearTime, KillScore);
+	}
+}
 
-		if (State == MainMenuTag)
-		{
-			//메인 메뉴
-			MenuWidgetInstance->SetMainMenuUI();
-		}
-		if (State == StageClearedTag)
-		{
-			//스테이지 클리어
-			//이후 StageManger 또는 GameState에서 정보 받아서 구현 필요.
-			MenuWidgetInstance->SetStageClearMenuUI(10.23f, 30);
-		}
-		if (State == GameOverTag)
-		{
-			//게임 오버
-			MenuWidgetInstance->SetGameOverMenuUI();
-		}
+void ASanzoPlayerController::OnMainClosed(FGameplayTag State)
+{
+	if (State == MainMenuTag)
+	{
+		ReturnMainMenu();
+	}
+	if (State == GamePlayingTag)
+	{
+		StartGame();
+	}
+	if (State == QuitGameTag)
+	{
+		QuitGame();
 	}
 }
 
@@ -183,7 +193,7 @@ void ASanzoPlayerController::ReturnMainMenu()
 	SetPause(true);
 }
 
-void ASanzoPlayerController::ExitGame()
+void ASanzoPlayerController::QuitGame()
 {
 	UWorld* World = GetWorld();
 	if (!World)

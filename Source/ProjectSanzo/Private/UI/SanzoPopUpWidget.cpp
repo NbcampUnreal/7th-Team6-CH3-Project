@@ -5,13 +5,27 @@
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
+#include "UI/SanzoUpgradeButtonWidget.h"
 
 void USanzoPopUpWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	UpgradeButtons.Empty();
-	UpgradeTexts.Empty();
+	GamePlayingTag = FGameplayTag::RequestGameplayTag(FName("Game.State.Playing"));
+	MainMenuTag = FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu"));
+	
+	if (ResumeButton)
+	{
+		ResumeButton->OnClicked.AddDynamic(this,&ThisClass::HandleResumeButtonClicked);
+	}
+	
+	if (MainMenuButton)
+	{
+		MainMenuButton->OnClicked.AddDynamic(this, &ThisClass::HandleMenuButtonClicked);
+	}
 
 	if (UpgradeButton_1)
 	{
@@ -25,18 +39,23 @@ void USanzoPopUpWidget::NativeConstruct()
 	{
 		UpgradeButtons.Add(UpgradeButton_3);
 	}
+	for (auto* UpgradeButton : UpgradeButtons)
+	{
+		UpgradeButton->OnUpgradeButtonClicked.AddDynamic(this,&ThisClass::HandleUpgradeSelected);
+	}
+}
 
-	if (UpgradeText_1)
+void USanzoPopUpWidget::SetPopUpUI(FGameplayTag GameState)
+{
+	CurrentState = GameState;
+	
+	if (GameState == FGameplayTag::RequestGameplayTag(FName("Game.State.Paused")))
 	{
-		UpgradeTexts.Add(UpgradeText_1);
+		SetPauseUI();
 	}
-	if (UpgradeText_2)
+	if (GameState == FGameplayTag::RequestGameplayTag(FName("Game.State.UpgradeSelecting")))
 	{
-		UpgradeTexts.Add(UpgradeText_2);
-	}
-	if (UpgradeText_3)
-	{
-		UpgradeTexts.Add(UpgradeText_3);
+		SetUpgradeUI();
 	}
 }
 
@@ -99,10 +118,45 @@ void USanzoPopUpWidget::SetUpgradeUI()
 	{
 		UpgradeListBorder->SetVisibility(ESlateVisibility::Hidden);
 	}
-	for (int32 i = 0; i < UpgradeButtons.Num(); i++)
+	
+	if (UpgradeButtonBox)
 	{
-		SetUpgradeButton(i);
+		UpgradeButtonBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
+	
+	USanzoUpgradeSubsystem* UpgradeSubsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
+	if (UpgradeSubsystem)
+	{
+		CurrentOptions = UpgradeSubsystem->GeneratedRandomOptions();
+		for (int32 i = 0; i < UpgradeButtons.Num(); i++)
+		{
+			if (CurrentOptions.IsValidIndex(i))
+			{
+				SetUpgradeButton(i, CurrentOptions[i]);
+			}
+		}
+	}
+}
+
+void USanzoPopUpWidget::HandleUpgradeSelected(const FUpgradeOption& SelectedUpgrade)
+{
+	USanzoUpgradeSubsystem* UpgradeSubsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
+	if (UpgradeSubsystem)
+	{
+		UpgradeSubsystem->ProcessSelectedUpgrade(SelectedUpgrade);
+	}
+	
+	OnButtonClicked.Broadcast(GamePlayingTag);	
+}
+
+void USanzoPopUpWidget::HandleMenuButtonClicked()
+{
+	OnButtonClicked.Broadcast(MainMenuTag);
+}
+
+void USanzoPopUpWidget::HandleResumeButtonClicked()
+{
+	OnButtonClicked.Broadcast(GamePlayingTag);
 }
 
 void USanzoPopUpWidget::SetStatusText()
@@ -142,36 +196,10 @@ void USanzoPopUpWidget::SetUpgradeListText()
 	}
 }
 
-void USanzoPopUpWidget::SetUpgradeButton(int32 index)
+void USanzoPopUpWidget::SetUpgradeButton(int32 Index, const FUpgradeOption& Option)
 {
-	if (UpgradeButtons[index])
+	if (UpgradeButtons.IsValidIndex(Index))
 	{
-		UpgradeButtons[index]->SetVisibility(ESlateVisibility::Visible);
-		//임시 값
-		int32 RandValue = FMath::RandRange(10, 100);
-		UpgradeButtons[index]->SetBackgroundColor(GetColorByRarity(RandValue));
-		if (UpgradeTexts[index])
-		{
-			//테스트 코드
-			UpgradeTexts[index]->SetText(FText::FromString(FString::Printf(TEXT("공격력 + %d"), RandValue)));
-		}
+		UpgradeButtons[Index]->SetUpgradeButton(Option);
 	}
-}
-
-//임시
-FLinearColor USanzoPopUpWidget::GetColorByRarity(int32 Value)
-{
-	if (Value > 85)
-	{
-		return FLinearColor(1.0f, 0.72f, 0.0f);
-	}
-	if (Value > 50)
-	{
-		return FLinearColor(0.6f, 0.2f, 0.9f);
-	}
-	if (Value > 25)
-	{
-		return FLinearColor(0.0f, 0.4f, 0.9f);
-	}
-	return FLinearColor::White;
 }

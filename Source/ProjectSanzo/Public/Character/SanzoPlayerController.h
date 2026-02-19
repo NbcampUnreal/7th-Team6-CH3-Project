@@ -34,6 +34,7 @@ protected:
 #pragma region UI
 
 public:
+
 	ASanzoPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
@@ -63,16 +64,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ShowPopUp(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "PopUp")
+	void OnPopUpClosed(FGameplayTag State);
+	UFUNCTION(BlueprintCallable, Category = "PopUp")
 	void ResumeGame();
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
-	void ShowMainUI(FGameplayTag State);
+	void ShowMainUI(FGameplayTag State, float ClearTime = 0.0f, int32 KillScore = 0);
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void OnMainClosed(FGameplayTag State);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ReturnMainMenu();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
-	void ExitGame();
+	void QuitGame();
 
 	//Tag
 	UPROPERTY(EditDefaultsOnly, Category = "State")
@@ -81,6 +86,8 @@ public:
 	FGameplayTag StageClearedTag;
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag GameOverTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag QuitGameTag;
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag GamePauseTag;
 	UPROPERTY(EditDefaultsOnly, Category = "State")

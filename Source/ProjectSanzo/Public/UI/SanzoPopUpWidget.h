@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "Core/UpgradeSystem/UpgradeDataRow.h"
 #include "Blueprint/UserWidget.h"
 #include "SanzoPopUpWidget.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPopUpUIButtonClicked, FGameplayTag, CurrentState);
+
 UCLASS()
 class PROJECTSANZO_API USanzoPopUpWidget : public UUserWidget
 {
@@ -16,15 +17,27 @@ class PROJECTSANZO_API USanzoPopUpWidget : public UUserWidget
 #pragma region PopUpUI
 
 public:
-	virtual void NativeConstruct() override;
 
+	virtual void NativeConstruct() override;
+	
+	void SetPopUpUI(FGameplayTag GameState);
+	
+	UPROPERTY()
+	TArray<FUpgradeOption> CurrentOptions;
+	
+	FOnPopUpUIButtonClicked OnButtonClicked;
+	
+protected:
+	
 	UFUNCTION(BlueprintCallable)
 	void SetPauseUI();
 
 	UFUNCTION(BlueprintCallable)
 	void SetUpgradeUI();
-
-protected:
+	
+	UPROPERTY(VisibleAnywhere)
+	FGameplayTag CurrentState;
+	
 	UFUNCTION(BlueprintCallable)
 	void SetStatusText();
 
@@ -32,10 +45,16 @@ protected:
 	void SetUpgradeListText();
 
 	UFUNCTION(BlueprintCallable)
-	void SetUpgradeButton(int32 index);
+	void SetUpgradeButton(int32 index, const FUpgradeOption& option);
+	
+	UFUNCTION()
+	void HandleUpgradeSelected(const FUpgradeOption& SelectedUpgrade);
 
 	UFUNCTION()
-	FLinearColor GetColorByRarity(int32 Value);
+	void HandleMenuButtonClicked();
+	
+	UFUNCTION()
+	void HandleResumeButtonClicked();
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* PopUpText;
@@ -57,26 +76,25 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StatusText;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* UpgradeButtonBox;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* UpgradeButton_1;
+	class USanzoUpgradeButtonWidget* UpgradeButton_1;
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* UpgradeText_1;
-
+	class USanzoUpgradeButtonWidget* UpgradeButton_2;
 	UPROPERTY(meta = (BindWidget))
-	class UButton* UpgradeButton_2;
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* UpgradeText_2;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* UpgradeButton_3;
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* UpgradeText_3;
+	class USanzoUpgradeButtonWidget* UpgradeButton_3;
 
 	UPROPERTY()
-	TArray<UButton*> UpgradeButtons;
-	UPROPERTY()
-	TArray<UTextBlock*> UpgradeTexts;
-
+	TArray<USanzoUpgradeButtonWidget*> UpgradeButtons;
+	
+	//Tag
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag GamePlayingTag;
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	FGameplayTag MainMenuTag;
+	
 #pragma endregion 이준로
 };
