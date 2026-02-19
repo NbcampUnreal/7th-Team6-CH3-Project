@@ -136,6 +136,9 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
     FRotator AimRotation = GetActorRotation();
     AimRotation.Pitch = LockedAimPitch;
 
+    float TargetPitch = FRotator::NormalizeAxis(LockedAimPitch);
+    AimPitch = FMath::FInterpTo(AimPitch, TargetPitch, DeltaTime, 15.0f);
+
     FVector TargetLocation = TraceStart + (AimRotation.Vector() * AttackRange);
 
     bool bDrawLaser = true;
@@ -160,8 +163,11 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
     {
       DrawDebugLine(GetWorld(), TraceStart, TargetLocation, LaserColor, false, 0.0f, 0, LineThickness);
     }
+
+    AimPitch = FMath::FInterpTo(AimPitch, 0.f, DeltaTime, 10.0f);
   }
 }
+
 void ASanzoEnemy_Ranged::StartAiming()
 {
   bIsAiming = true;
