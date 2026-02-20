@@ -48,12 +48,6 @@ void USanzoBTService_Detect::TickNode(
     );
 
     Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), Distance);
-
-    if (Distance > 800.0f)
-    {
-      Blackboard->SetValueAsObject(TEXT("TargetActor"), nullptr);
-      Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), 99999.f);
-    }
   }
   else
   {

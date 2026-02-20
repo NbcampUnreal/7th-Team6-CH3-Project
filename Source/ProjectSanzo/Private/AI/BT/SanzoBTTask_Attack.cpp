@@ -36,36 +36,20 @@ EBTNodeResult::Type USanzoBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& Own
 
   if (TargetActor)
   {
-    // 초근접 시 콜리전 겹침으로 시야 판정이 실패하는 버그 방지
-    float DistanceToTarget = FVector::Distance(Enemy->GetActorLocation(), TargetActor->GetActorLocation());
-    bool bCanSee = AIController->LineOfSightTo(TargetActor);
+    FHitResult Hit;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(Enemy);
 
-    // 플레이어가 시야에 보이거나, 코앞(250유닛 이하)까지 붙었다면 무조건 공격
-    if (bCanSee || DistanceToTarget <= 250.0f)
+    // 가슴 높이에서 플레이어의 가슴 높이로 레이저 발사
+    FVector Start = Enemy->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+    FVector End = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+
+    bool bHit = Enemy->GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+
+    // 1. 벽에 안 막혔거나
+    // 2. 코앞(250 이하)까지 붙어있다면 무조건 공격 시작! (방향 회전은 C++ Tick에서 알아서 해줍니다)
+    if (!bHit || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player")) || FVector::Distance(Start, End) <= 250.f)
     {
-      if (DistanceToTarget > 150.0f)
-      {
-        FHitResult MuzzleHit;
-        FCollisionQueryParams Params;
-        Params.AddIgnoredActor(Enemy);
-
-        // 대략적인 총구 높이 계산 (가슴 높이 + 캐릭터 앞쪽)
-        FVector MuzzleApprox = Enemy->GetActorLocation() + FVector(0.f, 0.f, 60.f) + (Enemy->GetActorForwardVector() * 50.f);
-        FVector TargetLoc = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 30.f);
-
-        bool bMuzzleBlocked = Enemy->GetWorld()->LineTraceSingleByChannel(MuzzleHit, MuzzleApprox, TargetLoc, ECC_Visibility, Params);
-
-        if (bMuzzleBlocked)
-        {
-          AActor* HitActor = MuzzleHit.GetActor();
-          // 총구 앞이 플레이어가 아닌 언덕/벽으로 막혀있다면
-          if (HitActor && !HitActor->ActorHasTag("Player") && !HitActor->IsA<ASanzoEnemyBase>())
-          {
-            // 실패를 반환
-            return EBTNodeResult::Failed;
-          }
-        }
-      }
       Enemy->Attack();
       return EBTNodeResult::Succeeded;
     }
