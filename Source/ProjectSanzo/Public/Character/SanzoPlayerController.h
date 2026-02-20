@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Core/SanzoStageTypes.h"
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+class USanzoStageAnnouncerWidget;
 class USanzoPopUpWidget;
 struct FGameplayTag;
 class USanzoMainWidget;
@@ -52,6 +54,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Menu")
 	USanzoPopUpWidget* PopUpWidgetInstance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Announcer")
+	TSubclassOf<USanzoStageAnnouncerWidget> StageAnnouncerWidgetClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Announcer")
+	USanzoStageAnnouncerWidget* StageAnnouncerWidgetInstance;
+	
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
 
@@ -79,6 +86,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void QuitGame();
 
+	UFUNCTION(BlueprintCallable, Category = "Announcer")
+	void ShowAnnouncerUI(FGameplayTag State, ESanzoStageType StageType = ESanzoStageType::None);
+	UFUNCTION(BlueprintCallable, Category = "Announcer")
+	void AnnounceEnded();
+	
 	//Tag
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag MainMenuTag;

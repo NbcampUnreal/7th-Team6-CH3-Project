@@ -115,7 +115,14 @@ void ASanzoStageManager::SetState(FGameplayTag NewState)
   }
   else if (NewState == StageClearedTag)
   {
-    // 스테이지 클리어
+	  // 스테이지 클리어
+  	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+  	{
+  		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
+  		{
+  			SanzoPlayerController->ShowAnnouncerUI(StageClearedTag);
+  		}
+  	}
   }
   else if(NewState== MoveNextTag)
   {
