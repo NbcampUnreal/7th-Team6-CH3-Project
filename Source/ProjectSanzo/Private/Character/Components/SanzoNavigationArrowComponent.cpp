@@ -10,12 +10,6 @@
 USanzoNavigationArrowComponent::USanzoNavigationArrowComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	
-	ArrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
-	ArrowMesh->SetupAttachment(this);
-	
-	ArrowMesh->SetHiddenInGame(true);
-	ArrowMesh->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 void USanzoNavigationArrowComponent::ActivateNavigation()
@@ -53,6 +47,32 @@ void USanzoNavigationArrowComponent::BeginPlay()
 	}
 }
 
+void USanzoNavigationArrowComponent::OnRegister()
+{
+	Super::OnRegister();
+	
+	if (!ArrowMesh)
+	{
+		ArrowMesh = NewObject<UStaticMeshComponent>(this, TEXT("ArrowMeshInstance"));
+		ArrowMesh->SetupAttachment(this);
+		ArrowMesh->RegisterComponent();
+		
+		static const FString MeshPath = TEXT("/Game/UI/NavArrow/SM_NavArrow.SM_NavArrow");
+		NavigationMeshAsset = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),nullptr,*MeshPath));
+		
+		if (NavigationMeshAsset)
+		{
+			ArrowMesh->SetStaticMesh(NavigationMeshAsset);
+		}
+        
+		// 초기 설정
+		ArrowMesh->SetHiddenInGame(true);
+		ArrowMesh->SetCastShadow(false);
+		ArrowMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	}
+	
+}
+
 void USanzoNavigationArrowComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -66,8 +86,14 @@ void USanzoNavigationArrowComponent::TickComponent(float DeltaTime, ELevelTick T
 		SetWorldRotation(LookAtRotation);
 		
 		//위 아래로 둥둥 뜨는 효과
-		float SineValue = FMath::Sin(GetWorld()->GetTimeSeconds() * 4.0f) * 15.0f;
-		ArrowMesh->SetRelativeLocation(FVector(0.0f, 0.0f, SineValue));
+		float SineValue = FMath::Sin(GetWorld()->GetTimeSeconds() * 4.0f) * 10.0f;
+		
+		//Scale 값 변화에 따른 진폭 보정
+		FVector ParentScale = GetComponentScale();
+		
+		float AdjustedX = (ParentScale.X != 0.0f) ? (SineValue / ParentScale.X) : SineValue;
+		
+		ArrowMesh->SetRelativeLocation(FVector(AdjustedX, 0.0f, 0.0f));
 		
 	}
 	

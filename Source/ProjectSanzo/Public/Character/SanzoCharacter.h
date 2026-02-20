@@ -52,7 +52,7 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
 #pragma region NavigationComponent
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Navigation", meta = (AllowPrivateAccess = "true"))
-	USanzoNavigationArrowComponent* NavigationArrow;
+	USanzoNavigationArrowComponent* NavArrow;
 	
 #pragma endregion 이준로
 #pragma region InputActions

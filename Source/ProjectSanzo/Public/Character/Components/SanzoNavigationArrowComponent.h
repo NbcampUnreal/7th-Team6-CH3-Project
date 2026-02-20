@@ -22,10 +22,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
+	virtual void OnRegister() override;
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 private:
-	UPROPERTY(VisibleAnywhere)
+	
+	UPROPERTY(EditAnywhere, Category="Navigation")
+	UStaticMesh* NavigationMeshAsset;
+	
+	UPROPERTY()
 	UStaticMeshComponent* ArrowMesh;
 	
 	UPROPERTY(EditAnywhere)

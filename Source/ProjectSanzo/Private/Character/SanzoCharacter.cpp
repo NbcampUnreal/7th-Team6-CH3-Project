@@ -71,15 +71,14 @@ ASanzoCharacter::ASanzoCharacter()
   
 #pragma endregion 김형백 
 #pragma region NavigationComponentInit
-	//컴포넌트 생성 및 부착
-	if (NavigationArrow)
-	{
-		NavigationArrow = CreateDefaultSubobject<USanzoNavigationArrowComponent>(TEXT("NavigationArrow"));
-		NavigationArrow->SetupAttachment(RootComponent);
-	
-		//위치 조정
-		NavigationArrow->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
-	}
+  //컴포넌트 생성 및 부착
+
+  NavArrow = CreateDefaultSubobject<USanzoNavigationArrowComponent>(TEXT("NavArrow"));
+  NavArrow->SetupAttachment(RootComponent);
+
+  //위치 조정
+  NavArrow->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
+  NavArrow->SetHiddenInGame(true);
 	
 #pragma endregion 이준로
 
