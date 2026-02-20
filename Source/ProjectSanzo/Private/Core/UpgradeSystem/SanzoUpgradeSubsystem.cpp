@@ -26,15 +26,20 @@ TArray<FUpgradeOption> USanzoUpgradeSubsystem::GeneratedRandomOptions()
 	TArray<FUpgradeDataRow*> AllRows;
 	UpgradeDataTable->GetAllRows<FUpgradeDataRow>(TEXT("GeneratedRandomOption"), AllRows);
 
+	//중복 옵션 방지용 Array
 	TArray<FName> CurrentTurnPickedIDs;
+	//무한루프 방지용 최대 시도 횟수
 	int32 MaxAttempts = 50;
 
 	while (Result.Num() < 3 && MaxAttempts > 0)
 	{
 		MaxAttempts--;
+		//선택될 옵션의 Rarity 뽑기
 		EUpgradeRarity TargetRarity = RollRarity();
 
+		//저장될 후보군 Array
 		TArray<FUpgradeDataRow*> Candidates;
+		//가중치 계산용 전체 가중치
 		int32 TotalWeight = 0;
 
 		for (auto Row : AllRows)
