@@ -145,16 +145,24 @@ void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
   }
 }
 
+void ASanzoCharacter::ExhaustionRecovery()
+{
+
+  CharacterGameplayTags.RemoveTag(ExhaustedTag);
+  if (StatComp)
+  {
+    StatComp->bIsExhausted = false;
+  }
+
+}
+
 #pragma region InputFunction
 
 void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
   if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-    //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-    //EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
     EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Move);
-
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::Look);
     EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ASanzoCharacter::SprintStart);
     EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ASanzoCharacter::StopSprint); 
@@ -228,27 +236,21 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
     //스태미나소모
     if (StatComp)
     {
-      StatComp->RequestConsumeStaminaForSprint(true);
-      if(StatComp->bIsExhausted)
+      StatComp->RequestConsumeStaminaForSprint(true); // 스태미나 소모 호출
+      if (StatComp->bIsExhausted)
       {
-        CharacterGameplayTags.AddTag(ExhaustedTag);
+        CharacterGameplayTags.AddTag(ExhaustedTag); //여기 내부는 사실 컴포넌트에 있어야하는데 귀찮아서 여기 만듬 ㅎ;
         GetWorld()->GetTimerManager().SetTimer(
-          ExhaustionRecoveryTimerHandle, 
-          [this]()
-        {
-          CharacterGameplayTags.RemoveTag(ExhaustedTag);
-          if (StatComp)
-          {
-            StatComp->bIsExhausted = false;
-          }
-        }, 
-        3.f, 
-        false);
+          ExhaustionRecoveryTimerHandle,
+          this,
+          &ASanzoCharacter::ExhaustionRecovery,
+          3.f,
+          false);
         StopSprint(Value);
       }
     }
   }
-  
+
 }
 
 void ASanzoCharacter::StopSprint(const FInputActionValue& Value)

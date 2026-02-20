@@ -29,7 +29,7 @@ struct FSanzoStatData
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
 
 #pragma endregion 이준로
-
+//추후 태그 추가/제거 델리게이트도 만들 예정 !
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))

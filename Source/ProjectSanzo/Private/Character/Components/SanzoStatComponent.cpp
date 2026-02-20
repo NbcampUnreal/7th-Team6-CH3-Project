@@ -14,8 +14,8 @@ USanzoStatComponent::USanzoStatComponent()
 
 	CurrentStamina = 100.f;
 	MaxStamina = 100.f;
-	StaminaRestoreAmount = 10.f; //초당 회복량
-  SprintStaminaCost = 10.f; //Sprint 초당 소모량
+	StaminaRestoreAmount = 10.f; //초당 Stamina회복량
+  SprintStaminaCost = 25.f; //Sprint 초당 소모량
   bIsExhausted = false;
 	//테스트 코드
 	CurrentHealth = 100.f;
