@@ -26,6 +26,14 @@ void USanzoBTService_Detect::TickNode(
   ACharacter* AIChar = Cast<ACharacter>(ControllingPawn);
   if (!AIChar) return;
 
+  if (UAnimInstance* AnimInstance = AIChar->GetMesh()->GetAnimInstance())
+  {
+    if (AnimInstance->IsAnyMontagePlaying())
+    {
+      return;
+    }
+  }
+
   UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
   AActor* Target = Cast<AActor>(Blackboard->GetValueAsObject(TEXT("TargetActor")));
 
@@ -41,7 +49,7 @@ void USanzoBTService_Detect::TickNode(
 
     Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), Distance);
 
-    if (Distance > 1500.0f)
+    if (Distance > 800.0f)
     {
       Blackboard->SetValueAsObject(TEXT("TargetActor"), nullptr);
       Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), 99999.f);

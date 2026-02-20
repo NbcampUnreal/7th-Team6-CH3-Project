@@ -28,7 +28,7 @@ ASanzoAIController::ASanzoAIController()
 
   // 청각(Hearing) 세팅
   // 감지 반경
-  HearingConfig->HearingRange = 5000.f;
+  HearingConfig->HearingRange = 10000.f;
   // 감지 대상 설정 (적, 중립, 아군 모두 감지)
   HearingConfig->DetectionByAffiliation.bDetectEnemies = true;
   HearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
@@ -77,7 +77,7 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
       {
         if (BBComp->GetValueAsObject(TEXT("TargetActor")) == nullptr)
         {
-          BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.ReceiverLocation);
+          BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
         }
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
       }

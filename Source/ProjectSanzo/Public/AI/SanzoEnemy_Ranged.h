@@ -26,7 +26,7 @@ public:
   void StopAiming();
 
   // 조준 취소
-  void CancelAiming();
+  void CancelAimingAnim();
 
   // 조준 재개
   void ResumeAiming();
@@ -73,4 +73,13 @@ protected:
   FVector LockedTraceEnd;
   // 조준 고정된 각도
   FRotator LockedAimRotation;
+
+  virtual void BeginPlay() override;
+
+  // 플레이어 정보를 기억해둘 캐싱 변수
+  UPROPERTY()
+  ACharacter* CachedPlayer = nullptr;
+
+  // 시야 검사를 위한 타이머
+  float VisibilityCheckTimer = 0.f;
 };
