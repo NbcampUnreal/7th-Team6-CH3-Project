@@ -17,7 +17,7 @@ struct FInputActionValue;
 class USanzoStatComponent;
 class USanzoParryComponent;
 class USanzoEquipmentComponent;
-
+class USanzoNavigationArrowComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
@@ -49,6 +49,12 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   USanzoEquipmentComponent* EquipmentComp;
 
 #pragma endregion 김형백
+#pragma region NavigationComponent
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Navigation", meta = (AllowPrivateAccess = "true"))
+	USanzoNavigationArrowComponent* NavigationArrow;
+	
+#pragma endregion 이준로
 #pragma region InputActions
   /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
    UInputAction* JumpAction;*/
