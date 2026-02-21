@@ -11,7 +11,7 @@ ASanzoGun::ASanzoGun()
 	BaseDamage = 20.0f;       // 기본 데미지
 	FireRate = 0.1f;          // 0.1초마다 발사 (빠른 연사)
 	MaxRange = 5000.0f;       // 사거리 50미터           
-	CurrentAmmo = 30;         // 시작 탄약
+	CurrentAmmo = 3000;         // 시작 탄약
 	bInfiniteAmmo = false;
 
 	// 라인트레이스 시작 위치 고정
@@ -65,7 +65,10 @@ void ASanzoGun::Fire()
 		return;
 	}
 
-	// CurrentAmmo--; 테스트용으로 꺼둠 후에 수정
+	if (!bInfiniteAmmo)
+	{
+		CurrentAmmo--;
+	}
 	PlayFireEffects();
 
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());

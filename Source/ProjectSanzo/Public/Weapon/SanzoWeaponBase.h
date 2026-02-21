@@ -84,6 +84,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
 	virtual void StopFire();
 
+	// 데미지 전달용(함수 내부에서 플레이어나 적의 상태(버프, 강화 등) 에 따라서 최종데미지 계산)
+	void ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo);
+
+	// UI에서 사용할 현재 총알 값 가져오는 함수
+	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
+	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
 	virtual void Fire() {};
@@ -93,9 +100,6 @@ protected:
 
 	// 맞은 대상의 이펙트 출력 담당
 	virtual void PlayImpactEffects(FHitResult HitInfo);
-
-	// 데미지 전달용(함수 내부에서 플레이어나 적의 상태(버프, 강화 등) 에 따라서 최종데미지 계산)
-	void ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo);
 
 	// 플레이어 총기 사용 시 연사 발사 속도 제어용 타이머
 	FTimerHandle FireTimerHandle;
