@@ -1,5 +1,6 @@
 #include "Core/SanzoGameState.h"
 #include "Core/SanzoGameInstance.h"
+#include "Core/SanzoStageTypes.h"
 #include "Character/SanzoPlayerController.h"
 #include "Common/SanzoLog.h"
 
@@ -24,6 +25,15 @@ void ASanzoGameState::BeginPlay()
 	}
 	
 	OpenHUD();
+	
+	GetWorldTimerManager().SetTimer(
+		OpenAnnouncerUITimer,
+		this,
+		&ASanzoGameState::OpenAnnouncerUI,
+		0.01f,
+		false
+	);
+	
 }
 
 #pragma region UpdateStage
@@ -34,6 +44,7 @@ void ASanzoGameState::UpdateStageInfo(float Current, float Total)
 	TotalCount = Total;
 	UpdateStageProgressBar();
 }
+
 void ASanzoGameState::UpdateStageResult(int32 KillCount, float SurvivalTime)
 {
   UE_LOG(LogCYS, Warning, TEXT("GS: 전투 결과 정보 업데이트 Kill: %d, Time: %.1f"),KillCount, SurvivalTime);
@@ -72,6 +83,35 @@ void ASanzoGameState::OpenStageClearUI(FGameplayTag State)
 		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
 		{
 			SanzoPlayerController->ShowMainUI(State,TotalSurvivalTime,TotalKillCount );
+		}
+	}
+}
+
+void ASanzoGameState::ResumeGame()
+{
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
+		{
+			UE_LOG(LogLJR,Warning,TEXT("스테이지 시작"));
+			SanzoPlayerController->ResumeGame();
+		}
+	}
+}
+
+void ASanzoGameState::OpenAnnouncerUI()
+{
+	GetWorldTimerManager().ClearTimer(OpenAnnouncerUITimer);
+	
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
+		{
+			//진짜 받아온 정보로 수정 필요
+			UE_LOG(LogLJR,Warning,TEXT("스테이지 알림 UI 열기"));
+			ESanzoStageType StageType = ESanzoStageType::Extermination;
+			FGameplayTag State = FGameplayTag::RequestGameplayTag(FName("Room.State.Actived"));
+			SanzoPlayerController->ShowAnnouncerUI(State, StageType);
 		}
 	}
 }

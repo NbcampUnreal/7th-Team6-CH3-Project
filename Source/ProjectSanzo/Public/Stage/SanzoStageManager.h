@@ -9,6 +9,12 @@
 #include "Stage/SanzoStagegate.h"
 #include "SanzoStageManager.generated.h"
 
+#pragma region NavArrowBroadcast
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStageCleared);
+
+#pragma endregion 이준로
+
 class ASanzoGameMode;
 UCLASS()
 class PROJECTSANZO_API ASanzoStageManager : public AActor
@@ -62,4 +68,10 @@ public:
   UFUNCTION()
   void SetState(FGameplayTag NewState);
 #pragma endregion 최윤서
+	
+#pragma region NavArrowBroadcast
+	
+	FOnStageCleared StageCleared;
+	
+#pragma endregion 이준로
 };
