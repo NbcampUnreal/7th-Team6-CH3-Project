@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "AIController.h"
@@ -26,6 +24,9 @@ protected:
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
   TObjectPtr<UAISenseConfig_Sight> SightConfig;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+  TObjectPtr<class UAISenseConfig_Hearing> HearingConfig;
 
   UFUNCTION()
   void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);

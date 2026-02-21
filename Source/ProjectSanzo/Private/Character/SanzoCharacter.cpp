@@ -20,6 +20,7 @@
 #include "Curves/CurveFloat.h"
 
 #include "Common/SanzoLog.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -268,7 +269,10 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
     {
       GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
       Weapon->StartFire();
-      
+#pragma region MakeNoise
+      MakeNoise(1.0f, this, GetActorLocation());
+#pragma endregion 김동주
+
     }
   }
 

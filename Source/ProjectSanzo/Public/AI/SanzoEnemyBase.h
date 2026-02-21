@@ -47,6 +47,11 @@ public:
   virtual bool IsDead() const override;
 
   virtual float GetAttackRange() const override;
+
+public:
+  // 상하 조준 각도 (-90 ~ 90)
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+  float AimPitch = 0.f;
 #pragma endregion 김동주
 
 #pragma region EnemyTakeDamage
