@@ -12,6 +12,7 @@
 #include "Stage/SanzoRoomBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Perception/AISense_Damage.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -60,6 +61,17 @@ ASanzoEnemyBase::ASanzoEnemyBase()
 
   // 초기에는 비활성화
   AlertWidgetComp->SetHiddenInGame(true);
+#pragma endregion 김동주
+
+#pragma region ProximitySensor
+  // 육감 구체 생성 및 세팅
+  ProximitySensor = CreateDefaultSubobject<USphereComponent>(TEXT("ProximitySensor"));
+  ProximitySensor->SetupAttachment(RootComponent);
+  ProximitySensor->SetSphereRadius(350.f);
+  ProximitySensor->SetCollisionProfileName(TEXT("Trigger"));
+
+  // 오버랩 이벤트 연결
+  ProximitySensor->OnComponentBeginOverlap.AddDynamic(this, &ASanzoEnemyBase::OnProximityOverlap);
 #pragma endregion 김동주
 
 }
@@ -278,6 +290,33 @@ void ASanzoEnemyBase::HideAlertWidget()
   if (AlertWidgetComp)
   {
     AlertWidgetComp->SetHiddenInGame(true);
+  }
+}
+#pragma endregion 김동주
+
+#pragma region ProximitySensor
+void ASanzoEnemyBase::OnProximityOverlap(
+  UPrimitiveComponent* OverlappedComp,
+  AActor* OtherActor,
+  UPrimitiveComponent* OtherComp,
+  int32 OtherBodyIndex,
+  bool bFromSweep,
+  const FHitResult& SweepResult)
+{
+  if (OtherActor && OtherActor->ActorHasTag("Player"))
+  {
+    if (ASanzoAIController* AICon = Cast<ASanzoAIController>(GetController()))
+    {
+      if (UBlackboardComponent* BBComp = AICon->GetBlackboardComponent())
+      {
+        if (BBComp->GetValueAsObject(TEXT("TargetActor")) == nullptr)
+        {
+          ShowAlertWidget(true);
+          BBComp->SetValueAsObject(TEXT("TargetActor"), OtherActor);
+          BBComp->ClearValue(TEXT("InvestigateLocation"));
+        }
+      }
+    }
   }
 }
 #pragma endregion 김동주

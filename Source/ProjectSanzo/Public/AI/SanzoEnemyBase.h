@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AI/Interface/SanzoEnemyInterface.h"
+#include "Components/SphereComponent.h"
 #include "SanzoEnemyBase.generated.h"
 
 class UWidgetComponent;
@@ -120,4 +121,20 @@ protected:
   FTimerHandle AlertWidgetTimerHandle;
 #pragma endregion 김동주
 
+#pragma region ProximitySensor
+public:
+  // 적이 플레이어와 가까워졌는지 감지하는 구체형 센서 컴포넌트
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sensor")
+  TObjectPtr<USphereComponent> ProximitySensor;
+
+  // 구체 센서의 겹침 이벤트를 처리하는 함수
+  UFUNCTION()
+  void OnProximityOverlap(
+    UPrimitiveComponent* OverlappedComp,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex,
+    bool bFromSweep,
+    const FHitResult& SweepResult);
+#pragma endregion 김동주
 };
