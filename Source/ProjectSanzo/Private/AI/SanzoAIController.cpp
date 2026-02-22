@@ -63,11 +63,22 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
     UBlackboardComponent* BBComp = GetBlackboardComponent();
     if (!BBComp) return;
 
+    // 최초 발견 여부 체크
+    bool bIsNewDetection = (BBComp->GetValueAsObject(TEXT("TargetActor")) == nullptr);
+
     if (Stimulus.WasSuccessfullySensed())
     {
       // [시각] 직접 플레이어를 봤을 때
       if (Stimulus.Type == SightConfig->GetSenseID())
       {
+        // 처음 발견했을 때만 느낌표 띄우기
+        if (bIsNewDetection)
+        {
+          if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
+          {
+            Enemy->ShowAlertWidget(true);
+          }
+        }
         BBComp->SetValueAsObject(TEXT("TargetActor"), Actor);
         BBComp->ClearValue(TEXT("InvestigateLocation"));
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Sight!"));
@@ -75,11 +86,15 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
       // [청각] 총소리(플레이어의 공격)를 들었을 때
       else if (Stimulus.Type == HearingConfig->GetSenseID())
       {
-        if (BBComp->GetValueAsObject(TEXT("TargetActor")) == nullptr)
+        if (bIsNewDetection)
         {
+          if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
+          {
+            Enemy->ShowAlertWidget(false);
+          }
           BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
+          UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
         }
-        UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
       }
     }
     else

@@ -46,8 +46,8 @@ EBTNodeResult::Type USanzoBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& Own
 
     bool bHit = Enemy->GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
 
-    // 1. 벽에 안 막혔거나
-    // 2. 코앞(250 이하)까지 붙어있다면 무조건 공격 시작! (방향 회전은 C++ Tick에서 알아서 해줍니다)
+    // 벽에 안 막혔거나
+    // 코앞(250 이하)까지 붙어있다면 무조건 공격 시작
     if (!bHit || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player")) || FVector::Distance(Start, End) <= 250.f)
     {
       Enemy->Attack();

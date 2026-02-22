@@ -46,6 +46,21 @@ ASanzoEnemyBase::ASanzoEnemyBase()
 
 #pragma endregion 이준로
 
+#pragma region AlertUI
+  // 위젯 컴포넌트 설정
+  AlertWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("AlertWidgetComp"));
+  AlertWidgetComp->SetupAttachment(GetMesh());
+
+  // 머리 위에 위치하도록 설정
+  AlertWidgetComp->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+
+  // 항상 플레이어 카메라를 향하도록 설정
+  AlertWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+
+  // 초기에는 비활성화
+  AlertWidgetComp->SetHiddenInGame(true);
+#pragma endregion 김동주
+
 }
 
 void ASanzoEnemyBase::BeginPlay()
@@ -227,3 +242,29 @@ void ASanzoEnemyBase::MakeOverHeadHPBar3D()
   OverHeadHPBar->SetWorldRotation(LookCameraRotation);
 }
 #pragma endregion 이준로
+
+#pragma region AlertUI
+// 느낌표 띄우기
+void ASanzoEnemyBase::ShowAlertWidget(bool bIsSight)
+{
+  if (AlertWidgetComp)
+  {
+    AlertWidgetComp->SetHiddenInGame(false);
+
+    // 블루프린트 쪽으로 시각적/청각적 감지 여부 전달
+    OnUpdateAlertUI(bIsSight);
+
+    // 2초 뒤에 다시 숨기도록 타이머 설정
+    GetWorldTimerManager().SetTimer(AlertWidgetTimerHandle, this, &ASanzoEnemyBase::HideAlertWidget, 2.0f, false);
+  }
+}
+
+// 느낌표 숨기기
+void ASanzoEnemyBase::HideAlertWidget()
+{
+  if (AlertWidgetComp)
+  {
+    AlertWidgetComp->SetHiddenInGame(true);
+  }
+}
+#pragma endregion 김동주

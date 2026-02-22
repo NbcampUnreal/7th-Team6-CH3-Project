@@ -100,4 +100,24 @@ public:
 
 #pragma endregion 이준로
 
+#pragma region AlertUI
+public:
+  // 적이 플레이어를 감지했을 때 나타나는 UI 위젯 컴포넌트
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI|Alert")
+  UWidgetComponent* AlertWidgetComp;
+
+  // 플레이어 감지 시 AlertWidget을 활성화하는 함수
+  void ShowAlertWidget(bool bIsSight);
+
+  // 플레이어 감지 해제 시 AlertWidget을 비활성화하는 함수
+  void HideAlertWidget();
+
+  // AlertWidget의 UI를 업데이트하는 함수
+  UFUNCTION(BlueprintImplementableEvent, Category = "UI|Alert")
+  void OnUpdateAlertUI(bool bIsSight);
+protected:
+  // AlertWidget 타이머 핸들
+  FTimerHandle AlertWidgetTimerHandle;
+#pragma endregion 김동주
+
 };
