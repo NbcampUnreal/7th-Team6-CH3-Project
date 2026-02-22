@@ -18,7 +18,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
   UAnimMontage* ParryMontage;
   void PlayParryMontage();
-
+  //패리몽타주 끝날때 실행할 델리게이트 선언
+  
+  FOnMontageBlendingOutStarted BlendingOutDelegate;
 
 protected:
   virtual void BeginPlay() override;

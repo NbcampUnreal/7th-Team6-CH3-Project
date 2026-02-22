@@ -32,6 +32,9 @@ void USanzoParryComponent::PlayParryMontage()
       if (AnimInstance)
       {
         AnimInstance->Montage_Play(ParryMontage);
+        //특정 몽타주가 끝날 때 실행할 델리게이트 설정
+        
+        AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, ParryMontage);
       }
     }
   }

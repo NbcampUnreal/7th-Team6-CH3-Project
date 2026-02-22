@@ -50,7 +50,8 @@ ASanzoCharacter::ASanzoCharacter()
   //감속힘
   GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
   GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
-#pragma endregion 김형백 
+#pragma endregion 김형백
+
 #pragma region ComponentInit
   GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
   CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -69,13 +70,8 @@ ASanzoCharacter::ASanzoCharacter()
   StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
   ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
   
-#pragma endregion 김형백 
+#pragma endregion 김형백
 
-  //태그캐싱
-  AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Aiming"));
-  SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Sprint"));
-  AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Attack"));
-  ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("Character.Status.Exhausted"));
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
 }
@@ -85,13 +81,15 @@ void ASanzoCharacter::PostInitializeComponents()
   Super::PostInitializeComponents();
   //태그확인용 델리게이 바인딩
   StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
+  //몽타주 끝날때 델리게이트 바인딩
+  ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
 }
 
 void ASanzoCharacter::BeginPlay()
 {
-
   Super::BeginPlay();
 
+  //인풋 시스템 설정
   if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
   {
     if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -100,6 +98,7 @@ void ASanzoCharacter::BeginPlay()
     }
   }
 
+  //타임라인 관련 설정
   if (AimCurve)
   {
     //델리게이트 바인딩
@@ -139,7 +138,6 @@ void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
   {
     GetWorld()->GetTimerManager().ClearTimer(SprintStaminaTimerHandle);
   }
-  
   if(GetWorld()->GetTimerManager().IsTimerActive(ExhaustionRecoveryTimerHandle))
   {
     GetWorld()->GetTimerManager().ClearTimer(ExhaustionRecoveryTimerHandle);
@@ -149,7 +147,7 @@ void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ASanzoCharacter::ExhaustionRecovery()
 {
 
-  CharacterGameplayTags.RemoveTag(ExhaustedTag);
+  CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
   if (StatComp)
   {
     StatComp->bIsExhausted = false;
@@ -286,6 +284,10 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   //  StopFire(Value);
   //  return;
   //} 이제 달릴때 쏘면 멈추고, 쏩니다
+  if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed))
+  {
+    return;
+  }
 
   if(EquipmentComp)
   {
@@ -327,9 +329,15 @@ void ASanzoCharacter::Parry(const FInputActionValue& Value)
   CharacterGameplayTags.AddTag(SanzoTags::Parry);
   ParryComp->PlayParryMontage();
   GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
-  FOnMontageEnded MontageEndedDelegate;
+ 
 
-  
+ 
+}
+
+void ASanzoCharacter::EndParry(UAnimMontage* Montage, bool bInterrupted)
+{
+  CharacterGameplayTags.RemoveTag(SanzoTags::Parry);
+
 }
 
 #pragma region AimingFunction
