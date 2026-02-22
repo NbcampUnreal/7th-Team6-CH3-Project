@@ -15,9 +15,15 @@ class PROJECTSANZO_API USanzoParryComponent : public UActorComponent
 public:
   USanzoParryComponent();
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  UAnimMontage* ParryMontage;
+  void PlayParryMontage();
+
+
 protected:
   virtual void BeginPlay() override;
-
+  
+  
 public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

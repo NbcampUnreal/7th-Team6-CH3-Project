@@ -2,7 +2,7 @@
 
 
 #include "Character/Components/SanzoParryComponent.h"
-
+#include "GameFramework/Character.h"
 USanzoParryComponent::USanzoParryComponent()
 {
 
@@ -18,6 +18,23 @@ void USanzoParryComponent::BeginPlay()
 
   // ...
 
+}
+
+void USanzoParryComponent::PlayParryMontage()
+{
+  
+  if (ParryMontage)
+  {
+    ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+    if (OwnerCharacter)
+    {
+      UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+      if (AnimInstance)
+      {
+        AnimInstance->Montage_Play(ParryMontage);
+      }
+    }
+  }
 }
 
 
