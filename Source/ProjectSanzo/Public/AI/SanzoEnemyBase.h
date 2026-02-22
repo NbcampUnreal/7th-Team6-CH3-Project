@@ -104,7 +104,7 @@ public:
 public:
   // 적이 플레이어를 감지했을 때 나타나는 UI 위젯 컴포넌트
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI|Alert")
-  UWidgetComponent* AlertWidgetComp;
+  TObjectPtr<UWidgetComponent> AlertWidgetComp;
 
   // 플레이어 감지 시 AlertWidget을 활성화하는 함수
   void ShowAlertWidget(bool bIsSight);

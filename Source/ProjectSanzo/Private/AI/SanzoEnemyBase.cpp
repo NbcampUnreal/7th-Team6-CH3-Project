@@ -11,6 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Stage/SanzoRoomBase.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Perception/AISense_Damage.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -132,6 +133,18 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   }
 
   UE_LOG(LogKDJ, Warning, TEXT("Enemy Took Damage: %f"), ActualDamage);
+
+  if (EventInstigator && EventInstigator->GetPawn())
+  {
+    UAISense_Damage::ReportDamageEvent(
+      GetWorld(),
+      this,
+      EventInstigator->GetPawn(),
+      ActualDamage,
+      EventInstigator->GetPawn()->GetActorLocation(),
+      GetActorLocation()
+    );
+  }
 
   // 사망 처리
   if (CurrentHP <= 0.f && !bIsDead)
