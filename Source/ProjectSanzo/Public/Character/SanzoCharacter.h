@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "Components/TimelineComponent.h"
 #include "GameplayTagAssetInterface.h"
+#include "Interface/SanzoTagEditorInterface.h"
 #include "SanzoCharacter.generated.h"
 
 class USpringArmComponent;
@@ -23,7 +24,9 @@ class USanzoEquipmentComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
-class PROJECTSANZO_API ASanzoCharacter : public ACharacter, public IGameplayTagAssetInterface
+class PROJECTSANZO_API ASanzoCharacter : public ACharacter, 
+                                         public IGameplayTagAssetInterface, 
+                                         public ISanzoTagEditorInterface
 {
   GENERATED_BODY()
 #pragma region Component
@@ -112,6 +115,8 @@ public:
 
   //인터페이스 구현
   virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+  virtual void AddGameplayTag(FGameplayTag TagToAdd) override;
+  virtual void RemoveGameplayTag(FGameplayTag TagToRemove) override;
 
 protected:
 #pragma region InputFunctions

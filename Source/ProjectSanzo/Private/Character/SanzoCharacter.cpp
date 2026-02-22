@@ -398,6 +398,16 @@ void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) 
   TagContainer = CharacterGameplayTags;
 }
 
+void ASanzoCharacter::AddGameplayTag(FGameplayTag TagToAdd)
+{
+  CharacterGameplayTags.AddTag(TagToAdd);
+}
+
+void ASanzoCharacter::RemoveGameplayTag(FGameplayTag TagToRemove)
+{
+  CharacterGameplayTags.RemoveTag(TagToRemove);
+}
+
 #pragma region PlayerTakeDamage
 float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
