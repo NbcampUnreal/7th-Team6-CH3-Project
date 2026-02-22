@@ -17,6 +17,7 @@ namespace SanzoTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Parry);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Dodge);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Action_Fixed);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Parrying);
 }
 //필요한 태그를 미리 선언	
 //사용법 SanzoTags::Aiming, SanzoTags::Sprint, SanzoTags::Attack, SanzoTags::Exhausted

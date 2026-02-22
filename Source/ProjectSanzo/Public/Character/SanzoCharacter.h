@@ -110,6 +110,7 @@ public:
   //태그확인 델리케이트에 바인딩 하는 함수
   bool CheckTags(const FGameplayTag& TagsToCheck);
 
+  //인터페이스 구현
   virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 protected:
