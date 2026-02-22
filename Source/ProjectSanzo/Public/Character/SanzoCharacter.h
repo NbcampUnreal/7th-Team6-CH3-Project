@@ -70,7 +70,9 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* AimAction;
-
+  
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* ParryAction;
 
 #pragma endregion 김형백
 
@@ -140,6 +142,8 @@ protected:
   void StopFire(const FInputActionValue& Value);
 
   void Dodge(const FInputActionValue& Value);
+
+  void Parry(const FInputActionValue& Value);
 
   void AimStart(const FInputActionValue& Value);
 

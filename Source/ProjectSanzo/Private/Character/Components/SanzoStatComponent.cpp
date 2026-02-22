@@ -7,9 +7,9 @@
 
 USanzoStatComponent::USanzoStatComponent()
 {
-	AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Aiming"));
-	SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Sprint"));
-	AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Attack"));
+	AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Aiming"));
+	SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Sprint"));
+	AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Attack"));
 	ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("Character.Status.Exhausted"));
 
 	CurrentStamina = 100.f;
@@ -109,7 +109,7 @@ void USanzoStatComponent::ConsumeStamina(float Amount)
   if (CurrentStamina <= 0.f)
   {
     CurrentStamina = 0.f;
-		bIsExhausted = true;
+		bIsExhausted = true; //사실 태그추가해야함 델리겡이트이용
     return;
   }
   

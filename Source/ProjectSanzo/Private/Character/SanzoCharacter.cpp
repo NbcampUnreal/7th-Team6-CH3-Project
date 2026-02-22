@@ -18,6 +18,7 @@
 #include "Weapon/SanzoGun.h"
 #include "Curves/CurveFloat.h"
 
+#include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
@@ -71,9 +72,9 @@ ASanzoCharacter::ASanzoCharacter()
 #pragma endregion 김형백 
 
   //태그캐싱
-  AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Aiming"));
-  SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Sprint"));
-  AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Attack"));
+  AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Aiming"));
+  SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Sprint"));
+  AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Attack"));
   ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("Character.Status.Exhausted"));
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
@@ -171,6 +172,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &ASanzoCharacter::Dodge);
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ASanzoCharacter::AimStart);
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
+    EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ASanzoCharacter::Parry);
   }
   else
   {
@@ -178,13 +180,16 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
   }
 }
 
-
-
 void ASanzoCharacter::Move(const FInputActionValue& Value)
 {
+  if(CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed))
+  {
+    return;
+  }
+
   FVector2D MovementVector = Value.Get<FVector2D>();
 
-  if (Controller != nullptr)
+  if (Controller != nullptr)//움직임 로직
   {
     const FRotator Rotation = Controller->GetControlRotation();
     const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -214,9 +219,9 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
 void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 {
   bool bShouldMove = !(GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero());
-  bool bHasAttackTag = CharacterGameplayTags.HasTag(AttackTag);   
-  bool bHasAimingTag = CharacterGameplayTags.HasTag(AimingTag); 
-  bool bIsExhausted = CharacterGameplayTags.HasTag(ExhaustedTag);
+  bool bHasAttackTag = CharacterGameplayTags.HasTag(SanzoTags::Attack);   
+  bool bHasAimingTag = CharacterGameplayTags.HasTag(SanzoTags::Aiming); 
+  bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
   
   if(bHasAimingTag||bHasAttackTag||!bShouldMove||bIsExhausted)
   {
@@ -232,14 +237,14 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
     GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 
     //달리기 태그 추가
-    CharacterGameplayTags.AddTag(SprintTag);
+    CharacterGameplayTags.AddTag(SanzoTags::Sprint);
     //스태미나소모
     if (StatComp)
     {
       StatComp->RequestConsumeStaminaForSprint(true); // 스태미나 소모 호출
       if (StatComp->bIsExhausted)
       {
-        CharacterGameplayTags.AddTag(ExhaustedTag); //여기 내부는 사실 컴포넌트에 있어야하는데 귀찮아서 여기 만듬 ㅎ;
+        CharacterGameplayTags.AddTag(SanzoTags::Exhausted); //여기 내부는 사실 컴포넌트에 있어야하는데 귀찮아서 여기 만듬 ㅎ;
         GetWorld()->GetTimerManager().SetTimer(
           ExhaustionRecoveryTimerHandle,
           this,
@@ -261,7 +266,7 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
     bUseControllerRotationYaw = true;
     GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
 
-    if (CharacterGameplayTags.HasTag(AimingTag))
+    if (CharacterGameplayTags.HasTag(SanzoTags::Aiming))
     {
       GetCharacterMovement()->MaxWalkSpeed = AimingSpeed;
     }
@@ -269,7 +274,7 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
     {
       StatComp->RequestConsumeStaminaForSprint(false);
     }
-    CharacterGameplayTags.RemoveTag(SprintTag);
+    CharacterGameplayTags.RemoveTag(SanzoTags::Sprint);
 
   }
 }
@@ -280,11 +285,11 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   //{
   //  StopFire(Value);
   //  return;
-  //} 이제 달릴때 쏘면 멈추고 쏩니다
+  //} 이제 달릴때 쏘면 멈추고, 쏩니다
 
   if(EquipmentComp)
   {
-    CharacterGameplayTags.AddTag(AttackTag);
+    CharacterGameplayTags.AddTag(SanzoTags::Attack);
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Component extists"));
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
@@ -303,7 +308,7 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 {
   if (EquipmentComp)
   {
-    CharacterGameplayTags.RemoveTag(AttackTag);
+    CharacterGameplayTags.RemoveTag(SanzoTags::Attack);
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
       Weapon->StopFire();
@@ -313,19 +318,31 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
+
   
 }
+
+void ASanzoCharacter::Parry(const FInputActionValue& Value)
+{
+  CharacterGameplayTags.AddTag(SanzoTags::Parry);
+  ParryComp->PlayParryMontage();
+  GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
+  FOnMontageEnded MontageEndedDelegate;
+
+  
+}
+
 #pragma region AimingFunction
 void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 {
   
-  if(CharacterGameplayTags.HasTag(AimingTag))
+  if(CharacterGameplayTags.HasTag(SanzoTags::Aiming))
   {
     return;
   }
   GetCharacterMovement()->MaxWalkSpeed = AimingSpeed;
   PlayAimTimeLine();
-  CharacterGameplayTags.AddTag(AimingTag);
+  CharacterGameplayTags.AddTag(SanzoTags::Aiming);
 }
 
 void ASanzoCharacter::AimStop(const FInputActionValue& Value)
@@ -333,7 +350,7 @@ void ASanzoCharacter::AimStop(const FInputActionValue& Value)
   
   GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
   PlayAimTimeLine();
-  CharacterGameplayTags.RemoveTag(AimingTag);
+  CharacterGameplayTags.RemoveTag(SanzoTags::Aiming);
 }
 
 void ASanzoCharacter::TimelineUpdateCallBack(float Value)
@@ -348,11 +365,11 @@ void ASanzoCharacter::TimelineFinishedCallBack()
 
 void ASanzoCharacter::PlayAimTimeLine()
 {
-  if (AimCurve && !CharacterGameplayTags.HasTag(AimingTag))
+  if (AimCurve && !CharacterGameplayTags.HasTag(SanzoTags::Aiming))
   {
     AimTimeline.Play(); 
   }
-  if (AimCurve && CharacterGameplayTags.HasTag(AimingTag))
+  if (AimCurve && CharacterGameplayTags.HasTag(SanzoTags::Aiming))
   {
     AimTimeline.Reverse();
   }
