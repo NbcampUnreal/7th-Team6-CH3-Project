@@ -124,7 +124,8 @@ void ASanzoCharacter::Tick(float DeltaTime)
   }
   
   //확인용 지울예정
-  GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red,
+  PrintGameplayTags(); //겜태그확인용
+  GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Green,
     FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), 
       GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
 }
@@ -153,6 +154,36 @@ void ASanzoCharacter::ExhaustionRecovery()
     StatComp->bIsExhausted = false;
   }
 
+}
+
+void ASanzoCharacter::PrintGameplayTags()
+{
+  // 엔진이 유효한지 확인
+  if (!GEngine) return;
+
+  // 1. 태그가 하나도 없을 때의 처리
+  if (CharacterGameplayTags.IsEmpty())
+  {
+    // Key 값을 100으로 고정하여 한 줄에서만 갱신되도록 설정
+    GEngine->AddOnScreenDebugMessage(100, 0.0f, FColor::Red, TEXT("보유 중인 태그 없음"));
+    return;
+  }
+
+  // 2. 컨테이너 내부의 태그들을 배열로 추출
+  TArray<FGameplayTag> TagArray;
+  CharacterGameplayTags.GetGameplayTagArray(TagArray);
+
+  // 3. 배열을 순회하며 화면에 출력
+  for (int32 i = 0; i < TagArray.Num(); ++i)
+  {
+    // 각 태그마다 고유한 Key(101, 102...)를 부여하여 줄이 겹치지 않게 함
+    int32 Key = 101 + i;
+    FString TagName = TagArray[i].ToString();
+    FString Message = FString::Printf(TEXT("Tag [%d]: %s"), i, *TagName);
+
+    // 시간을 0.0f로 설정하면 Tick에서 호출될 때 잔상 없이 매 프레임 깔끔하게 출력됨
+    GEngine->AddOnScreenDebugMessage(Key, 0.0f, FColor::Magenta, Message);
+  }
 }
 
 #pragma region InputFunction
@@ -336,8 +367,7 @@ void ASanzoCharacter::Parry(const FInputActionValue& Value)
 
 void ASanzoCharacter::EndParry(UAnimMontage* Montage, bool bInterrupted)
 {
-  CharacterGameplayTags.RemoveTag(SanzoTags::Parry);
-
+    CharacterGameplayTags.RemoveTag(SanzoTags::Parry);
 }
 
 #pragma region AimingFunction
@@ -392,7 +422,7 @@ bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
   return CharacterGameplayTags.HasTag(TagsToCheck);
   
 }
-
+#pragma region InterfaceFunction
 void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
   TagContainer = CharacterGameplayTags;
@@ -407,7 +437,43 @@ void ASanzoCharacter::RemoveGameplayTag(FGameplayTag TagToRemove)
 {
   CharacterGameplayTags.RemoveTag(TagToRemove);
 }
+#pragma endregion 김형백
 
+float ASanzoCharacter::TakeDamage(
+  float DamageAmount,
+  FDamageEvent const& DamageEvent,
+  AController* EventInstigator,
+  AActor* DamageCauser)
+{
+  float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+  if (CharacterGameplayTags.HasTag(SanzoTags::ParryWindow))
+  {
+    ParryComp->SuccessParry();
+    FinalDamage = 0.f;
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
+  }
+
+  if (StatComp)
+  {
+    StatComp->ApplyDamage(FinalDamage);
+    if (GEngine)
+    {
+      FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
+      GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
+    }
+
+    if (StatComp->IsDead())
+    {
+      UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
+      // TO-DO: 플레이어 래그돌, 게임 오버 UI 호출, 조작 불가 등 처리
+    }
+  }
+
+
+  return FinalDamage;
+}
+
+/*
 #pragma region PlayerTakeDamage
 float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -432,3 +498,4 @@ float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   return FinalDamage;
 }
 #pragma endregion 김동주
+*/

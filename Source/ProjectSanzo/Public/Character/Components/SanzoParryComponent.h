@@ -17,9 +17,15 @@ public:
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
   UAnimMontage* ParryMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  UAnimMontage* ParrySuccessMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  USoundBase* ParrySound;
+
   void PlayParryMontage();
+  void SuccessParry();
+
   //패리몽타주 끝날때 실행할 델리게이트 선언
-  
   FOnMontageBlendingOutStarted BlendingOutDelegate;
 
 protected:
