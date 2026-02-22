@@ -393,6 +393,11 @@ bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
   
 }
 
+void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+  TagContainer = CharacterGameplayTags;
+}
+
 #pragma region PlayerTakeDamage
 float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {

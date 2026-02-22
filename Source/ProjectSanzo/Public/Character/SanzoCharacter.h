@@ -107,8 +107,10 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Tags")
   FGameplayTagContainer CharacterGameplayTags;
 
-
+  //태그확인 델리케이트에 바인딩 하는 함수
   bool CheckTags(const FGameplayTag& TagsToCheck);
+
+  virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 protected:
 #pragma region InputFunctions
