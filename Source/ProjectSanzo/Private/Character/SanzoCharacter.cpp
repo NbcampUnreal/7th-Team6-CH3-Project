@@ -93,9 +93,16 @@ void ASanzoCharacter::PostInitializeComponents()
 {
   Super::PostInitializeComponents();
   //태그확인용 델리게이 바인딩
-  StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
+  if (StatComp)
+  {
+    StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
+  }
+
   //몽타주 끝날때 델리게이트 바인딩
-  ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
+  if(ParryComp)
+  {
+    ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
+  }
 }
 
 void ASanzoCharacter::BeginPlay()
