@@ -75,8 +75,13 @@ public:
   virtual void Attack() override;
 
 protected:
+  // 무기 컴포넌트(스켈레탈 매시) 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
   TObjectPtr<class USkeletalMeshComponent> WeaponMesh;
+
+  // 무기 컴포넌트(스태틱 매시)
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+  TObjectPtr<class UStaticMeshComponent> StaticWeaponMesh;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
   TObjectPtr<class UAnimMontage> AttackMontage;
