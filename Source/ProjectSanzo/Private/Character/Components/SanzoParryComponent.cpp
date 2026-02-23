@@ -2,7 +2,8 @@
 
 
 #include "Character/Components/SanzoParryComponent.h"
-
+#include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 USanzoParryComponent::USanzoParryComponent()
 {
 
@@ -18,6 +19,46 @@ void USanzoParryComponent::BeginPlay()
 
   // ...
 
+}
+
+void USanzoParryComponent::PlayParryMontage()
+{
+  
+  if (ParryMontage)
+  {
+    ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+    if (OwnerCharacter)
+    {
+      UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+      if (AnimInstance)
+      {
+        AnimInstance->Montage_Play(ParryMontage);
+        //특정 몽타주가 끝날 때 실행할 델리게이트 설정
+        
+        AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, ParryMontage);
+      }
+    }
+  }
+}
+
+void USanzoParryComponent::SuccessParry()
+{
+  if (ParrySuccessMontage)
+  {
+    ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+    if (OwnerCharacter)
+    {
+      UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+      if (AnimInstance)
+      {
+        AnimInstance->Montage_JumpToSection(FName("Success"), ParryMontage);
+        if (ParrySound)
+        {
+          UGameplayStatics::PlaySound2D(GetWorld(), ParrySound);
+        }
+      }
+    }
+  }
 }
 
 
