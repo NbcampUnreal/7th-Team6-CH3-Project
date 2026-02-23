@@ -82,9 +82,9 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter,
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* ParryAction;
 #pragma endregion 김형백
-
-#pragma region Aiming
 public:
+#pragma region Aiming
+
   FTimeline AimTimeline;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AimingTimeLine")
   UCurveFloat* AimCurve;
@@ -97,7 +97,8 @@ public:
   void PlayAimTimeLine();
 #pragma endregion 김형백
   
-
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
+  UAnimMontage* DodgeMontage;
 
 public:
   ASanzoCharacter();

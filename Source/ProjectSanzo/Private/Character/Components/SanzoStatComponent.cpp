@@ -170,6 +170,10 @@ FSanzoStatData USanzoStatComponent::MakeStatData() const
 }
 #pragma endregion 이준로
 
+
+
+
+
 #pragma region PlayerApplyDamage
 void USanzoStatComponent::ApplyDamage(float DamageAmount)
 {
