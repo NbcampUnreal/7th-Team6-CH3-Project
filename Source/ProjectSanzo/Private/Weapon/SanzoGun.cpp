@@ -189,7 +189,7 @@ void ASanzoGun::Fire()
 	// 데미지 적용
 	if (bHit)
 	{
-		ApplyDamageToTarget(HitResult.GetActor(), HitResult);
+		ApplyDamageToTarget(HitResult.GetActor(), HitResult,BaseDamage);
 		PlayImpactEffects(HitResult);
 	}
 }

@@ -49,7 +49,13 @@ public:
 		FVector NormalImpulse,
 		const FHitResult& Hit);
 
-	// 외부에서한 데미지 들어오는 함수
-	void SetDamage(float NewDamage) { Damage = NewDamage; }
+	// 차징에 따른 속도 변경 함수
+	void SetArrowSpeed(float NewSpeed);
+	// 화살마다 가지게 될 데미지
+	float ArrowDamage;
+	//가지게 될 데미지 설정 함수
+	void SetArrowDamage(float NewDamage);
 
+protected:
+	virtual void BeginPlay() override;
 };
