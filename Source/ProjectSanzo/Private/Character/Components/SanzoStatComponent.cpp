@@ -7,16 +7,16 @@
 
 USanzoStatComponent::USanzoStatComponent()
 {
-	AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Aiming"));
-	SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Sprint"));
-	AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Attack"));
+	AimingTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Aiming"));
+	SprintTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Sprint"));
+	AttackTag = FGameplayTag::RequestGameplayTag(FName("Character.Action.Movable.Attack"));
 	ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("Character.Status.Exhausted"));
 
 	CurrentStamina = 100.f;
 	MaxStamina = 100.f;
-	StaminaRestoreAmount = 10.f; //초당 회복량
-  SprintStaminaCost = 10.f; //Sprint 초당 소모량
-
+	StaminaRestoreAmount = 10.f; //초당 Stamina회복량
+  SprintStaminaCost = 25.f; //Sprint 초당 소모량
+  bIsExhausted = false;
 	//테스트 코드
 	CurrentHealth = 100.f;
 	MaxHealth = 100.f;
@@ -56,11 +56,19 @@ void USanzoStatComponent::BeginPlay()
 	// ...
 }
 
+void USanzoStatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	//타이머 정리
+	GetWorld()->GetTimerManager().ClearTimer(StaminaRestoreHandle);
+  GetWorld()->GetTimerManager().ClearTimer(SprintStaminaCostHandle);
+}
+
 
 void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
 {
   bool bIsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(SprintStaminaCostHandle);
-	if(bShouldConsume == true && !bIsTimerActive) //true면서 타이머가없을때	
+	if(bShouldConsume == true && !bIsTimerActive) //true면서 타이머가없을때	소모
 	{
 		GetWorld()->GetTimerManager().SetTimer(
 			SprintStaminaCostHandle, 
@@ -79,6 +87,8 @@ void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
 }
 
 
+
+
 void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
   FActorComponentTickFunction* ThisTickFunction)
 {
@@ -91,12 +101,15 @@ void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
+
+
 void USanzoStatComponent::ConsumeStamina(float Amount)
 {
 	CurrentStamina -= Amount;
   if (CurrentStamina <= 0.f)
   {
     CurrentStamina = 0.f;
+		bIsExhausted = true; //사실 태그추가해야함 델리겡이트이용
     return;
   }
   

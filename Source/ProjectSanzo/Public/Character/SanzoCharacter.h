@@ -7,6 +7,8 @@
 #include "Logging/LogMacros.h"
 #include "GameplayTagContainer.h"
 #include "Components/TimelineComponent.h"
+#include "GameplayTagAssetInterface.h"
+#include "Interface/SanzoTagEditorInterface.h"
 #include "SanzoCharacter.generated.h"
 
 class USpringArmComponent;
@@ -22,7 +24,9 @@ class USanzoNavigationArrowComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
-class PROJECTSANZO_API ASanzoCharacter : public ACharacter
+class PROJECTSANZO_API ASanzoCharacter : public ACharacter, 
+                                         public IGameplayTagAssetInterface, 
+                                         public ISanzoTagEditorInterface
 {
   GENERATED_BODY()
 #pragma region Component
@@ -49,16 +53,14 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
   USanzoEquipmentComponent* EquipmentComp;
 
 #pragma endregion 김형백
+
 #pragma region NavigationComponent
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Navigation", meta = (AllowPrivateAccess = "true"))
 	USanzoNavigationArrowComponent* NavArrow;
-	
 #pragma endregion 이준로
-#pragma region InputActions
-  /* UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-   UInputAction* JumpAction;*/
 
+
+#pragma region InputActions
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* MoveAction;
 
@@ -76,10 +78,10 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* AimAction;
-
-
+  
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* ParryAction;
 #pragma endregion 김형백
-
 
 #pragma region Aiming
 public:
@@ -93,9 +95,6 @@ public:
   void TimelineFinishedCallBack();
   UFUNCTION()
   void PlayAimTimeLine();
-
-  
-
 #pragma endregion 김형백
   
 
@@ -117,22 +116,16 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Tags")
   FGameplayTagContainer CharacterGameplayTags;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
-  FGameplayTag AimingTag;
-
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
-  FGameplayTag SprintTag;
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
-  FGameplayTag AttackTag;
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Tags")
-  FGameplayTag ExhaustedTag;
-
-  FTimerHandle SprintStaminaTimerHandle;
-
+  //태그확인 델리케이트에 바인딩 하는 함수
   bool CheckTags(const FGameplayTag& TagsToCheck);
 
-protected:
+  //인터페이스 구현
+  virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+  virtual void AddGameplayTag(FGameplayTag TagToAdd) override;
+  virtual void RemoveGameplayTag(FGameplayTag TagToRemove) override;
 
+protected:
+#pragma region InputFunctions
   void Move(const FInputActionValue& Value);
 
   void Look(const FInputActionValue& Value);
@@ -147,19 +140,30 @@ protected:
 
   void Dodge(const FInputActionValue& Value);
 
+  void Parry(const FInputActionValue& Value);
+  void EndParry(UAnimMontage* Montage, bool bInterrupted);
+
   void AimStart(const FInputActionValue& Value);
 
   void AimStop(const FInputActionValue& Value);
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+#pragma endregion 김형백
 
-
+#pragma region ActorLifecycle
   virtual void PostInitializeComponents() override;
   virtual void BeginPlay() override;
-
-
   virtual void Tick(float DeltaTime) override;
+  virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+#pragma endregion 김형백
 
+  //타이머 핸들러 선언
+  FTimerHandle SprintStaminaTimerHandle;
+  FTimerHandle ExhaustionRecoveryTimerHandle;
+
+  void ExhaustionRecovery();
+
+  void PrintGameplayTags();
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

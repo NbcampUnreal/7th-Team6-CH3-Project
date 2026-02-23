@@ -29,7 +29,7 @@ struct FSanzoStatData
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
 
 #pragma endregion 이준로
-
+//추후 태그 추가/제거 델리게이트도 만들 예정 !
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -42,6 +42,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+  virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	//stamina 관련 변수
 	float CurrentStamina;
@@ -72,6 +73,7 @@ public:
 	FOnTagCheckDelegate TagCheckDelegate;
 	//캐릭터에서 사용할 질문함수
 	void RequestConsumeStaminaForSprint(bool bShouldConsume);
+	bool bIsExhausted;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -83,7 +85,6 @@ public:
 
 	bool bCanSprint();
 	//태그확인용 델리게이
-
   bool CheckTag(const FGameplayTag& Tag) const;
 
 	
