@@ -3,6 +3,7 @@
 
 #include "UI/SanzoEnemyOverHeadWidget.h"
 
+#include "EditorDirectories.h"
 #include "AI/SanzoEnemyBase.h"
 #include "Common/SanzoLog.h"
 #include "Components/Border.h"
@@ -63,9 +64,9 @@ void USanzoEnemyOverHeadWidget::UpdateStunGage(int32 CurrentStunCount)
 			if (StunImages[i])
 			{
 				UTexture2D* TargetTexture = (i < CurrentStunCount) ? EmptyTexture : FullTexture;
-				StunImages[i]->SetBrushSize(FVector2D(50,50));
-				StunImages[i]->SetBrushFromTexture(TargetTexture);
 				
+				StunImages[i]->SetBrushFromTexture(TargetTexture);
+				StunImages[i]->SetDesiredSizeOverride(FVector2D(50.0f, 50.0f));
 			}
 		}
 	}
