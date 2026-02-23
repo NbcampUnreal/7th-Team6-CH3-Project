@@ -22,6 +22,7 @@
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
 #include "Components/PawnNoiseEmitterComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -374,7 +375,10 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
-
+  if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+  {
+    AnimInstance->Montage_Play(DodgeMontage);
+  }
   
 }
 
@@ -383,8 +387,6 @@ void ASanzoCharacter::Parry(const FInputActionValue& Value)
   CharacterGameplayTags.AddTag(SanzoTags::Parry);
   ParryComp->PlayParryMontage();
   GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
- 
-
  
 }
 
@@ -469,10 +471,16 @@ float ASanzoCharacter::TakeDamage(
   AActor* DamageCauser)
 {
   float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-  if (CharacterGameplayTags.HasTag(SanzoTags::ParryWindow))
+
+  UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+  FName CurrentSection = AnimInstance->Montage_GetCurrentSection();
+  //패리태그가 있거나 성공섹션일때 패리 성공
+  if (CharacterGameplayTags.HasTag(SanzoTags::ParryWindow) || CurrentSection == FName("Success"))
   {
     ParryComp->SuccessParry();
     FinalDamage = 0.f;
+    //딜 반사
+    UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount, GetController(), this, UDamageType::StaticClass());
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
   }
 
