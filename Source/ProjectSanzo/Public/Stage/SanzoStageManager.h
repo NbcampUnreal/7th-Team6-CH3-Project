@@ -65,6 +65,9 @@ public:
   UPROPERTY(EditAnywhere, Category = "Stage")
   ASanzoStageGate* StageGate;
 
+  UPROPERTY(EditAnywhere, Category = "Stage")
+  AActor* Fog;
+
   UFUNCTION()
   void SetState(FGameplayTag NewState);
 #pragma endregion 최윤서
