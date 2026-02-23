@@ -111,6 +111,11 @@ void ASanzoStageManager::SetState(FGameplayTag NewState)
   if (NewState == StageActivedTag)
   {
     // 스테이지 활성
+    ASanzoGameState* GameState = Cast<ASanzoGameState>(UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoGameState::StaticClass()));
+    if (GameState)
+    {
+      GameState->UpdateStageInit(StageType, CurrentState);
+    }
     CurrentRoom->BeginRoomSequence();
   }
   else if (NewState == StageClearedTag)
