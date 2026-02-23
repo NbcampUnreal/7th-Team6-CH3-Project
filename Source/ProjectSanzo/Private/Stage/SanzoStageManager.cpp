@@ -15,9 +15,9 @@ ASanzoStageManager::ASanzoStageManager()
 void ASanzoStageManager::BeginPlay()
 {
   Super::BeginPlay();
-  if(AGameModeBase* GM=GetWorld()->GetAuthGameMode())
+  if(AGameModeBase* GameMode=GetWorld()->GetAuthGameMode())
   {
-    SGM=Cast<ASanzoGameMode>(GM);
+    SanzoGameMode=Cast<ASanzoGameMode>(GameMode);
   }
   if (StageGate)
   {
@@ -44,9 +44,9 @@ void ASanzoStageManager::StartStage()
 {
   UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 시작"));
   // 현재 스테이지 타입 가져오기
-  if (SGM)
+  if (SanzoGameMode)
   {
-    StageType = SGM->CurrentStageType;
+    StageType = SanzoGameMode->CurrentStageType;
   }
 
   TSubclassOf<ASanzoRoomBase> RoomClassToSpawn = nullptr;
@@ -95,9 +95,9 @@ void ASanzoStageManager::OnRoomCleared()
 
 void ASanzoStageManager::MoveToNextRoom()
 {
-  if (SGM)
+  if (SanzoGameMode)
   {
-    SGM->OnStageCleared();
+    SanzoGameMode->OnStageCleared();
   }
 }
 #pragma endregion 최윤서

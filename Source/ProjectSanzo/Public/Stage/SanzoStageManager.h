@@ -38,7 +38,7 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
   ASanzoRoomBase* CurrentRoom;
   UPROPERTY()
-  ASanzoGameMode* SGM;
+  ASanzoGameMode* SanzoGameMode;
 
 protected:
   virtual void BeginPlay() override;
