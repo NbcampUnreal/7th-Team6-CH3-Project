@@ -54,3 +54,81 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
     DisableWeaponCollision();
   }
 }
+
+void ASanzoEnemy_Melee::Attack()
+{
+  if (GEngine)
+  {
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Melee Attack! Drawing Range..."));
+  }
+  Super::Attack();
+  DrawAttackRange();
+}
+
+bool ASanzoEnemy_Melee::CanAttack(AActor* TargetActor)
+{
+  if (!TargetActor) return false;
+
+  // 2D 평면상(Z축 무시)의 방향 벡터 추출
+  FVector DirToTarget = (TargetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+  FVector EnemyForward = GetActorForwardVector().GetSafeNormal2D();
+
+  // 내적을 사용해 두 벡터 사이의 각도 계산
+  float DotProduct = FMath::Clamp(FVector::DotProduct(EnemyForward, DirToTarget), -1.0f, 1.0f);
+  float AngleToTarget = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
+
+  // 거리가 AttackRange 이하이고, 각도가 정면(좌우 45도, 총 90도) 이내일 때만 true
+  float Distance = FVector::Distance(GetActorLocation(), TargetActor->GetActorLocation());
+
+  if (Distance <= AttackRange && AngleToTarget <= 45.0f)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+void ASanzoEnemy_Melee::DrawAttackRange()
+{
+  UWorld* World = GetWorld();
+  if (!World) return;
+
+  FVector Center = GetActorLocation();
+  FVector Forward = GetActorForwardVector();
+
+  float Radius = AttackRange;
+  float AngleHalf = 45.0f; // 좌우 45도 (총 90도)
+
+  int32 Segments = 50;
+
+  // 색상 설정 (내부는 반투명, 외곽선은 진하게)
+  FColor FillColor = FColor(255, 0, 0, 100);
+  FColor OutlineColor = FColor::Red;
+
+  // 왼쪽 가장자리 방향 벡터 계산
+  FVector LeftEdgeDir = Forward.RotateAngleAxis(-AngleHalf, FVector::UpVector);
+  float AngleStep = (AngleHalf * 2.f) / Segments;
+
+  FVector PrevPoint = Center + (LeftEdgeDir * Radius);
+
+  for (int32 i = 0; i <= Segments; i++)
+  {
+    FVector CurrentDir = LeftEdgeDir.RotateAngleAxis(AngleStep * i, FVector::UpVector);
+    FVector CurrentPoint = Center + (CurrentDir * Radius);
+
+    // 내부 채우기
+    DrawDebugLine(World, Center, CurrentPoint, FillColor, false, 1.0f, 0, 8.0f);
+
+    // 바깥쪽 호 외곽선
+    if (i > 0)
+    {
+      DrawDebugLine(World, PrevPoint, CurrentPoint, OutlineColor, false, 1.0f, 0, 3.0f);
+    }
+    PrevPoint = CurrentPoint;
+  }
+
+  // 양옆 직선 외곽선
+  FVector RightEdgeDir = Forward.RotateAngleAxis(AngleHalf, FVector::UpVector);
+  DrawDebugLine(World, Center, Center + (LeftEdgeDir * Radius), OutlineColor, false, 1.0f, 0, 3.0f);
+  DrawDebugLine(World, Center, Center + (RightEdgeDir * Radius), OutlineColor, false, 1.0f, 0, 3.0f);
+}
