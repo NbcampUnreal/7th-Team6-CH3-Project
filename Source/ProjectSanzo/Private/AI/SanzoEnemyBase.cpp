@@ -11,6 +11,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Stage/SanzoRoomBase.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Perception/AISense_Damage.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -45,6 +47,32 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   OverHeadHPBar->SetRelativeScale3D(FVector(.15f, 0.15f, 0.15f));
 
 #pragma endregion 이준로
+
+#pragma region AlertUI
+  // 위젯 컴포넌트 설정
+  AlertWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("AlertWidgetComp"));
+  AlertWidgetComp->SetupAttachment(GetMesh());
+
+  // 머리 위에 위치하도록 설정
+  AlertWidgetComp->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+
+  // 항상 플레이어 카메라를 향하도록 설정
+  AlertWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+
+  // 초기에는 비활성화
+  AlertWidgetComp->SetHiddenInGame(true);
+#pragma endregion 김동주
+
+#pragma region ProximitySensor
+  // 육감 구체 생성 및 세팅
+  ProximitySensor = CreateDefaultSubobject<USphereComponent>(TEXT("ProximitySensor"));
+  ProximitySensor->SetupAttachment(RootComponent);
+  ProximitySensor->SetSphereRadius(350.f);
+  ProximitySensor->SetCollisionProfileName(TEXT("Trigger"));
+
+  // 오버랩 이벤트 연결
+  ProximitySensor->OnComponentBeginOverlap.AddDynamic(this, &ASanzoEnemyBase::OnProximityOverlap);
+#pragma endregion 김동주
 
 }
 
@@ -117,6 +145,18 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   }
 
   UE_LOG(LogKDJ, Warning, TEXT("Enemy Took Damage: %f"), ActualDamage);
+
+  if (EventInstigator && EventInstigator->GetPawn())
+  {
+    UAISense_Damage::ReportDamageEvent(
+      GetWorld(),
+      this,
+      EventInstigator->GetPawn(),
+      ActualDamage,
+      EventInstigator->GetPawn()->GetActorLocation(),
+      GetActorLocation()
+    );
+  }
 
   // 사망 처리
   if (CurrentHP <= 0.f && !bIsDead)
@@ -227,3 +267,56 @@ void ASanzoEnemyBase::MakeOverHeadHPBar3D()
   OverHeadHPBar->SetWorldRotation(LookCameraRotation);
 }
 #pragma endregion 이준로
+
+#pragma region AlertUI
+// 느낌표 띄우기
+void ASanzoEnemyBase::ShowAlertWidget(bool bIsSight)
+{
+  if (AlertWidgetComp)
+  {
+    AlertWidgetComp->SetHiddenInGame(false);
+
+    // 블루프린트 쪽으로 시각적/청각적 감지 여부 전달
+    OnUpdateAlertUI(bIsSight);
+
+    // 2초 뒤에 다시 숨기도록 타이머 설정
+    GetWorldTimerManager().SetTimer(AlertWidgetTimerHandle, this, &ASanzoEnemyBase::HideAlertWidget, 2.0f, false);
+  }
+}
+
+// 느낌표 숨기기
+void ASanzoEnemyBase::HideAlertWidget()
+{
+  if (AlertWidgetComp)
+  {
+    AlertWidgetComp->SetHiddenInGame(true);
+  }
+}
+#pragma endregion 김동주
+
+#pragma region ProximitySensor
+void ASanzoEnemyBase::OnProximityOverlap(
+  UPrimitiveComponent* OverlappedComp,
+  AActor* OtherActor,
+  UPrimitiveComponent* OtherComp,
+  int32 OtherBodyIndex,
+  bool bFromSweep,
+  const FHitResult& SweepResult)
+{
+  if (OtherActor && OtherActor->ActorHasTag("Player"))
+  {
+    if (ASanzoAIController* AICon = Cast<ASanzoAIController>(GetController()))
+    {
+      if (UBlackboardComponent* BBComp = AICon->GetBlackboardComponent())
+      {
+        if (BBComp->GetValueAsObject(TEXT("TargetActor")) == nullptr)
+        {
+          ShowAlertWidget(true);
+          BBComp->SetValueAsObject(TEXT("TargetActor"), OtherActor);
+          BBComp->ClearValue(TEXT("InvestigateLocation"));
+        }
+      }
+    }
+  }
+}
+#pragma endregion 김동주

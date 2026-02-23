@@ -5,8 +5,6 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "SanzoAIController.generated.h"
 
-class UAISenseConfig_Sight;
-
 UCLASS()
 class PROJECTSANZO_API ASanzoAIController : public AAIController
 {
@@ -23,10 +21,13 @@ protected:
   TObjectPtr<class UAIPerceptionComponent> AIPerception;
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-  TObjectPtr<UAISenseConfig_Sight> SightConfig;
+  TObjectPtr<class UAISenseConfig_Sight> SightConfig;
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
   TObjectPtr<class UAISenseConfig_Hearing> HearingConfig;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+  TObjectPtr<class UAISenseConfig_Damage> DamageConfig;
 
   UFUNCTION()
   void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
