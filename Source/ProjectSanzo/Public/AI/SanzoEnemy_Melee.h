@@ -32,6 +32,13 @@ public:
     bool bFromSweep,
     const FHitResult& SweepResult);
 
+  virtual void Attack() override;
+
+  virtual bool CanAttack(AActor* Target) override;
+
+  // 공격 시 부채꼴 모양으로 공격 범위를 그려주는 함수
+  void DrawAttackRange();
+
 protected:
   // 근접 공격 데미지
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")

@@ -229,6 +229,32 @@ void ASanzoEnemyBase::Attack()
   }
 }
 
+bool ASanzoEnemyBase::CanAttack(AActor* Target)
+{
+  if (!Target) return false;
+
+  FHitResult Hit;
+  FCollisionQueryParams Params;
+  Params.AddIgnoredActor(this);
+
+  // 가슴 높이에서 플레이어의 가슴 높이로 레이저 발사
+  FVector Start = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+  FVector End = Target->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+  bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+
+  // 벽에 안 막혔거나
+    // 코앞(250 이하)까지 붙어있다면 무조건 공격 시작
+  if (!bHit 
+    || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player")) 
+    || FVector::Distance(Start, End) <= 250.f)
+  {
+    return true;
+  }
+
+  // 벽에 가려져 있거나 타겟이 없다면 공격하지 않고 실패 반환
+  return false;
+}
+
 #pragma region OverHeadUI
 
 FEnemyOverHeadData ASanzoEnemyBase::MakeUpdateOverHeadData() const
