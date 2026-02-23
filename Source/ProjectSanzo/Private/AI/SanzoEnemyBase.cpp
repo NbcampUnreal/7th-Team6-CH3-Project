@@ -13,6 +13,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Perception/AISense_Damage.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
 #include "Dataflow/DataflowContent.h"
 #include "UI/SanzoEnemyOverHeadWidget.h"
@@ -33,11 +34,16 @@ ASanzoEnemyBase::ASanzoEnemyBase()
 
   GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
-  // 적 무기 컴포넌트 설정
+  // 적 무기 컴포넌트 설정 (스켈레탈 매시)
   WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
   // 오른손 뼈(hand_r)에 무기를 기본적으로 부착
   WeaponMesh->SetupAttachment(GetMesh(), TEXT("hand_r"));
   WeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+  // 적 무기 컴포넌트 설정 (스태틱 매시)
+  StaticWeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticWeaponMesh"));
+  StaticWeaponMesh->SetupAttachment(GetMesh(), TEXT("hand_r"));
+  StaticWeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
 #pragma region OverHeadUI
 
@@ -214,6 +220,13 @@ void ASanzoEnemyBase::Die()
     WeaponMesh->SetCollisionProfileName(TEXT("Ragdoll"));
     WeaponMesh->SetSimulatePhysics(true);
     WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+  }
+
+  if (StaticWeaponMesh)
+  {
+    StaticWeaponMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+    StaticWeaponMesh->SetSimulatePhysics(true);
+    StaticWeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
   }
 
   // 일정 시간 후 액터 제거
