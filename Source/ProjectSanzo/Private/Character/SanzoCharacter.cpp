@@ -14,12 +14,14 @@
 #include "Character/Components/SanzoStatComponent.h"
 #include "Character/Components/SanzoParryComponent.h"
 #include "Character/Components/SanzoEquipmentComponent.h"
+#include "Character/Components/SanzoNavigationArrowComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
 #include "Weapon/SanzoGun.h"
 #include "Curves/CurveFloat.h"
 
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -70,7 +72,18 @@ ASanzoCharacter::ASanzoCharacter()
   StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
   ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
   
-#pragma endregion 김형백
+#pragma endregion 김형백 
+  
+#pragma region NavigationComponentInit
+  //컴포넌트 생성 및 부착
+
+  NavArrow = CreateDefaultSubobject<USanzoNavigationArrowComponent>(TEXT("NavArrow"));
+  NavArrow->SetupAttachment(RootComponent);
+
+  //위치 조정
+  NavArrow->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
+  NavArrow->SetHiddenInGame(true);
+#pragma endregion 이준로
 
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
@@ -329,7 +342,10 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
     {
       GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
       Weapon->StartFire();
-      
+#pragma region MakeNoise
+      MakeNoise(1.0f, this, GetActorLocation());
+#pragma endregion 김동주
+
     }
   }
 

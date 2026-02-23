@@ -6,8 +6,10 @@
 #include "UI/SanzoMainWidget.h"
 #include "UI/SanzoHUDWidget.h"
 #include "UI/SanzoPopUpWidget.h"
+#include "UI/SanzoStageAnnouncerWidget.h"
 #include "Core/SanzoGameInstance.h"
 #include "Core/SanzoGameMode.h"
+#include "Core/SanzoGameState.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/GameMode.h"
 #include "Kismet/GameplayStatics.h"
@@ -119,6 +121,11 @@ void ASanzoPlayerController::ResumeGame()
 		PopUpWidgetInstance->RemoveFromParent();
 		PopUpWidgetInstance = nullptr;
 	}
+	if (StageAnnouncerWidgetInstance)
+	{
+		StageAnnouncerWidgetInstance->RemoveFromParent();
+		StageAnnouncerWidgetInstance = nullptr;
+	}
 
 	SetPause(false);
 	bShowMouseCursor = false;
@@ -219,5 +226,42 @@ void ASanzoPlayerController::QuitGame()
 		EQuitPreference::Quit,
 		false
 	);
+}
+
+void ASanzoPlayerController::ShowAnnouncerUI(FGameplayTag State, ESanzoStageType StageType)
+{
+	if (MenuWidgetInstance)
+	{
+		MenuWidgetInstance->RemoveFromParent();
+		MenuWidgetInstance = nullptr;
+	}
+	
+	if (StageAnnouncerWidgetClass)
+	{
+		StageAnnouncerWidgetInstance = CreateWidget<USanzoStageAnnouncerWidget>(this, StageAnnouncerWidgetClass);
+		if (StageAnnouncerWidgetInstance)
+		{
+			StageAnnouncerWidgetInstance->OnAnnouncerEnded.AddDynamic(this,&ThisClass::AnnounceEnded);
+			StageAnnouncerWidgetInstance->AddToViewport();
+			
+			if (State == FGameplayTag::RequestGameplayTag(FName("Room.State.Actived")))
+			{
+				SetPause(true);
+			}
+			
+			if (State == FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")))
+			{
+				SetPause(false);
+			}
+		}
+		
+	}
+	StageAnnouncerWidgetInstance->SetStageAnnouncer(State, StageType);
+	
+}
+
+void ASanzoPlayerController::AnnounceEnded()
+{
+	ResumeGame();
 }
 #pragma endregion 이준로

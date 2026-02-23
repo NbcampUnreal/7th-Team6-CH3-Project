@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "AI/BT/SanzoBTService_Detect.h"
+﻿#include "AI/BT/SanzoBTService_Detect.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -28,6 +26,14 @@ void USanzoBTService_Detect::TickNode(
   ACharacter* AIChar = Cast<ACharacter>(ControllingPawn);
   if (!AIChar) return;
 
+  if (UAnimInstance* AnimInstance = AIChar->GetMesh()->GetAnimInstance())
+  {
+    if (AnimInstance->IsAnyMontagePlaying())
+    {
+      return;
+    }
+  }
+
   UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
   AActor* Target = Cast<AActor>(Blackboard->GetValueAsObject(TEXT("TargetActor")));
 
@@ -42,12 +48,6 @@ void USanzoBTService_Detect::TickNode(
     );
 
     Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), Distance);
-
-    if (Distance > 1500.0f)
-    {
-      Blackboard->SetValueAsObject(TEXT("TargetActor"), nullptr);
-      Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), 99999.f);
-    }
   }
   else
   {

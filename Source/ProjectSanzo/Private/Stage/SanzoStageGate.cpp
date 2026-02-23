@@ -1,5 +1,6 @@
 #include "Stage/SanzoStageGate.h"
 #include "Common/SanzoLog.h"
+#include "Kismet/GameplayStatics.h"
 
 #pragma region Stage Gate
 
@@ -9,8 +10,11 @@ ASanzoStageGate::ASanzoStageGate()
   Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
   SetRootComponent(Root);
 
-  GateMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GateMesh"));
-  GateMesh->SetupAttachment(Root);
+  GateMeshL = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GateMeshL"));
+  GateMeshL->SetupAttachment(Root);
+
+  GateMeshR = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GateMeshR"));
+  GateMeshR->SetupAttachment(Root);
 
   TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
   TriggerBox->SetupAttachment(Root);
@@ -25,6 +29,29 @@ void ASanzoStageGate::OpenGate()
   if (bIsOpened) return;
   UE_LOG(LogCYS, Warning, TEXT("SG: 문 열림"));
   bIsOpened = true;
+
+  if (OpenSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(
+      GetWorld(),
+      OpenSound,
+      GetActorLocation(),
+      1.f,
+      1.f,
+      0.f,
+      OpenSoundAttenuation
+    );
+  }
+
+  RotatedAmount = 0.f;
+
+  GetWorldTimerManager().SetTimer(
+    DoorTimer,
+    this,
+    &ASanzoStageGate::RotateDoor,
+    0.016f,
+    true
+  );
 }
 
 void ASanzoStageGate::BeginPlay()
@@ -52,6 +79,22 @@ void ASanzoStageGate::OnOverlapBegin(
 
     // 여기서 StageManager에 다음 방 이동 요청
     OnGateEntered.Broadcast();
+  }
+}
+
+void ASanzoStageGate::RotateDoor()
+{
+  float DeltaTime = GetWorld()->GetDeltaSeconds();
+  float DeltaYaw = RotateSpeed * DeltaTime;
+
+  GateMeshL->AddRelativeRotation(FRotator(0.f, -DeltaYaw, 0.f));
+  GateMeshR->AddRelativeRotation(FRotator(0.f, DeltaYaw, 0.f));
+
+  RotatedAmount += DeltaYaw;
+
+  if (RotatedAmount >= TargetAngle)
+  {
+    GetWorldTimerManager().ClearTimer(DoorTimer);
   }
 }
 

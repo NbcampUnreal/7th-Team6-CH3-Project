@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "SanzoStageTypes.h"
 #include "GameFramework/GameStateBase.h"
 #include "SanzoGameState.generated.h"
 
@@ -57,7 +58,13 @@ public:
 	void OpenHUD();
 	
 	void OpenStageClearUI(FGameplayTag State);
+	
+	void ResumeGame();
+	
+	void OpenAnnouncerUI();
 
 	FTimerHandle UpdateStageProgressBarTimer;
+	FTimerHandle OpenAnnouncerUITimer;
+
 #pragma endregion 이준로
 };

@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "AI/BT/SanzoBTTask_Patrol.h"
+﻿#include "AI/BT/SanzoBTTask_Patrol.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
