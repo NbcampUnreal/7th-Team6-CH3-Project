@@ -27,9 +27,13 @@ public:
 
 	// 스테이지 정보
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
-	int32 CurrentStageType;
+	ESanzoStageType CurrentStageType;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
 	int32 CurrentStageIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
+
+	FGameplayTag CurrentStageState;
+
 
 	// 실시간 전투 정보
 	// 섬멸전일때는 적 수, 버티기일때는 생존 시간
@@ -47,6 +51,7 @@ public:
   // 전투 정보 업데이트
   void UpdateStageInfo(float Current, float Total);
   void UpdateStageResult(int32 KillCount, float SurvivalTime);
+	void UpdateStageInit(ESanzoStageType StageType, FGameplayTag StageState);
 #pragma endregion 최윤서
 
 #pragma region UI

@@ -15,15 +15,15 @@ void ASanzoGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UGameInstance* GI = GetGameInstance())
+	if (UGameInstance* GameInstance = GetGameInstance())
 	{
-		USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GI);
-		if (SGI)
+		USanzoGameInstance* SanzoGameInstance = Cast<USanzoGameInstance>(GameInstance);
+		if (SanzoGameInstance)
 		{
-			//CurrentStageIndex = SGI->CurrentLevelIndex;
+			CurrentStageIndex = SanzoGameInstance->CurrentStageIndex;
 		}
 	}
-	
+
 	OpenHUD();
 	
 	GetWorldTimerManager().SetTimer(
@@ -50,6 +50,11 @@ void ASanzoGameState::UpdateStageResult(int32 KillCount, float SurvivalTime)
   UE_LOG(LogCYS, Warning, TEXT("GS: 전투 결과 정보 업데이트 Kill: %d, Time: %.1f"),KillCount, SurvivalTime);
   TotalKillCount = KillCount;
   TotalSurvivalTime = SurvivalTime;
+}
+void ASanzoGameState::UpdateStageInit(ESanzoStageType StageType, FGameplayTag StageState)
+{
+	CurrentStageType = StageType;
+	CurrentStageState = StageState;
 }
 #pragma endregion 최윤서
 
