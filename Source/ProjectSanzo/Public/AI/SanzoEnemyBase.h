@@ -10,6 +10,28 @@ class UWidgetComponent;
 class UBehaviorTree;
 class ASanzoRoomBase;
 
+#pragma region OverHeadData
+
+USTRUCT(BlueprintType)
+struct FEnemyOverHeadData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+	float HealthPercent = 1.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+	int32 CurrentStunCount = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+	bool bIsSighted = false;
+	
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDataChanged, const FEnemyOverHeadData&, UpdateData);
+
+#pragma endregion 이준로
+
 UCLASS()
 class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter, public ISanzoEnemyInterface
 {
@@ -96,34 +118,27 @@ protected:
 
 public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-  UWidgetComponent* OverHeadHPBar;
+  UWidgetComponent* OverHeadWidget;
+	//Delegate
+	FOnEnemyDataChanged OnEnemyDataChanged;
+	//3D 업데이트 용 TimerHandle
+  FTimerHandle OverHeadWidgetUpdateTimerHandle;
+	
+	FEnemyOverHeadData MakeUpdateOverHeadData() const;
+	
+	bool bIsSighted = false;
+	
+	//임시 스턴 카운트
+	int32 StunCount = 2;
 
-  FTimerHandle OverHeadHPBarUpdateTimerHandle;
+	void BroadCastAllData();
 
-  void UpdateOverHeadHPBar();
-
-  void MakeOverHeadHPBar3D();
+  void MakeOverHeadWidget3D();
+	
+	void ShowAlertWidget(bool bIsSight);
 
 #pragma endregion 이준로
-
-#pragma region AlertUI
-public:
-  // 적이 플레이어를 감지했을 때 나타나는 UI 위젯 컴포넌트
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI|Alert")
-  TObjectPtr<UWidgetComponent> AlertWidgetComp;
-
-  // 플레이어 감지 시 AlertWidget을 활성화하는 함수
-  void ShowAlertWidget(bool bIsSight);
-
-  // 플레이어 감지 해제 시 AlertWidget을 비활성화하는 함수
-  void HideAlertWidget();
-
-  // AlertWidget의 UI를 업데이트하는 함수
-  UFUNCTION(BlueprintImplementableEvent, Category = "UI|Alert")
-  void OnUpdateAlertUI(bool bIsSight);
-protected:
-  // AlertWidget 타이머 핸들
-  FTimerHandle AlertWidgetTimerHandle;
+	
 #pragma endregion 김동주
 
 #pragma region ProximitySensor

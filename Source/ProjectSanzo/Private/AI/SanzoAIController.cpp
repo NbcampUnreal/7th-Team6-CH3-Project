@@ -127,7 +127,12 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 
         // 플레이어의 마지막 위치를 기억
         BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Actor->GetActorLocation());
-
+      	
+      	if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
+      	{
+      		Enemy->ShowAlertWidget(false);
+      	}
+      	
         UE_LOG(LogKDJ, Log, TEXT("Player Lost! Going to Last Known Location."));
       }
     }
