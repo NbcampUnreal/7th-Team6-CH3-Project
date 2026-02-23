@@ -22,6 +22,10 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
   USoundBase* ParrySound;
 
+  FTimerHandle SlowTimerHandle;
+
+  int32 ParryCount;
+
   void PlayParryMontage();
   void SuccessParry();
 
