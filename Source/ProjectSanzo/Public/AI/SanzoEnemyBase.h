@@ -9,23 +9,24 @@
 class UWidgetComponent;
 class UBehaviorTree;
 class ASanzoRoomBase;
+class USanzoEnemyStunComponent;
 
 #pragma region OverHeadData
 
 USTRUCT(BlueprintType)
 struct FEnemyOverHeadData
 {
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
-	float HealthPercent = 1.0f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
-	int32 CurrentStunCount = 0;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
-	bool bIsSighted = false;
-	
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  float HealthPercent = 1.0f;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  int32 CurrentStunCount = 0;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  bool bIsSighted = false;
+
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDataChanged, const FEnemyOverHeadData&, UpdateData);
@@ -58,7 +59,7 @@ protected:
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
   float CurrentHP;
 
-  // 기본 근거리 사거리
+  // 기본 공격 사거리
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float AttackRange = 150.f;
 
@@ -121,26 +122,23 @@ protected:
 public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
   UWidgetComponent* OverHeadWidget;
-	//Delegate
-	FOnEnemyDataChanged OnEnemyDataChanged;
-	//3D 업데이트 용 TimerHandle
+  //Delegate
+  FOnEnemyDataChanged OnEnemyDataChanged;
+  //3D 업데이트 용 TimerHandle
   FTimerHandle OverHeadWidgetUpdateTimerHandle;
-	
-	FEnemyOverHeadData MakeUpdateOverHeadData() const;
-	
-	bool bIsSighted = false;
-	
-	//임시 스턴 카운트
-	int32 StunCount = 2;
 
-	void BroadCastAllData();
+  FEnemyOverHeadData MakeUpdateOverHeadData() const;
+
+  bool bIsSighted = false;
+
+  void BroadCastAllData();
 
   void MakeOverHeadWidget3D();
-	
-	void ShowAlertWidget(bool bIsSight);
+
+  void ShowAlertWidget(bool bIsSight);
 
 #pragma endregion 이준로
-	
+
 #pragma endregion 김동주
 
 #pragma region ProximitySensor
@@ -159,4 +157,44 @@ public:
     bool bFromSweep,
     const FHitResult& SweepResult);
 #pragma endregion 김동주
+
+#pragma region StunComponent
+public:
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+  TObjectPtr<USanzoEnemyStunComponent> StunComponent;
+
+protected:
+  // 패링 당했을 때 재생할 몽타주
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Parried")
+  TObjectPtr<UAnimMontage> StaggerMontage;
+
+  // 패링 당했을 때 발생할 이펙트
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Parried")
+  TObjectPtr<class UParticleSystem> ParriedEffect;
+
+  // 패링 당했을 때 재생할 효과음 (예: 칼 튕기는 소리)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Parried")
+  TObjectPtr<class USoundBase> ParriedSound;
+
+  // 스턴 시 재생할 몽타주
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Stun")
+  TObjectPtr<UAnimMontage> StunMontage;
+
+  // 스턴 상태 진입 시 재생할 효과음
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Stun")
+  TObjectPtr<class USoundBase> StunSound;
+
+  UFUNCTION()
+  virtual void OnStunCountChangedCallback(int32 CurrentStun, int32 MaxStun);
+
+  UFUNCTION()
+  virtual void OnStunEnteredCallback();
+
+  UFUNCTION()
+  virtual void OnStunRecoveredCallback();
+
+  UFUNCTION()
+  virtual void OnParriedCallback();
+#pragma endregion 김동주
+
 };

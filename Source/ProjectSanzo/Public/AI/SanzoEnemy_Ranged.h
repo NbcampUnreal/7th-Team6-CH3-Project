@@ -82,4 +82,7 @@ protected:
 
   // 시야 검사를 위한 타이머
   float VisibilityCheckTimer = 0.f;
+
+protected:
+  virtual void OnStunEnteredCallback() override;
 };
