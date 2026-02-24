@@ -13,6 +13,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Perception/AISense_Damage.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
 #include "Dataflow/DataflowContent.h"
 #include "UI/SanzoEnemyOverHeadWidget.h"
@@ -33,11 +34,16 @@ ASanzoEnemyBase::ASanzoEnemyBase()
 
   GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
-  // 적 무기 컴포넌트 설정
+  // 적 무기 컴포넌트 설정 (스켈레탈 매시)
   WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
   // 오른손 뼈(hand_r)에 무기를 기본적으로 부착
   WeaponMesh->SetupAttachment(GetMesh(), TEXT("hand_r"));
   WeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+  // 적 무기 컴포넌트 설정 (스태틱 매시)
+  StaticWeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticWeaponMesh"));
+  StaticWeaponMesh->SetupAttachment(GetMesh(), TEXT("hand_r"));
+  StaticWeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
 
 #pragma region OverHeadUI
 
@@ -216,6 +222,13 @@ void ASanzoEnemyBase::Die()
     WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
   }
 
+  if (StaticWeaponMesh)
+  {
+    StaticWeaponMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+    StaticWeaponMesh->SetSimulatePhysics(true);
+    StaticWeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+  }
+
   // 일정 시간 후 액터 제거
   SetLifeSpan(5.f);
 }
@@ -227,6 +240,32 @@ void ASanzoEnemyBase::Attack()
   {
     PlayAnimMontage(AttackMontage);
   }
+}
+
+bool ASanzoEnemyBase::CanAttack(AActor* Target)
+{
+  if (!Target) return false;
+
+  FHitResult Hit;
+  FCollisionQueryParams Params;
+  Params.AddIgnoredActor(this);
+
+  // 가슴 높이에서 플레이어의 가슴 높이로 레이저 발사
+  FVector Start = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+  FVector End = Target->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+  bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+
+  // 벽에 안 막혔거나
+    // 코앞(250 이하)까지 붙어있다면 무조건 공격 시작
+  if (!bHit 
+    || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player")) 
+    || FVector::Distance(Start, End) <= 250.f)
+  {
+    return true;
+  }
+
+  // 벽에 가려져 있거나 타겟이 없다면 공격하지 않고 실패 반환
+  return false;
 }
 
 #pragma region OverHeadUI

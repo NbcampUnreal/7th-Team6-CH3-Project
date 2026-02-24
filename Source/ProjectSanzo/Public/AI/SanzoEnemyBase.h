@@ -96,9 +96,16 @@ protected:
 public:
   virtual void Attack() override;
 
+  // 공격 조건을 검사하는 가상 함수
+  virtual bool CanAttack(AActor* Target);
 protected:
+  // 무기 컴포넌트(스켈레탈 매시) 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
   TObjectPtr<class USkeletalMeshComponent> WeaponMesh;
+
+  // 무기 컴포넌트(스태틱 매시)
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+  TObjectPtr<class UStaticMeshComponent> StaticWeaponMesh;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
   TObjectPtr<class UAnimMontage> AttackMontage;
