@@ -14,7 +14,16 @@ ASanzoProjectile::ASanzoProjectile()
 	// 루트 컴포넌트 설정
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
-	CollisionComp->SetCollisionProfileName("Projectile");
+	// 기본 콜리전 설정
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// 어딘가에 충돌할때마다 OnHit 함수 실행
+	CollisionComp->SetNotifyRigidBodyCollision(true);
+	// 커스텀 Collision 설정을 위해 모든 충돌 무시로 설정
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	// Collision 설정
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);  // 벽, 바닥같이 움직이지 않는 것들
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block); // 움직이는 물체
+	CollisionComp->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Block);  // 적 스켈레탈 메시
 	CollisionComp->OnComponentHit.AddDynamic(this, &ASanzoProjectile::OnHit);
 	RootComponent = CollisionComp;
 
@@ -35,7 +44,7 @@ ASanzoProjectile::ASanzoProjectile()
 
 	// 화살의 트레일 이펙트 담당
 	TrailEffectComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrailEffectComp"));
-	// 화살의 꼬리(루트)를 따라다니도록 부착
+	// 화살의 콜리전 컴포넌트를 따라다니도록 부착
 	TrailEffectComp->SetupAttachment(RootComponent);
 
 }
@@ -53,9 +62,50 @@ void ASanzoProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	if (WeaponOwner)
 	{
 		// 웨폰베이스의 데미지 적용 함수 실행
-		WeaponOwner->ApplyDamageToTarget(OtherActor, Hit);
+		WeaponOwner->ApplyDamageToTarget(OtherActor, Hit,ArrowDamage);
+		WeaponOwner->PlayImpactEffects(Hit);
 	}
 
-	// 화살 파괴(후에 수정할수도 있음)
-	Destroy();
+	// 맞은 화살 붙이는 로직
+
+	// 어딘가에 맞으면 정지
+	ProjectileMovement->StopMovementImmediately();
+	// 정지 후 화살의 콜리전 판정 없애기
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// 맞은게 적이라면 맞고 움직일때 화살도 같이 움직이게 수정
+	AttachToComponent(OtherComp, FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+	// 2초 후에 사라짐
+	SetLifeSpan(2.0f);
+}
+
+void ASanzoProjectile::SetArrowSpeed(float NewSpeed)
+{
+	// 기존의 최대 속도를 새로받은 속도로 바꾸기
+	ProjectileMovement->MaxSpeed = NewSpeed;
+	ProjectileMovement->InitialSpeed = NewSpeed;
+
+	// 원래 화살에 적용되어있던 속도 새 속도로 바꾸기
+	ProjectileMovement->Velocity = ProjectileMovement->Velocity.GetSafeNormal() * NewSpeed;
+}
+
+void ASanzoProjectile::SetArrowDamage(float NewDamage)
+{
+	ArrowDamage = NewDamage;
+}
+
+void ASanzoProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 쏜 플레이어 충돌 무시
+	if (GetInstigator())
+	{
+		CollisionComp->IgnoreActorWhenMoving(GetInstigator(), true);
+	}
+
+	// 소환된 활 충돌 무시
+	if (GetOwner())
+	{
+		CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
+	}
 }

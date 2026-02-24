@@ -3,6 +3,8 @@
 
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Character/SanzoCharacter.h"
+#include "Weapon/SanzoBow.h"
+#include "Weapon/SanzoGun.h"
 #include "Weapon/SanzoWeaponBase.h"
 
 USanzoEquipmentComponent::USanzoEquipmentComponent()
@@ -35,9 +37,19 @@ void USanzoEquipmentComponent::BeginPlay()
 			FAttachmentTransformRules::SnapToTargetIncludingScale,
 			TEXT("HandGrip_R")
 		);
-	}
-	
-	
+		
+		if (ASanzoGun* Gun = Cast<ASanzoGun>(CurrentWeapon))
+		{
+			Gun->OnAmmoChanged.AddDynamic(this,&USanzoEquipmentComponent::UpdateHUDAmmo);
+			
+			UpdateHUDAmmo();
+		}
+		
+		if (ASanzoBow* Bow = Cast<ASanzoBow>(CurrentWeapon))
+		{
+			UpdateHUDAmmo();
+		}
+	}	
 }
 
 
@@ -57,4 +69,16 @@ ASanzoCharacter* USanzoEquipmentComponent::GetOwnerCharacter()
 
 	return OwnerCharacter;
 }
+
+#pragma region UIDataTransfer
+
+void USanzoEquipmentComponent::UpdateHUDAmmo()
+{
+	if (CurrentWeapon)
+	{
+		OnAmmoChanged.Broadcast(CurrentWeapon->GetAmmoTextForHUD());
+	}
+}
+
+#pragma endregion 이준로
 

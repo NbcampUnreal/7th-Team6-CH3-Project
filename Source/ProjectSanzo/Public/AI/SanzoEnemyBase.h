@@ -9,6 +9,29 @@
 class UWidgetComponent;
 class UBehaviorTree;
 class ASanzoRoomBase;
+class USanzoEnemyStunComponent;
+
+#pragma region OverHeadData
+
+USTRUCT(BlueprintType)
+struct FEnemyOverHeadData
+{
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  float HealthPercent = 1.0f;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  int32 CurrentStunCount = 0;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  bool bIsSighted = false;
+
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDataChanged, const FEnemyOverHeadData&, UpdateData);
+
+#pragma endregion 이준로
 
 UCLASS()
 class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter, public ISanzoEnemyInterface
@@ -36,7 +59,7 @@ protected:
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
   float CurrentHP;
 
-  // 기본 근거리 사거리
+  // 기본 공격 사거리
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float AttackRange = 150.f;
 
@@ -74,9 +97,16 @@ protected:
 public:
   virtual void Attack() override;
 
+  // 공격 조건을 검사하는 가상 함수
+  virtual bool CanAttack(AActor* Target);
 protected:
+  // 무기 컴포넌트(스켈레탈 매시) 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
   TObjectPtr<class USkeletalMeshComponent> WeaponMesh;
+
+  // 무기 컴포넌트(스태틱 매시)
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+  TObjectPtr<class UStaticMeshComponent> StaticWeaponMesh;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
   TObjectPtr<class UAnimMontage> AttackMontage;
@@ -91,34 +121,24 @@ protected:
 
 public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-  UWidgetComponent* OverHeadHPBar;
+  UWidgetComponent* OverHeadWidget;
+  //Delegate
+  FOnEnemyDataChanged OnEnemyDataChanged;
+  //3D 업데이트 용 TimerHandle
+  FTimerHandle OverHeadWidgetUpdateTimerHandle;
 
-  FTimerHandle OverHeadHPBarUpdateTimerHandle;
+  FEnemyOverHeadData MakeUpdateOverHeadData() const;
 
-  void UpdateOverHeadHPBar();
+  bool bIsSighted = false;
 
-  void MakeOverHeadHPBar3D();
+  void BroadCastAllData();
+
+  void MakeOverHeadWidget3D();
+
+  void ShowAlertWidget(bool bIsSight);
 
 #pragma endregion 이준로
 
-#pragma region AlertUI
-public:
-  // 적이 플레이어를 감지했을 때 나타나는 UI 위젯 컴포넌트
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI|Alert")
-  TObjectPtr<UWidgetComponent> AlertWidgetComp;
-
-  // 플레이어 감지 시 AlertWidget을 활성화하는 함수
-  void ShowAlertWidget(bool bIsSight);
-
-  // 플레이어 감지 해제 시 AlertWidget을 비활성화하는 함수
-  void HideAlertWidget();
-
-  // AlertWidget의 UI를 업데이트하는 함수
-  UFUNCTION(BlueprintImplementableEvent, Category = "UI|Alert")
-  void OnUpdateAlertUI(bool bIsSight);
-protected:
-  // AlertWidget 타이머 핸들
-  FTimerHandle AlertWidgetTimerHandle;
 #pragma endregion 김동주
 
 #pragma region ProximitySensor
@@ -137,4 +157,44 @@ public:
     bool bFromSweep,
     const FHitResult& SweepResult);
 #pragma endregion 김동주
+
+#pragma region StunComponent
+public:
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+  TObjectPtr<USanzoEnemyStunComponent> StunComponent;
+
+protected:
+  // 패링 당했을 때 재생할 몽타주
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Parried")
+  TObjectPtr<UAnimMontage> StaggerMontage;
+
+  // 패링 당했을 때 발생할 이펙트
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Parried")
+  TObjectPtr<class UParticleSystem> ParriedEffect;
+
+  // 패링 당했을 때 재생할 효과음 (예: 칼 튕기는 소리)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Parried")
+  TObjectPtr<class USoundBase> ParriedSound;
+
+  // 스턴 시 재생할 몽타주
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Stun")
+  TObjectPtr<UAnimMontage> StunMontage;
+
+  // 스턴 상태 진입 시 재생할 효과음
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat|Stun")
+  TObjectPtr<class USoundBase> StunSound;
+
+  UFUNCTION()
+  virtual void OnStunCountChangedCallback(int32 CurrentStun, int32 MaxStun);
+
+  UFUNCTION()
+  virtual void OnStunEnteredCallback();
+
+  UFUNCTION()
+  virtual void OnStunRecoveredCallback();
+
+  UFUNCTION()
+  virtual void OnParriedCallback();
+#pragma endregion 김동주
+
 };

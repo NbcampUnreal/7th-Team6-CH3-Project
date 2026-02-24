@@ -38,7 +38,7 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Room")
   ASanzoRoomBase* CurrentRoom;
   UPROPERTY()
-  ASanzoGameMode* SGM;
+  ASanzoGameMode* SanzoGameMode;
 
 protected:
   virtual void BeginPlay() override;
@@ -64,6 +64,9 @@ public:
 
   UPROPERTY(EditAnywhere, Category = "Stage")
   ASanzoStageGate* StageGate;
+
+  UPROPERTY(EditAnywhere, Category = "Stage")
+  AActor* Fog;
 
   UFUNCTION()
   void SetState(FGameplayTag NewState);

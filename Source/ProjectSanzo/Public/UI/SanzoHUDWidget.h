@@ -23,6 +23,9 @@ protected:
 
 	UFUNCTION()
 	void HandleStageProgressChanged(float percent);
+	
+	UFUNCTION()
+	void HandleAmmoChanged(FText NewAmmoText);
 
 public:
 	//Stat Component 로 부터 받아올 정보 위젯 연결

@@ -115,13 +115,13 @@ void ASanzoWeaponBase::PlayImpactEffects(FHitResult HitInfo)
   }
 }
 
-void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo)
+void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo, float DamageToApply)
 {
   if (!TargetActor) return;
 
   // 맞은 대상이 SanzoEnemyBase 클래스인지 확인용
   ASanzoEnemyBase* HitEnemy = Cast<ASanzoEnemyBase>(TargetActor);
-  float FinalDamage = BaseDamage;
+  float FinalDamage = DamageToApply;
 
   // 맞은 액터가 SanzoEnemyBase가 맞다면 데미지 적용
   if (HitEnemy)

@@ -85,7 +85,10 @@ public:
 	virtual void StopFire();
 
 	// 데미지 전달용(함수 내부에서 플레이어나 적의 상태(버프, 강화 등) 에 따라서 최종데미지 계산)
-	void ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo);
+	void ApplyDamageToTarget(AActor* TargetActor, FHitResult HitInfo, float DamageToApply);
+
+	// 맞은 대상의 이펙트 출력 담당
+	virtual void PlayImpactEffects(FHitResult HitInfo);
 
 	// UI에서 사용할 현재 총알 값 가져오는 함수
 	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
@@ -98,11 +101,14 @@ protected:
 	// 총에서 나갈 이펙트, 사운드 출력 담당, 에디터에서 수정 가능
 	virtual void PlayFireEffects();
 
-	// 맞은 대상의 이펙트 출력 담당
-	virtual void PlayImpactEffects(FHitResult HitInfo);
-
 	// 플레이어 총기 사용 시 연사 발사 속도 제어용 타이머
 	FTimerHandle FireTimerHandle;
-
+	
+#pragma region DataForHUD
+	
+public:
+	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
+	
+#pragma endregion 이준로
 };
 

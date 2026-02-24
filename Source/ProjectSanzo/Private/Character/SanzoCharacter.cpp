@@ -15,6 +15,7 @@
 #include "Character/Components/SanzoParryComponent.h"
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Character/Components/SanzoNavigationArrowComponent.h"
+#include "Character/Components/SanzoUpgradeComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
 #include "Weapon/SanzoGun.h"
 #include "Curves/CurveFloat.h"
@@ -23,6 +24,7 @@
 #include "Common/SanzoLog.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "AI/Components/SanzoEnemyStunComponent.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -74,7 +76,13 @@ ASanzoCharacter::ASanzoCharacter()
   ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
   
 #pragma endregion 김형백 
-  
+	
+#pragma region UpgradeComponentInit
+	
+	UpgradeComp = CreateDefaultSubobject<USanzoUpgradeComponent>(TEXT("Upgrade"));
+	
+#pragma endregion 이준로
+	
 #pragma region NavigationComponentInit
   //컴포넌트 생성 및 부착
 
@@ -496,6 +504,14 @@ float ASanzoCharacter::TakeDamage(
     }
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
+
+    if (DamageCauser)
+    {
+      if (USanzoEnemyStunComponent* EnemyStunComp = DamageCauser->FindComponentByClass<USanzoEnemyStunComponent>())
+      {
+        EnemyStunComp->NotifyParried();
+      }
+    }
   }
 
   if (StatComp)
