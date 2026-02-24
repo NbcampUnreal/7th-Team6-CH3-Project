@@ -199,6 +199,7 @@ void ASanzoGun::Fire()
 void ASanzoGun::AddAmmo()
 {
 	CurrentAmmo++;
+	OnAmmoChanged.Broadcast();
 	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %d"), CurrentAmmo);
 }
 
