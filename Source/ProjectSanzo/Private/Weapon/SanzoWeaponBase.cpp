@@ -1,4 +1,4 @@
-﻿#include "Weapon/SanzoWeaponBase.h"
+#include "Weapon/SanzoWeaponBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -145,6 +145,17 @@ void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitIn
       UDamageType::StaticClass()
     );
   }
+#pragma region DestructibleItem
+  // 부숴지는 물체 태그 확인
+  else if (TargetActor->ActorHasTag(FName("Destructible")))
+  {
+    APawn* OwnerPawn = Cast<APawn>(GetOwner());
+    AController* OwnerController = OwnerPawn ? OwnerPawn->GetController() : nullptr;
+    // 데미지 전달
+    UGameplayStatics::ApplyDamage(TargetActor, FinalDamage, OwnerController, this, UDamageType::StaticClass());
+    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("WB: Hit Destructible Object"));
+  }
+#pragma endregion 최윤서
 
   if (HitEnemy)
   {
