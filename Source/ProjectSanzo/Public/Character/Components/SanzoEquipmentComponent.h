@@ -6,6 +6,12 @@
 #include "Components/ActorComponent.h"
 #include "SanzoEquipmentComponent.generated.h"
 
+#pragma region UIDataTransfer
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAmmoChanged, FText, NewAmmo);
+
+#pragma endregion 이준로
+
 class ASanzoCharacter;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -32,4 +38,14 @@ public:
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Equipment|Class")
   ASanzoCharacter* OwnerCharacter;
 
+#pragma region UIDataTransfer
+
+public:
+  FOnWeaponAmmoChanged OnAmmoChanged;
+
+protected:
+  UFUNCTION()
+  void UpdateHUDAmmo();
+
+#pragma endregion 이준로
 };

@@ -68,6 +68,8 @@ void ASanzoGun::Fire()
 	if (!bInfiniteAmmo)
 	{
 		CurrentAmmo--;
+		//총알 개수 변화 방송
+		OnAmmoChanged.Broadcast();
 	}
 	PlayFireEffects();
 
@@ -199,3 +201,11 @@ void ASanzoGun::AddAmmo()
 	CurrentAmmo++;
 	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %d"), CurrentAmmo);
 }
+
+#pragma region DataForHUD
+	
+FText ASanzoGun::GetAmmoTextForHUD() const
+{
+	return FText::AsNumber(CurrentAmmo);
+}
+#pragma endregion 이준로
