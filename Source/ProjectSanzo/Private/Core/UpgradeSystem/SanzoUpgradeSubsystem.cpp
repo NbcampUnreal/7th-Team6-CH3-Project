@@ -27,7 +27,8 @@ TArray<FUpgradeOption> USanzoUpgradeSubsystem::GeneratedRandomOptions()
 	UpgradeDataTable->GetAllRows<FUpgradeDataRow>(TEXT("GeneratedRandomOption"), AllRows);
 
 	//중복 옵션 방지용 Array
-	TArray<FName> CurrentTurnPickedIDs;
+	TArray<FUpgradeStatKey> CurrentTurnPickedTypes;
+	
 	//무한루프 방지용 최대 시도 횟수
 	int32 MaxAttempts = 50;
 
@@ -44,52 +45,43 @@ TArray<FUpgradeOption> USanzoUpgradeSubsystem::GeneratedRandomOptions()
 
 		for (auto Row : AllRows)
 		{
+			FUpgradeStatKey RowKey(Row->UpgradeTarget, Row->UpgradeType);
 			// Rarity가 맞지 않거나 이미 선택된 업그레이드 선택지 일 경우 스킵
-			if (Row->Rarity != TargetRarity || CurrentTurnPickedIDs.Contains(Row->UpgradeID))
+			if (Row->Rarity != TargetRarity || CurrentTurnPickedTypes.Contains(RowKey))
 			{
 				continue;
 			}
-			FUpgradeStatKey Key(Row->UpgradeTarget, Row->UpgradeType);
-			float CurrentTotalValue = UpgradeTotalMap.Contains(Key) ? UpgradeTotalMap[Key] : 0.0f;
-
+			//해당 옵션의 Key로 LimitValue 계산
+			float CurrentTotalValue = UpgradeTotalMap.Contains(RowKey) ? UpgradeTotalMap[RowKey] : 0.0f;
 			if (Row->LimitValue > 0 && CurrentTotalValue >= Row->LimitValue)
 			{
 				continue;
 			}
+			
 			Candidates.Add(Row);
 			TotalWeight += Row->SpawnWeight;
 		}
-		if (Candidates.Num() > 0)
+		//만약 해당 등급의 후보가 없으면 다시 RollRarity부터 시작
+		if (Candidates.Num() == 0) continue;
+		
+		//가중치 기반 랜덤 선택
+		int32 RandomWeight = FMath::RandRange(1, TotalWeight);
+		int32 WeightSum = 0;
+		for (auto Candidate : Candidates)
 		{
-			int32 RandomWeight = FMath::RandRange(1, TotalWeight);
-			int32 WeightSum = 0;
-
-			for (auto Candidate : Candidates)
+			WeightSum += Candidate->SpawnWeight;
+			if (RandomWeight <= WeightSum)
 			{
-				WeightSum += Candidate->SpawnWeight;
-				if (RandomWeight <= WeightSum)
-				{
-					CurrentTurnPickedIDs.Add(Candidate->UpgradeID);
-					Result.Add(ConvertToOption(Candidate));
-					break;
-				}
+				CurrentTurnPickedTypes.Add(FUpgradeStatKey(Candidate->UpgradeTarget, Candidate->UpgradeType));
+				Result.Add(ConvertToOption(Candidate));
+				break;
 			}
 		}
 	}
 	// 옵션이 3개 채워지지 않았을 경우 빈 값 입력
 	while (Result.Num() < 3)
 	{
-		FUpgradeOption EmptyOption;
-		
-		EmptyOption.UpgradeID = TEXT("NONE"); // ID를 통해 UI와 로직에서 구분
-		EmptyOption.DisplayName = FText::FromString(TEXT("더 이상 강화 가능한 항목이 없습니다."));
-		EmptyOption.UpgradeTarget = EUpgradeTarget::Character;
-		EmptyOption.UpgradeType = EUpgradeType::MaxHealth;
-		EmptyOption.Value = 0.0f;
-		EmptyOption.Rarity = EUpgradeRarity::Common;
-		EmptyOption.IconTexture = nullptr;
-		
-		Result.Add(EmptyOption);
+		Result.Add(GetNoneOption());
 	}
 	
 	return Result;
@@ -97,19 +89,15 @@ TArray<FUpgradeOption> USanzoUpgradeSubsystem::GeneratedRandomOptions()
 
 void USanzoUpgradeSubsystem::ProcessSelectedUpgrade(const FUpgradeOption& Selected)
 {
-	if (Selected.UpgradeID != TEXT("NONE") && !Selected.UpgradeID.IsNone())
-	{
-		FUpgradeStatKey Key(Selected.UpgradeTarget, Selected.UpgradeType);
-		UpgradeTotalMap.FindOrAdd(Key) += Selected.Value;
+	if (Selected.UpgradeID == TEXT("NONE") || Selected.UpgradeID.IsNone()) return;
+
+	FUpgradeStatKey Key(Selected.UpgradeTarget, Selected.UpgradeType);
+	UpgradeTotalMap.FindOrAdd(Key) += Selected.Value;
+
+	SelectedTotalMap.FindOrAdd(Selected.UpgradeID) += 1;
 	
-		UpgradeHistory.Add(Selected);
-	
-		// UpgradeComponent에 Data 전달하는 로직 추가
-	}
-	else
-	{
-		UE_LOG(LogLJR, Log, TEXT("빈 업그레이드 선택됨"));
-	}
+	OnUpgradeSelected.Broadcast(Selected);
+	// UpgradeComponent에 Data 전달하는 로직 추가
 }
 
 EUpgradeRarity USanzoUpgradeSubsystem::RollRarity()
@@ -134,5 +122,20 @@ FUpgradeOption USanzoUpgradeSubsystem::ConvertToOption(const FUpgradeDataRow* Se
 	NewOption.Rarity = SelectedRow->Rarity;
 	NewOption.IconTexture = SelectedRow->IconTexture;
 	return NewOption;
+}
+
+FUpgradeOption USanzoUpgradeSubsystem::GetNoneOption()
+{
+	FUpgradeOption EmptyOption;
+		
+	EmptyOption.UpgradeID = TEXT("NONE"); // ID를 통해 UI와 로직에서 구분
+	EmptyOption.DisplayName = FText::FromString(TEXT("더 이상 강화 가능한 항목이 없습니다."));
+	EmptyOption.UpgradeTarget = EUpgradeTarget::Character;
+	EmptyOption.UpgradeType = EUpgradeType::MaxHealth;
+	EmptyOption.Value = 0.0f;
+	EmptyOption.Rarity = EUpgradeRarity::Common;
+	EmptyOption.IconTexture = nullptr;
+	
+	return EmptyOption;
 }
 

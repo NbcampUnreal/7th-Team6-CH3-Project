@@ -7,6 +7,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "SanzoUpgradeSubsystem.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpgradeSelected, const FUpgradeOption&);
+
 UCLASS()
 class PROJECTSANZO_API USanzoUpgradeSubsystem : public UGameInstanceSubsystem
 {
@@ -25,7 +27,10 @@ public:
 	void ProcessSelectedUpgrade(const FUpgradeOption& Selected);
 	
 	UFUNCTION(BlueprintCallable, Category = "Upgrade System")
-	const TArray<FUpgradeOption>& GetUpgradeHistory() const { return UpgradeHistory;}
+	const TMap<FUpgradeStatKey, float>& GetUpgradeTotalMap() const { return UpgradeTotalMap; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Upgrade System")
+	const TMap<FName, int32>& GetSelectedTotalMap() const { return SelectedTotalMap; }
 
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Upgrade System|DataTable")
@@ -36,13 +41,22 @@ private:
 	
 	FUpgradeOption ConvertToOption(const FUpgradeDataRow* SelectedRow);
 	
-	TMap<FUpgradeStatKey, float> UpgradeTotalMap;
-	//선택된 업그레이드 기록용
-	UPROPERTY()
-	TArray<FUpgradeOption> UpgradeHistory;
+	//빈 값 생성용 함수
+	FUpgradeOption GetNoneOption();
 	
+	//선택된 업그레이드 Limit 값 계산
+	UPROPERTY()
+	TMap<FUpgradeStatKey, float> UpgradeTotalMap;
+	
+	//선택된 업그레이드 카운트 저장용 Map
+	UPROPERTY()
+	TMap<FName, int32> SelectedTotalMap;
+	
+	//업그레이드 한도 도달 ID 저장
 	UPROPERTY()
 	TSet<FName> LimitedUpgradeIDs;
+	
+	FOnUpgradeSelected OnUpgradeSelected;
 
 #pragma endregion 이준로
 };
