@@ -11,6 +11,7 @@
 #include "Interface/SanzoTagEditorInterface.h"
 #include "SanzoCharacter.generated.h"
 
+class USanzoUpgradeComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -54,6 +55,13 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter,
 
 #pragma endregion 김형백
 
+#pragma region UpgradeComponent
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Components", meta = (AllowPrivateAccess = "true"))
+	USanzoUpgradeComponent* UpgradeComp;
+	
+#pragma endregion 이준로
+	
 #pragma region NavigationComponent
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Navigation", meta = (AllowPrivateAccess = "true"))
 	USanzoNavigationArrowComponent* NavArrow;
