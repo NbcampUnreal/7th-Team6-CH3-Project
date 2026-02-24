@@ -1,6 +1,10 @@
 #include "Stage/SanzoSpawnGate.h"
 #include "Common/SanzoLog.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
+
+#define COLLISION_GATEBLOCKER ECC_GameTraceChannel1
 
 ASanzoSpawnGate::ASanzoSpawnGate()
 {
@@ -17,25 +21,29 @@ ASanzoSpawnGate::ASanzoSpawnGate()
   TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
   TriggerBox->SetupAttachment(Root);
 
+  // 트리거박스 타입 전용 채널로 설정
+  TriggerBox->SetCollisionObjectType(COLLISION_GATEBLOCKER);
+
+  // 모든 채널을 무시하도록 초기화 (슈팅 판정 등 영향 X)
   TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
   TriggerBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-  TriggerBox->SetGenerateOverlapEvents(true);
 
-  // 플레이어 막기
+  // 플레이어(Pawn) Block
   TriggerBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-
-  // Enemy(PhysicsBody) 감지
+  // 적(PhysicsBody) Overlap
   TriggerBox->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Overlap);
+  TriggerBox->SetGenerateOverlapEvents(true);
 }
 
 void ASanzoSpawnGate::BeginPlay()
 {
 	Super::BeginPlay();
-  TriggerBox->OnComponentEndOverlap.AddDynamic(
-    this,
-    &ASanzoSpawnGate::OnOverlapEnd
-  );
+  LeftRot = GateMeshL->GetRelativeRotation();
+  RightRot = GateMeshR->GetRelativeRotation();
+  TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ASanzoSpawnGate::OnOverlapBegin);
+  TriggerBox->OnComponentEndOverlap.AddDynamic(this, &ASanzoSpawnGate::OnOverlapEnd);
 }
+
 void ASanzoSpawnGate::OpenGate()
 {
   if (bIsOpened) return;
@@ -101,6 +109,7 @@ void ASanzoSpawnGate::RotateDoor()
 
   if (bIsOpened)
   {
+    // 열릴 때
     GateMeshL->AddRelativeRotation(FRotator(0.f, DeltaYaw, 0.f));
     GateMeshR->AddRelativeRotation(FRotator(0.f, -DeltaYaw, 0.f));
 
@@ -113,6 +122,7 @@ void ASanzoSpawnGate::RotateDoor()
   }
   else
   {
+    // 닫힐 때
     GateMeshL->AddRelativeRotation(FRotator(0.f, -DeltaYaw, 0.f));
     GateMeshR->AddRelativeRotation(FRotator(0.f, DeltaYaw, 0.f));
 
@@ -121,9 +131,10 @@ void ASanzoSpawnGate::RotateDoor()
     if (RotatedAmount >= TargetAngle)
     {
       GetWorldTimerManager().ClearTimer(DoorTimer);
+      GateMeshL->SetRelativeRotation(FRotator(LeftRot));
+      GateMeshR->SetRelativeRotation(FRotator(RightRot));
     }
   }
-
 }
 
 void ASanzoSpawnGate::OnOverlapEnd(
@@ -134,7 +145,21 @@ void ASanzoSpawnGate::OnOverlapEnd(
 {
   if (OtherActor && OtherActor->ActorHasTag("Enemy"))
   {
-    UE_LOG(LogTemp, Warning, TEXT("SpawnGate:Enemy 나감"));
+    UE_LOG(LogCYS, Error, TEXT("SpawnGate: Enemy 나감"));
     CloseGate();
+  }
+}
+
+void ASanzoSpawnGate::OnOverlapBegin(
+  UPrimitiveComponent* OverlappedComponent, 
+  AActor* OtherActor, 
+  UPrimitiveComponent* OtherComp, 
+  int32 OtherBodyIndex, 
+  bool bFromSweep, 
+  const FHitResult& SweepResult)
+{
+  if (OtherActor && OtherActor->ActorHasTag("Enemy"))
+  {
+    OpenGate();
   }
 }

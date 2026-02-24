@@ -44,7 +44,8 @@ protected:
   float RotateSpeed = 180.f;   // deg/sec
   float RotatedAmount = 0.f;   // 누적 회전량
   float TargetAngle = 90.f;
-
+  FRotator LeftRot;
+  FRotator RightRot;
 
 private:
   UFUNCTION()
@@ -54,7 +55,15 @@ private:
     UPrimitiveComponent* OtherComp,
     int32 OtherBodyIndex
   );
-
+  UFUNCTION()
+  void OnOverlapBegin(
+    UPrimitiveComponent* OverlappedComponent, 
+    AActor* OtherActor, 
+    UPrimitiveComponent* OtherComp, 
+    int32 OtherBodyIndex, 
+    bool bFromSweep, 
+    const FHitResult& SweepResult
+  );
   void RotateDoor();
 
   bool bIsOpened = false;

@@ -22,11 +22,7 @@ public:
   // 시간
   float TotalTime;
   virtual void UpdateTime() override;
-  float ElapsedTime = 25.f;
-
-  // 스폰 Gate
-  UPROPERTY()
-  TArray<ASanzoSpawnGate*> SpawnGates;
-  void OpenSpawnGate();
+  float ElapsedTime = 10.f; // 사이클 카운트
+  float CycleTime = 15.f; // 스폰 사이클
 #pragma endregion 최윤서
 };

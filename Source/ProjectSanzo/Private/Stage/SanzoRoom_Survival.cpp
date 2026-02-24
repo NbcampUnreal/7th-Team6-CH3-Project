@@ -2,7 +2,6 @@
 #include "Common/SanzoLog.h"
 #include "Core/SanzoGameState.h"
 #include "Kismet/GameplayStatics.h"
-#include "Stage/SanzoSpawnGate.h"
 
 #pragma region Battle Flow for Survival
 ASanzoRoom_Survival::ASanzoRoom_Survival()
@@ -13,21 +12,6 @@ ASanzoRoom_Survival::ASanzoRoom_Survival()
 void ASanzoRoom_Survival::BeginPlay()
 {
   Super::BeginPlay();
-  // 스폰 Gate 찾기
-  TArray<AActor*> FoundGates;
-  UGameplayStatics::GetAllActorsOfClass(
-    GetWorld(),
-    ASanzoSpawnGate::StaticClass(),
-    FoundGates
-  );
-  for (AActor* Actor : FoundGates)
-  {
-    if (ASanzoSpawnGate* Gates = Cast<ASanzoSpawnGate>(Actor))
-    {
-      SpawnGates.Add(Gates);
-      UE_LOG(LogCYS, Warning, TEXT("RB: Spawn Gate Found"));
-    }
-  }
 }
 void ASanzoRoom_Survival::BeginRoomSequence()
 {
@@ -65,27 +49,15 @@ void ASanzoRoom_Survival::UpdateTime()
     GameState->UpdateStageInfo(CurrentTime, TotalTime);
   }
   ElapsedTime += 0.1;
-  if(ElapsedTime>=30.f)
+  if(ElapsedTime>=CycleTime)
   {
     ElapsedTime = 0.f;
-    OpenSpawnGate();
+    EnemySpawned();
   }
   if (CurrentTime > TotalTime)
   {
     UE_LOG(LogCYS, Warning, TEXT("방호: 시간 끝"));
     EndRoomSequence();
   }
-}
-void ASanzoRoom_Survival::OpenSpawnGate()
-{
-  for (ASanzoSpawnGate* SpawnGate : SpawnGates)
-  {
-    if (SpawnGate)
-    {
-      SpawnGate->OpenGate();
-    }
-  }
-  // 적 스폰
-  EnemySpawned();
 }
 #pragma endregion 최윤서
