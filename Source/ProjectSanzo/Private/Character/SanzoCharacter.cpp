@@ -384,15 +384,33 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
-  CharacterGameplayTags.AddTag(SanzoTags::Parry);
-  ParryComp->PlayParryMontage();
-  GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
+  
+  if (ParryComp->TryParry())
+  {
+    ParryComp->PlayParryMontage();
+
+    CharacterGameplayTags.AddTag(SanzoTags::Parry);
+    CharacterGameplayTags.AddTag(SanzoTags::ParryPenaltyActive);
+
+    ParryComp->ApplyParrySpamPenalty(); //패널티 체크 및 적용함수
+   
+
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
+  }
+  else
+  {
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Parry Failed!"));
+  }
+
  
 }
 
 void ASanzoCharacter::EndParry(UAnimMontage* Montage, bool bInterrupted)
 {
+  //패리관련 태그 제거
     CharacterGameplayTags.RemoveTag(SanzoTags::Parry);
+    CharacterGameplayTags.RemoveTag(SanzoTags::ParryWindow);
+    
 }
 
 #pragma region AimingFunction
@@ -462,6 +480,8 @@ void ASanzoCharacter::RemoveGameplayTag(FGameplayTag TagToRemove)
 {
   CharacterGameplayTags.RemoveTag(TagToRemove);
 }
+
+
 #pragma endregion 김형백
 
 float ASanzoCharacter::TakeDamage(
@@ -472,15 +492,20 @@ float ASanzoCharacter::TakeDamage(
 {
   float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+  /*패리 성공*/
+  //패리태그가 있거나 성공섹션일때 패리 성공
   UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
   FName CurrentSection = AnimInstance->Montage_GetCurrentSection();
-  //패리태그가 있거나 성공섹션일때 패리 성공
   if (CharacterGameplayTags.HasTag(SanzoTags::ParryWindow) || CurrentSection == FName("Success"))
   {
     ParryComp->SuccessParry();
     FinalDamage = 0.f;
-    //딜 반사
-    UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount, GetController(), this, UDamageType::StaticClass());
+    //50%확률로 딜 반사 딜 반사 
+    if (FMath::RandBool()) 
+    {
+      UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount, GetController(), this, UDamageType::StaticClass());
+    }
+
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
   }
 

@@ -23,8 +23,22 @@ public:
   USoundBase* ParrySound;
 
   FTimerHandle SlowTimerHandle;
+  FTimerHandle ParryPenaltyTimerHandle; //패널티 시간을 관리하는 타이머핸들
 
-  int32 ParryCount;
+ 
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  float ParryPenaltyDuration;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  float ParryCooldownTime;
+  int32 ParryPenaltyCount;
+
+  void ApplyParrySpamPenalty();
+  void ResetParrySpamPenalty();
+
+  float LastParryTime;
+  bool TryParry();
+  
 
   void PlayParryMontage();
   void SuccessParry();

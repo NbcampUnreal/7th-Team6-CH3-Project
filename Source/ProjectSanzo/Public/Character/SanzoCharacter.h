@@ -9,7 +9,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameplayTagAssetInterface.h"
 #include "Interface/SanzoTagEditorInterface.h"
-#include "SanzoCharacter.generated.h"
+#include "SanzoCharacter.generated.h" 
 
 class USpringArmComponent;
 class UCameraComponent;
@@ -24,9 +24,11 @@ class USanzoNavigationArrowComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
-class PROJECTSANZO_API ASanzoCharacter : public ACharacter, 
-                                         public IGameplayTagAssetInterface, 
-                                         public ISanzoTagEditorInterface
+class PROJECTSANZO_API ASanzoCharacter : 
+  public ACharacter, 
+  public IGameplayTagAssetInterface, 
+  public ISanzoTagEditorInterface
+  
 {
   GENERATED_BODY()
 #pragma region Component
@@ -161,7 +163,7 @@ protected:
   //타이머 핸들러 선언
   FTimerHandle SprintStaminaTimerHandle;
   FTimerHandle ExhaustionRecoveryTimerHandle;
-
+  FTimerHandle ParryPenaltyTimerHandle;
   void ExhaustionRecovery();
 
   void PrintGameplayTags();
