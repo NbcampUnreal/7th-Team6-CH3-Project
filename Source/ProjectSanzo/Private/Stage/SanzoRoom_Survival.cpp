@@ -1,19 +1,22 @@
 #include "Stage/SanzoRoom_Survival.h"
 #include "Common/SanzoLog.h"
 #include "Core/SanzoGameState.h"
+#include "Kismet/GameplayStatics.h"
 
 #pragma region Battle Flow for Survival
 ASanzoRoom_Survival::ASanzoRoom_Survival()
 {
   // 클리어 조건 시간 (더미)
-  TotalTime = 30.0;
+  TotalTime = 60.0;
+}
+void ASanzoRoom_Survival::BeginPlay()
+{
+  Super::BeginPlay();
 }
 void ASanzoRoom_Survival::BeginRoomSequence()
 {
   Super::BeginRoomSequence();
   UE_LOG(LogCYS, Warning, TEXT("방호: 시퀀스 시작"));
-  // 적 스폰
-  EnemySpawned();
   // 클리어 조건 달성 시 end
   UE_LOG(LogCYS, Warning, TEXT("방호: 클리어 조건 - 제한 시간 %.1f초 동안 살아남기"), TotalTime);
   GetWorldTimerManager().SetTimer(
@@ -44,6 +47,12 @@ void ASanzoRoom_Survival::UpdateTime()
   if (GameState)
   {
     GameState->UpdateStageInfo(CurrentTime, TotalTime);
+  }
+  ElapsedTime += 0.1;
+  if(ElapsedTime>=CycleTime)
+  {
+    ElapsedTime = 0.f;
+    EnemySpawned();
   }
   if (CurrentTime > TotalTime)
   {

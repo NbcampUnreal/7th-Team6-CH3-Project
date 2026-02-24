@@ -120,6 +120,11 @@ void ASanzoStageManager::SetState(FGameplayTag NewState)
   }
   else if (NewState == StageClearedTag)
   {
+    // 안개 지우기
+    if(Fog)
+    {
+      Fog->SetActorHiddenInGame(true);
+    }
 	  // 스테이지 클리어 - 작업자: 이준로
   	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
   	{
