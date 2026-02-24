@@ -40,8 +40,14 @@ void ASanzoSpawnGate::BeginPlay()
 	Super::BeginPlay();
   LeftRot = GateMeshL->GetRelativeRotation();
   RightRot = GateMeshR->GetRelativeRotation();
-  TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ASanzoSpawnGate::OnOverlapBegin);
-  TriggerBox->OnComponentEndOverlap.AddDynamic(this, &ASanzoSpawnGate::OnOverlapEnd);
+	if (TriggerBox)
+	{
+		TriggerBox->OnComponentBeginOverlap.RemoveDynamic(this, &ASanzoSpawnGate::OnOverlapBegin);
+		TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ASanzoSpawnGate::OnOverlapBegin);
+		
+		TriggerBox->OnComponentEndOverlap.RemoveDynamic(this, &ASanzoSpawnGate::OnOverlapEnd);
+		TriggerBox->OnComponentEndOverlap.AddDynamic(this, &ASanzoSpawnGate::OnOverlapEnd);
+	}
 }
 
 void ASanzoSpawnGate::OpenGate()
