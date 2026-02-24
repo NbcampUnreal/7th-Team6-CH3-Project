@@ -14,7 +14,7 @@ UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Exhausted, "Character.Status.Exhausted");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Action_Fixed, "Character.Action.Fixed");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::ParryWindow, "Character.State.ParryWindow");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::IFrame, "Character.State.IFrame");
-
+UE_DEFINE_GAMEPLAY_TAG(SanzoTags::ParryPenaltyActive, "Character.State.ParryPenaltyActive");
 
 SanzoGameplayTag::SanzoGameplayTag()
 {
