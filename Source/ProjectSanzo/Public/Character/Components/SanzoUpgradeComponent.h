@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Core/UpgradeSystem/UpgradeDataRow.h"
 #include "SanzoUpgradeComponent.generated.h"
 
 
@@ -13,16 +14,18 @@ class PROJECTSANZO_API USanzoUpgradeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+	
 	USanzoUpgradeComponent();
 
 protected:
-	// Called when the game starts
+	
 	virtual void BeginPlay() override;
+	
+	void OnNewUpgradeSelected(const FUpgradeOption& UpgradeOption);
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	void ProcessUpgradeValue(EUpgradeTarget Target, EUpgradeType Type, float TotalValue);
+	
+	void InitializeUpgradeFromSubsystem(const TMap<FUpgradeStatKey, float> TotalMap);
+	
 		
 };

@@ -32,6 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Upgrade System")
 	const TMap<FName, int32>& GetSelectedTotalMap() const { return SelectedTotalMap; }
 
+	FOnUpgradeSelected OnUpgradeSelected;
+	
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Upgrade System|DataTable")
 	UDataTable* UpgradeDataTable;
@@ -55,8 +57,6 @@ private:
 	//업그레이드 한도 도달 ID 저장
 	UPROPERTY()
 	TSet<FName> LimitedUpgradeIDs;
-	
-	FOnUpgradeSelected OnUpgradeSelected;
 
 #pragma endregion 이준로
 };

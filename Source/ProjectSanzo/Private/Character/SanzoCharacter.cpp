@@ -15,6 +15,7 @@
 #include "Character/Components/SanzoParryComponent.h"
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Character/Components/SanzoNavigationArrowComponent.h"
+#include "Character/Components/SanzoUpgradeComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
 #include "Weapon/SanzoGun.h"
 #include "Curves/CurveFloat.h"
@@ -73,7 +74,13 @@ ASanzoCharacter::ASanzoCharacter()
   ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
   
 #pragma endregion 김형백 
-  
+	
+#pragma region UpgradeComponentInit
+	
+	UpgradeComp = CreateDefaultSubobject<USanzoUpgradeComponent>(TEXT("Upgrade"));
+	
+#pragma endregion 이준로
+	
 #pragma region NavigationComponentInit
   //컴포넌트 생성 및 부착
 
