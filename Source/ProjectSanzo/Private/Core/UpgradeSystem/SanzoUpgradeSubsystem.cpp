@@ -96,8 +96,8 @@ void USanzoUpgradeSubsystem::ProcessSelectedUpgrade(const FUpgradeOption& Select
 
 	SelectedTotalMap.FindOrAdd(Selected.UpgradeID) += 1;
 	
+	// UpgradeComponent에 Data 전달하는 로직 
 	OnUpgradeSelected.Broadcast(Selected);
-	// UpgradeComponent에 Data 전달하는 로직 추가
 }
 
 EUpgradeRarity USanzoUpgradeSubsystem::RollRarity()

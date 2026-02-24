@@ -42,7 +42,7 @@ protected:
 	void SetStatusText();
 
 	UFUNCTION(BlueprintCallable)
-	void SetUpgradeListText();
+	void SetUpgradeList();
 
 	UFUNCTION(BlueprintCallable)
 	void SetUpgradeButton(int32 index, const FUpgradeOption& option);
@@ -63,6 +63,11 @@ protected:
 	class UBorder* UpgradeListBorder;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* UpgradeListText;
+	UPROPERTY(meta = (BindWidget))
+	class UWrapBox* UpgradeListWrapBox;
+	
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<class UUserWidget> UpgradeInfoWidgetClass;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ResumeButton;
