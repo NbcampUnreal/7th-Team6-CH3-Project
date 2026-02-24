@@ -38,14 +38,18 @@ USanzoStatComponent::USanzoStatComponent()
 void USanzoStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+  
 	//스태미나 지속 회복
+	TWeakObjectPtr<USanzoStatComponent> WeakThis(this); //약한 참조로 람다에서 this사용
   GetWorld()->GetTimerManager().SetTimer(
 		StaminaRestoreHandle, 
-		[this]() //인자(회복량)를 받아야 해서 람다로 변환
+		[WeakThis]() //인자(회복량)를 받아야 해서 람다로 변환
 		{
-      RestoreStamina(StaminaRestoreAmount * 0.01f);
-				BroadCastStatUpdate();
+      if (WeakThis.IsValid())
+      {
+        WeakThis->RestoreStamina(WeakThis->StaminaRestoreAmount * 0.01f);
+        WeakThis->BroadCastStatUpdate();
+      }
 		},
 		0.01f, 
 		true);
@@ -70,12 +74,16 @@ void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
   bool bIsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(SprintStaminaCostHandle);
 	if(bShouldConsume == true && !bIsTimerActive) //true면서 타이머가없을때	소모
 	{
+		TWeakObjectPtr<USanzoStatComponent> WeakThis(this); //약한 참조로 람다에서 this사용
 		GetWorld()->GetTimerManager().SetTimer(
 			SprintStaminaCostHandle, 
-			[this]()
+			[WeakThis]()
 			{
-				ConsumeStamina(SprintStaminaCost * 0.01f);
-				BroadCastStatUpdate();
+				if (WeakThis.IsValid())
+				{
+					WeakThis->ConsumeStamina(WeakThis->SprintStaminaCost * 0.01f);
+					WeakThis->BroadCastStatUpdate();
+				}
 			},
 			0.01f, 
       true);
