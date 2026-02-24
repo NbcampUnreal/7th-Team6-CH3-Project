@@ -23,6 +23,7 @@
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
 #include "Components/PawnNoiseEmitterComponent.h"
+#include "AI/Components/SanzoEnemyStunComponent.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -481,6 +482,14 @@ float ASanzoCharacter::TakeDamage(
     ParryComp->SuccessParry();
     FinalDamage = 0.f;
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
+
+    if (DamageCauser)
+    {
+      if (USanzoEnemyStunComponent* EnemyStunComp = DamageCauser->FindComponentByClass<USanzoEnemyStunComponent>())
+      {
+        EnemyStunComp->NotifyParried();
+      }
+    }
   }
 
   if (StatComp)

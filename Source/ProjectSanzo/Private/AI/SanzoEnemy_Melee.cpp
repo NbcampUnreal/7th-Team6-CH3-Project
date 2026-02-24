@@ -3,6 +3,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "Common/SanzoGameplayTag.h"
+#include "AI/Components/SanzoEnemyStunComponent.h" 
 
 ASanzoEnemy_Melee::ASanzoEnemy_Melee()
 {
@@ -40,7 +42,7 @@ void ASanzoEnemy_Melee::DisableWeaponCollision()
 
 void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-  if (OtherActor && OtherActor != this && OtherActor->ActorHasTag("Player"))
+  if (OtherActor && OtherActor != this)
   {
     UGameplayStatics::ApplyDamage(
       OtherActor,

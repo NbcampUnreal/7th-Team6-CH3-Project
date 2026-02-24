@@ -10,6 +10,9 @@
 #include "Animation/AnimInstance.h" 
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Common/SanzoGameplayTag.h"
+#include "Common/SanzoLog.h"
+#include "AI/Components/SanzoEnemyStunComponent.h" 
 
 ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
 {
@@ -88,18 +91,16 @@ void ASanzoEnemy_Ranged::FireHitScan()
   if (bHit)
   {
     AActor* HitActor = HitResult.GetActor();
-    if (HitActor)
+    if (HitActor && !HitActor->IsA<ASanzoEnemyBase>())
     {
-      if (!HitActor->IsA<ASanzoEnemyBase>())
-      {
-        UGameplayStatics::ApplyDamage(
-          HitActor,
-          ShootDamage,
-          GetController(),
-          this,
-          UDamageType::StaticClass()
-        );
-      }
+      UGameplayStatics::ApplyDamage(
+        HitActor,
+        ShootDamage,
+        GetController(),
+        this,
+        UDamageType::StaticClass()
+      );
+
       // 피격 위치에 이펙트 생성
       if (HitEffect)
       {
@@ -325,4 +326,10 @@ void ASanzoEnemy_Ranged::CancelAimingAnim()
   {
     AnimInstance->Montage_Stop(0.2f, AttackMontage);
   }
+}
+
+void ASanzoEnemy_Ranged::OnStunEnteredCallback()
+{
+  CancelAimingAnim();
+  Super::OnStunEnteredCallback();
 }

@@ -17,6 +17,8 @@
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
 #include "Dataflow/DataflowContent.h"
 #include "UI/SanzoEnemyOverHeadWidget.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "AI/Components/SanzoEnemyStunComponent.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -54,8 +56,8 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   OverHeadWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 115.0f));
 
   OverHeadWidget->SetRelativeScale3D(FVector(.3f, 0.3f, 0.3f));
-	
-	OverHeadWidget->SetDrawSize(FVector2D(500,900));
+
+  OverHeadWidget->SetDrawSize(FVector2D(500, 900));
 
 #pragma endregion 이준로
 
@@ -70,6 +72,10 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   ProximitySensor->OnComponentBeginOverlap.AddDynamic(this, &ASanzoEnemyBase::OnProximityOverlap);
 #pragma endregion 김동주
 
+#pragma region StunComponent
+  StunComponent = CreateDefaultSubobject<USanzoEnemyStunComponent>(TEXT("StunComponent"));
+#pragma endregion 김동주
+
 }
 
 void ASanzoEnemyBase::BeginPlay()
@@ -78,22 +84,32 @@ void ASanzoEnemyBase::BeginPlay()
   CurrentHP = MaxHP;
   bIsDead = false;
 
+#pragma region StunComponent
+  if (StunComponent)
+  {
+    StunComponent->OnStunCountChanged.AddDynamic(this, &ASanzoEnemyBase::OnStunCountChangedCallback);
+    StunComponent->OnStunStateEntered.AddDynamic(this, &ASanzoEnemyBase::OnStunEnteredCallback);
+    StunComponent->OnStunStateRecovered.AddDynamic(this, &ASanzoEnemyBase::OnStunRecoveredCallback);
+    StunComponent->OnParried.AddDynamic(this, &ASanzoEnemyBase::OnParriedCallback);
+  }
+#pragma endregion 김동주
+
 #pragma region OverHeadUI
-	
-	if (OverHeadWidget)
-	{
-		UUserWidget* OverHeadWidgetInstance = OverHeadWidget->GetUserWidgetObject();
-		
-		USanzoEnemyOverHeadWidget* CurrentWidget = Cast<USanzoEnemyOverHeadWidget>(OverHeadWidgetInstance);
-		
-		if (CurrentWidget)
-		{
-			OnEnemyDataChanged.AddDynamic(CurrentWidget, &USanzoEnemyOverHeadWidget::UpdateOverHeadWidget);
-			
-			BroadCastAllData();
-		}
-	}
-	
+
+  if (OverHeadWidget)
+  {
+    UUserWidget* OverHeadWidgetInstance = OverHeadWidget->GetUserWidgetObject();
+
+    USanzoEnemyOverHeadWidget* CurrentWidget = Cast<USanzoEnemyOverHeadWidget>(OverHeadWidgetInstance);
+
+    if (CurrentWidget)
+    {
+      OnEnemyDataChanged.AddDynamic(CurrentWidget, &USanzoEnemyOverHeadWidget::UpdateOverHeadWidget);
+
+      BroadCastAllData();
+    }
+  }
+
   GetWorldTimerManager().SetTimer(
     OverHeadWidgetUpdateTimerHandle,
     this,
@@ -110,6 +126,7 @@ void ASanzoEnemyBase::BeginPlay()
     CurrentRoom = Found;
   }
 #pragma endregion 최윤서
+
 }
 
 
@@ -142,7 +159,7 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   CurrentHP = FMath::Clamp(CurrentHP - ActualDamage, 0.f, MaxHP);
 
   //HP바 갱신
- BroadCastAllData();
+  BroadCastAllData();
 
   if (GEngine)
   {
@@ -257,8 +274,8 @@ bool ASanzoEnemyBase::CanAttack(AActor* Target)
 
   // 벽에 안 막혔거나
     // 코앞(250 이하)까지 붙어있다면 무조건 공격 시작
-  if (!bHit 
-    || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player")) 
+  if (!bHit
+    || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player"))
     || FVector::Distance(Start, End) <= 250.f)
   {
     return true;
@@ -272,22 +289,22 @@ bool ASanzoEnemyBase::CanAttack(AActor* Target)
 
 FEnemyOverHeadData ASanzoEnemyBase::MakeUpdateOverHeadData() const
 {
-	FEnemyOverHeadData NewData;
-	if (MaxHP > 0.f)
-	{
-		
-		NewData.HealthPercent = CurrentHP / MaxHP;
-		UE_LOG(LogLJR,Warning,TEXT("적 체력 퍼센트 : %f"),NewData.HealthPercent);
-	}
-	NewData.CurrentStunCount = StunCount;
-	NewData.bIsSighted = bIsSighted;
-	
-	return NewData;
+  FEnemyOverHeadData NewData;
+  if (MaxHP > 0.f)
+  {
+
+    NewData.HealthPercent = CurrentHP / MaxHP;
+    UE_LOG(LogLJR, Warning, TEXT("적 체력 퍼센트 : %f"), NewData.HealthPercent);
+  }
+  NewData.CurrentStunCount = StunComponent ? StunComponent->GetCurrentStunCount() : 0;
+  NewData.bIsSighted = bIsSighted;
+
+  return NewData;
 }
 
 void ASanzoEnemyBase::BroadCastAllData()
 {
-	OnEnemyDataChanged.Broadcast(MakeUpdateOverHeadData());
+  OnEnemyDataChanged.Broadcast(MakeUpdateOverHeadData());
 }
 
 void ASanzoEnemyBase::MakeOverHeadWidget3D()
@@ -306,9 +323,9 @@ void ASanzoEnemyBase::MakeOverHeadWidget3D()
 
 void ASanzoEnemyBase::ShowAlertWidget(bool bIsSight)
 {
-	bIsSighted = bIsSight;
-	UE_LOG(LogLJR,Warning,TEXT("봤는가? %s"), bIsSighted ? TEXT("true") : TEXT("false"));
-	BroadCastAllData();
+  bIsSighted = bIsSight;
+  UE_LOG(LogLJR, Warning, TEXT("봤는가? %s"), bIsSighted ? TEXT("true") : TEXT("false"));
+  BroadCastAllData();
 }
 
 #pragma endregion 이준로
@@ -339,6 +356,73 @@ void ASanzoEnemyBase::OnProximityOverlap(
         }
       }
     }
+  }
+}
+#pragma endregion 김동주
+
+#pragma region StunComponent
+void ASanzoEnemyBase::OnStunCountChangedCallback(int32 CurrentStun, int32 MaxStun)
+{
+  BroadCastAllData();
+}
+
+void ASanzoEnemyBase::OnStunEnteredCallback()
+{
+  if (WeaponMesh) WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  if (StaticWeaponMesh) StaticWeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+  if (StunSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(this, StunSound, GetActorLocation());
+  }
+
+  StopAnimMontage();
+  if (StunMontage)
+  {
+    PlayAnimMontage(StunMontage);
+  }
+
+  if (AAIController* AICon = Cast<AAIController>(GetController()))
+  {
+    if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetBrainComponent()))
+    {
+      BTComp->StopTree(EBTStopMode::Safe);
+    }
+  }
+}
+
+void ASanzoEnemyBase::OnStunRecoveredCallback()
+{
+  if (bIsDead) return;
+
+  if (AAIController* AICon = Cast<AAIController>(GetController()))
+  {
+    if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetBrainComponent()))
+    {
+      BTComp->RestartTree();
+    }
+  }
+}
+
+void ASanzoEnemyBase::OnParriedCallback()
+{
+  if (bIsDead) return;
+
+  FVector EffectLocation = WeaponMesh ? WeaponMesh->GetComponentLocation() : GetActorLocation();
+  
+  if (ParriedEffect)
+  {
+    UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParriedEffect, EffectLocation);
+  }
+
+  if (ParriedSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(this, ParriedSound, EffectLocation);
+  }
+
+  if (!StunComponent->GetIsStunned() && StaggerMontage)
+  {
+    PlayAnimMontage(StaggerMontage);
   }
 }
 #pragma endregion 김동주
