@@ -160,22 +160,10 @@ void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
   {
     GetWorld()->GetTimerManager().ClearTimer(SprintStaminaTimerHandle);
   }
-  if(GetWorld()->GetTimerManager().IsTimerActive(ExhaustionRecoveryTimerHandle))
-  {
-    GetWorld()->GetTimerManager().ClearTimer(ExhaustionRecoveryTimerHandle);
-  }
-}
-
-void ASanzoCharacter::ExhaustionRecovery()
-{
-
-  CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
-  if (StatComp)
-  {
-    StatComp->bIsExhausted = false;
-  }
 
 }
+
+
 
 void ASanzoCharacter::PrintGameplayTags()
 {
@@ -269,44 +257,35 @@ void ASanzoCharacter::Look(const FInputActionValue& Value)
 void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
 {
   bool bShouldMove = !(GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero());
-  bool bHasAttackTag = CharacterGameplayTags.HasTag(SanzoTags::Attack);   
-  bool bHasAimingTag = CharacterGameplayTags.HasTag(SanzoTags::Aiming); 
+  bool bHasAttackTag = CharacterGameplayTags.HasTag(SanzoTags::Attack);
+  bool bHasAimingTag = CharacterGameplayTags.HasTag(SanzoTags::Aiming);
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
-  
-  if(bHasAimingTag||bHasAttackTag||!bShouldMove||bIsExhausted)
+
+  if (bHasAimingTag || bHasAttackTag || !bShouldMove || bIsExhausted)
   {
     StopSprint(Value);
     return;
   }
 
 
-  if(GetCharacterMovement() && bShouldMove)
+  if (GetCharacterMovement() && bShouldMove)
   {
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
     GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 
+    
     //달리기 태그 추가
     CharacterGameplayTags.AddTag(SanzoTags::Sprint);
     //스태미나소모
     if (StatComp)
     {
       StatComp->RequestConsumeStaminaForSprint(true); // 스태미나 소모 호출
-      if (StatComp->bIsExhausted)
-      {
-        CharacterGameplayTags.AddTag(SanzoTags::Exhausted); //여기 내부는 사실 컴포넌트에 있어야하는데 귀찮아서 여기 만듬 ㅎ;
-        GetWorld()->GetTimerManager().SetTimer(
-          ExhaustionRecoveryTimerHandle,
-          this,
-          &ASanzoCharacter::ExhaustionRecovery,
-          3.f,
-          false);
-        StopSprint(Value);
-      }
     }
   }
-
 }
+
+
 
 void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 {
@@ -324,6 +303,7 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
     {
       StatComp->RequestConsumeStaminaForSprint(false);
     }
+
     CharacterGameplayTags.RemoveTag(SanzoTags::Sprint);
 
   }
@@ -384,16 +364,24 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
+  bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
+  if (bIsExhausted)
+  {
+    EndParry(nullptr, false);
+    return;
+  }
   
   if (ParryComp->TryParry())
   {
     ParryComp->PlayParryMontage();
+    StatComp->ConsumeStaminaForAction(); //스태미나 소모
+    StatComp->BeginExhaustionCooldown(); // 지친 상태로 가는 쿨다운 시작
 
     CharacterGameplayTags.AddTag(SanzoTags::Parry);
     CharacterGameplayTags.AddTag(SanzoTags::ParryPenaltyActive);
 
     ParryComp->ApplyParrySpamPenalty(); //패널티 체크 및 적용함수
-   
+    
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
   }
@@ -499,6 +487,7 @@ float ASanzoCharacter::TakeDamage(
   if (CharacterGameplayTags.HasTag(SanzoTags::ParryWindow) || CurrentSection == FName("Success"))
   {
     ParryComp->SuccessParry();
+    CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
     FinalDamage = 0.f;
     //50%확률로 딜 반사 딜 반사 
     if (FMath::RandBool()) 

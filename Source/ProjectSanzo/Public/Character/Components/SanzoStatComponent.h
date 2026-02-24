@@ -45,10 +45,16 @@ protected:
   virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	//stamina 관련 변수
+	UPROPERTY(EditAnywhere, Category = "Stamina")
 	float CurrentStamina;
+	UPROPERTY(EditAnywhere, Category = "Stamina")
 	float MaxStamina;
+  UPROPERTY(EditAnywhere, Category = "Stamina")
   float StaminaRestoreAmount;
+  UPROPERTY(EditAnywhere, Category = "Stamina|Cost")
   float SprintStaminaCost;
+	UPROPERTY(EditAnywhere, Category = "Stamina|Cost")
+  float ParryStaminaCost;
 	//스태미나 지속회복 핸들
 	FTimerHandle StaminaRestoreHandle;
   FTimerHandle SprintStaminaCostHandle;
@@ -68,11 +74,17 @@ protected:
 	FGameplayTag ExhaustedTag;
 	void ConsumeStamina(float Amount);
 	void RestoreStamina(float Amount);
+
+	FTimerHandle ExhaustionRecoveryTimerHandle;
+	void ExhaustionRecovery(); // 콜백함수
 	
+
 public:
+	void BeginExhaustionCooldown(); //타이머함수
 	FOnTagCheckDelegate TagCheckDelegate;
 	//캐릭터에서 사용할 질문함수
 	void RequestConsumeStaminaForSprint(bool bShouldConsume);
+	void ConsumeStaminaForAction();
 	bool bIsExhausted;
 
 public:
@@ -80,8 +92,9 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 
-	float GetStamina() const { return CurrentStamina; }
 
+
+	float GetStamina() const { return CurrentStamina; }
 
 	bool bCanSprint();
 	//태그확인용 델리게이

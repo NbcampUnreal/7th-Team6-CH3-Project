@@ -162,9 +162,7 @@ protected:
 
   //타이머 핸들러 선언
   FTimerHandle SprintStaminaTimerHandle;
-  FTimerHandle ExhaustionRecoveryTimerHandle;
   FTimerHandle ParryPenaltyTimerHandle;
-  void ExhaustionRecovery();
 
   void PrintGameplayTags();
 
