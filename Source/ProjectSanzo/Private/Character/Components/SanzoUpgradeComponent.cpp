@@ -64,7 +64,7 @@ void USanzoUpgradeComponent::ProcessUpgradeValue(EUpgradeTarget Target, EUpgrade
 			{
 				UE_LOG(LogLJR, Warning, TEXT("스탯 업그레이드 전달 완료"))
 				//스탯 적용 함수 등록
-				//StatComponent->ApplyUpgradeModifier(Type, Value);
+				//StatComponent->ApplyStatUpgrade(Type, Value);
 			}
 		}
 	}
