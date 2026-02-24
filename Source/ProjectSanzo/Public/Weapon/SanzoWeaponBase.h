@@ -94,6 +94,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 
+	// 무기 장착했을 때 캐릭터 메쉬에 적용할 ABP 클래스
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Swap")
+	TSubclassOf<class UAnimInstance> WeaponAnimInstanceClass;
+
+	// 무기가 부착될 소켓 이름
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon|Attachment")
+	FName AttachSocketName;
+
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
 	virtual void Fire() {};
