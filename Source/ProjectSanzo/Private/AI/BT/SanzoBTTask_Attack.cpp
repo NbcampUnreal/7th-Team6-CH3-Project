@@ -36,11 +36,25 @@ EBTNodeResult::Type USanzoBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& Own
 
   if (TargetActor)
   {
-    if (Enemy->CanAttack(TargetActor))
+    FHitResult Hit;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(Enemy);
+
+    // 가슴 높이에서 플레이어의 가슴 높이로 레이저 발사
+    FVector Start = Enemy->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+    FVector End = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+
+    bool bHit = Enemy->GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+
+    // 벽에 안 막혔거나
+    // 코앞(250 이하)까지 붙어있다면 무조건 공격 시작
+    if (!bHit || (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Player")) || FVector::Distance(Start, End) <= 250.f)
     {
       Enemy->Attack();
       return EBTNodeResult::Succeeded;
     }
   }
+
+  // 벽에 가려져 있거나 타겟이 없다면 공격하지 않고 실패 반환
   return EBTNodeResult::Failed;
 }
