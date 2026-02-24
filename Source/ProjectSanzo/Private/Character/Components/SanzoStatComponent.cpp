@@ -2,7 +2,9 @@
 
 
 #include "Character/Components/SanzoStatComponent.h"
+#include "Character/Interface/SanzoTagEditorInterface.h"
 #include "TimerManager.h"
+#include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
 
 USanzoStatComponent::USanzoStatComponent()
@@ -16,6 +18,8 @@ USanzoStatComponent::USanzoStatComponent()
 	MaxStamina = 100.f;
 	StaminaRestoreAmount = 10.f; //초당 Stamina회복량
   SprintStaminaCost = 25.f; //Sprint 초당 소모량
+  ParryStaminaCost = 15.f; //Parry 한번당 소모량
+
   bIsExhausted = false;
 	//테스트 코드
 	CurrentHealth = 100.f;
@@ -38,14 +42,18 @@ USanzoStatComponent::USanzoStatComponent()
 void USanzoStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+  
 	//스태미나 지속 회복
+	TWeakObjectPtr<USanzoStatComponent> WeakThis(this); //약한 참조로 람다에서 this사용
   GetWorld()->GetTimerManager().SetTimer(
 		StaminaRestoreHandle, 
-		[this]() //인자(회복량)를 받아야 해서 람다로 변환
+		[WeakThis]() //인자(회복량)를 받아야 해서 람다로 변환
 		{
-      RestoreStamina(StaminaRestoreAmount * 0.01f);
-				BroadCastStatUpdate();
+      if (WeakThis.IsValid())
+      {
+        WeakThis->RestoreStamina(WeakThis->StaminaRestoreAmount * 0.01f);
+        WeakThis->BroadCastStatUpdate();
+      }
 		},
 		0.01f, 
 		true);
@@ -60,22 +68,28 @@ void USanzoStatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	//타이머 정리
+	
 	GetWorld()->GetTimerManager().ClearTimer(StaminaRestoreHandle);
   GetWorld()->GetTimerManager().ClearTimer(SprintStaminaCostHandle);
+  GetWorld()->GetTimerManager().ClearTimer(ExhaustionRecoveryTimerHandle);
 }
 
 
 void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
 {
-  bool bIsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(SprintStaminaCostHandle);
+	bool bIsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(SprintStaminaCostHandle);
 	if(bShouldConsume == true && !bIsTimerActive) //true면서 타이머가없을때	소모
 	{
+		TWeakObjectPtr<USanzoStatComponent> WeakThis(this); //약한 참조로 람다에서 this사용
 		GetWorld()->GetTimerManager().SetTimer(
 			SprintStaminaCostHandle, 
-			[this]()
+			[WeakThis]()
 			{
-				ConsumeStamina(SprintStaminaCost * 0.01f);
-				BroadCastStatUpdate();
+				if (WeakThis.IsValid())
+				{
+					WeakThis->ConsumeStamina(WeakThis->SprintStaminaCost * 0.01f);
+					WeakThis->BroadCastStatUpdate();
+				}
 			},
 			0.01f, 
       true);
@@ -84,6 +98,12 @@ void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(SprintStaminaCostHandle);
 	}
+}
+
+void USanzoStatComponent::ConsumeStaminaForAction()
+{
+	ConsumeStamina(ParryStaminaCost); // 예시로 10만큼 소모
+	BroadCastStatUpdate();
 }
 
 
@@ -109,7 +129,11 @@ void USanzoStatComponent::ConsumeStamina(float Amount)
   if (CurrentStamina <= 0.f)
   {
     CurrentStamina = 0.f;
-		bIsExhausted = true; //사실 태그추가해야함 델리겡이트이용
+    if(ISanzoTagEditorInterface* TagEditor = Cast<ISanzoTagEditorInterface>(GetOwner()))
+		{
+			TagEditor->AddGameplayTag(SanzoTags::Exhausted);
+    }
+		BeginExhaustionCooldown(); // 탈진 회복 시작
     return;
   }
   
@@ -130,6 +154,36 @@ void USanzoStatComponent::RestoreStamina(float Amount)
 		BroadCastStatUpdate();
 	}
 }
+
+void USanzoStatComponent::ExhaustionRecovery()
+{
+	if (ISanzoTagEditorInterface* TagEditor = Cast<ISanzoTagEditorInterface>(GetOwner()))
+	{
+    TagEditor->RemoveGameplayTag(SanzoTags::Exhausted);
+	}
+}
+
+void USanzoStatComponent::BeginExhaustionCooldown()
+{
+  if (GetWorld() && CheckTag(SanzoTags::Exhausted))
+	{
+		if (GetWorld()->GetTimerManager().IsTimerActive(ExhaustionRecoveryTimerHandle))
+		{
+			return;
+		}
+			GetWorld()->GetTimerManager().SetTimer(
+			ExhaustionRecoveryTimerHandle,
+			this,
+			&USanzoStatComponent::ExhaustionRecovery,
+			3.f,
+			false);
+    
+		
+	}
+}
+
+
+
 
 bool USanzoStatComponent::bCanSprint()
 {
@@ -169,6 +223,10 @@ FSanzoStatData USanzoStatComponent::MakeStatData() const
 	return Data;
 }
 #pragma endregion 이준로
+
+
+
+
 
 #pragma region PlayerApplyDamage
 void USanzoStatComponent::ApplyDamage(float DamageAmount)

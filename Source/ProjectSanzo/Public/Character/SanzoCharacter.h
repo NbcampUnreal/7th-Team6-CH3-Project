@@ -9,7 +9,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameplayTagAssetInterface.h"
 #include "Interface/SanzoTagEditorInterface.h"
-#include "SanzoCharacter.generated.h"
+#include "SanzoCharacter.generated.h" 
 
 class USanzoUpgradeComponent;
 class USpringArmComponent;
@@ -25,9 +25,11 @@ class USanzoNavigationArrowComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
-class PROJECTSANZO_API ASanzoCharacter : public ACharacter, 
-                                         public IGameplayTagAssetInterface, 
-                                         public ISanzoTagEditorInterface
+class PROJECTSANZO_API ASanzoCharacter : 
+  public ACharacter, 
+  public IGameplayTagAssetInterface, 
+  public ISanzoTagEditorInterface
+  
 {
   GENERATED_BODY()
 #pragma region Component
@@ -90,9 +92,9 @@ class PROJECTSANZO_API ASanzoCharacter : public ACharacter,
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* ParryAction;
 #pragma endregion 김형백
-
-#pragma region Aiming
 public:
+#pragma region Aiming
+
   FTimeline AimTimeline;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AimingTimeLine")
   UCurveFloat* AimCurve;
@@ -105,7 +107,8 @@ public:
   void PlayAimTimeLine();
 #pragma endregion 김형백
   
-
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
+  UAnimMontage* DodgeMontage;
 
 public:
   ASanzoCharacter();
@@ -167,9 +170,7 @@ protected:
 
   //타이머 핸들러 선언
   FTimerHandle SprintStaminaTimerHandle;
-  FTimerHandle ExhaustionRecoveryTimerHandle;
-
-  void ExhaustionRecovery();
+  FTimerHandle ParryPenaltyTimerHandle;
 
   void PrintGameplayTags();
 
