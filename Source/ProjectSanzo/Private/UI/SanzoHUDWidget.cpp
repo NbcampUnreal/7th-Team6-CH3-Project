@@ -3,6 +3,7 @@
 
 #include "UI/SanzoHUDWidget.h"
 
+#include "Character/Components/SanzoEquipmentComponent.h"
 #include "Character/Components/SanzoStatComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -22,13 +23,20 @@ void USanzoHUDWidget::NativeConstruct()
 			//this : 대상 객체, &USanzoHUDWidget::HandleStatChanged: 실행할 함수
 			StatComponent->OnStatChanged.AddDynamic(this, &USanzoHUDWidget::HandleStatChanged);
 		}
+		
+		USanzoEquipmentComponent* EquipmentComponent = PlayerCharacter->FindComponentByClass<USanzoEquipmentComponent>();
+		if (EquipmentComponent)
+		{
+			EquipmentComponent->OnAmmoChanged.AddDynamic(this, &USanzoHUDWidget::HandleAmmoChanged);
+		}
+		
 	}
 
 	if (ASanzoGameState* GameState = GetWorld()->GetGameState<ASanzoGameState>())
 	{
 		if (StageText)
 		{
-			int32 StageInfo = GameState->CurrentStageIndex + 1;
+			int32 StageInfo = GameState->CurrentStageIndex;
 			StageText->SetText(FText::FromString(FString::Printf(TEXT("스테이지: %d"), StageInfo)));
 		}
 		//Delegate 등록
@@ -63,4 +71,9 @@ void USanzoHUDWidget::HandleStageProgressChanged(float percent)
 	{
 		StageProgressBar->SetPercent(percent);
 	}
+}
+
+void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
+{
+	AmmoCountText->SetText(NewAmmoText);
 }

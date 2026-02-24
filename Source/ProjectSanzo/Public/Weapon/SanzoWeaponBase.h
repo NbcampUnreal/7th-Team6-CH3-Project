@@ -103,6 +103,12 @@ protected:
 
 	// 플레이어 총기 사용 시 연사 발사 속도 제어용 타이머
 	FTimerHandle FireTimerHandle;
-
+	
+#pragma region DataForHUD
+	
+public:
+	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
+	
+#pragma endregion 이준로
 };
 

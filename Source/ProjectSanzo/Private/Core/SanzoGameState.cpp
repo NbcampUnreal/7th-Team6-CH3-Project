@@ -114,9 +114,7 @@ void ASanzoGameState::OpenAnnouncerUI()
 		{
 			//진짜 받아온 정보로 수정 필요
 			UE_LOG(LogLJR,Warning,TEXT("스테이지 알림 UI 열기"));
-			ESanzoStageType StageType = ESanzoStageType::Extermination;
-			FGameplayTag State = FGameplayTag::RequestGameplayTag(FName("Room.State.Actived"));
-			SanzoPlayerController->ShowAnnouncerUI(State, StageType);
+			SanzoPlayerController->ShowAnnouncerUI(CurrentStageState, CurrentStageType);
 		}
 	}
 }

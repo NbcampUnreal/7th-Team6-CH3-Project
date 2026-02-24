@@ -4,6 +4,12 @@
 #include "Weapon/SanzoWeaponBase.h"
 #include "SanzoGun.generated.h"
 
+#pragma region DataForHUD
+	
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAmmoChanged);
+	
+#pragma endregion 이준로
+
 UCLASS()
 class PROJECTSANZO_API ASanzoGun : public ASanzoWeaponBase
 {
@@ -36,4 +42,14 @@ public:
 
 	// 후에 드랍된 총알 먹었을 때 탄약 보충될 함수
 	void AddAmmo();
+	
+#pragma region DataForHUD
+	
+public:
+	UPROPERTY()
+	FOnAmmoChanged OnAmmoChanged;
+	
+	virtual FText GetAmmoTextForHUD() const override;
+	
+#pragma endregion 이준로
 };

@@ -51,4 +51,11 @@ protected:
 	// 차징에 따른 최대 데미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
 	float MaxArrowDamage = 30.0f;
+	
+#pragma region DataForHUD
+	
+public:
+	virtual FText GetAmmoTextForHUD() const override;
+	
+#pragma endregion 이준로
 };

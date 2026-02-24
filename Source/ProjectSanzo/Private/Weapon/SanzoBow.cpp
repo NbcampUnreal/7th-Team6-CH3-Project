@@ -110,3 +110,12 @@ void ASanzoBow::Fire()
 	}
 
 }
+
+#pragma region DataForHUD
+	
+FText ASanzoBow::GetAmmoTextForHUD() const
+{
+	return FText::FromString(TEXT("무한"));
+}
+	
+#pragma endregion 이준로
