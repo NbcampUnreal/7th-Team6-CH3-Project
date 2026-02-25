@@ -2,12 +2,16 @@
 
 
 #include "UI/SanzoPopUpWidget.h"
+
+#include "Common/SanzoLog.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "Components/WrapBox.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
 #include "UI/SanzoUpgradeButtonWidget.h"
+#include "UI/SanzoUpgradeInfo.h"
 
 void USanzoPopUpWidget::NativeConstruct()
 {
@@ -91,7 +95,7 @@ void USanzoPopUpWidget::SetPauseUI()
 		UpgradeListBorder->SetVisibility(ESlateVisibility::Visible);
 		if (UpgradeListText)
 		{
-			SetUpgradeListText();
+			SetUpgradeList();
 		}
 	}
 }
@@ -188,11 +192,38 @@ void USanzoPopUpWidget::SetStatusText()
 	}
 }
 
-void USanzoPopUpWidget::SetUpgradeListText()
+void USanzoPopUpWidget::SetUpgradeList()
 {
 	if (UpgradeListText)
 	{
 		UpgradeListText->SetText(FText::FromString(TEXT("강화 목록")));
+	}
+	
+	if (!UpgradeListWrapBox || !UpgradeInfoWidgetClass) return;
+	
+	UpgradeListWrapBox->ClearChildren();
+	
+	USanzoUpgradeSubsystem* Subsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
+	if (!Subsystem) return;
+	
+	const TMap<FName, int32>& SelectedTotalMap = Subsystem->GetSelectedTotalMap();
+	
+	for (const auto& Elem : SelectedTotalMap)
+	{
+		FName UpgradeID = Elem.Key;
+		int32 Count = Elem.Value;
+		
+		UE_LOG(LogLJR, Log, TEXT("Processing Upgrade: %s (Count: %d)"), *UpgradeID.ToString(), Count);
+		
+		UUserWidget* UpgradeInfoWidget = CreateWidget<UUserWidget>(this, UpgradeInfoWidgetClass);
+		if (UpgradeInfoWidget)
+		{
+			if (USanzoUpgradeInfo* InfoWidget = Cast<USanzoUpgradeInfo>(UpgradeInfoWidget))
+			{
+				InfoWidget->SetUpgradeInfoBlock(UpgradeID, Count);
+			}
+			UpgradeListWrapBox->AddChild(UpgradeInfoWidget);
+		}
 	}
 }
 
