@@ -14,6 +14,7 @@ ASanzoEnemy_Boss::ASanzoEnemy_Boss()
   // 보스 기본 스탯
   MaxHP = 1000.f;
   AttackRange = 300.f;
+  Exp = 500.f; // 레벨업 5번, 외모 업글 찍으라고 협박
 }
 
 void ASanzoEnemy_Boss::BeginPlay()

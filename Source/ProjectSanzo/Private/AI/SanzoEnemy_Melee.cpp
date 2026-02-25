@@ -11,7 +11,7 @@ ASanzoEnemy_Melee::ASanzoEnemy_Melee()
   // 근접 적 기본 스탯 세팅
   MaxHP = 120.f;
   AttackRange = 180.f;
-
+  Exp = 30.f;
   // 근접 공격용 박스 콜리전 생성
   MeleeCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeCollision"));
 

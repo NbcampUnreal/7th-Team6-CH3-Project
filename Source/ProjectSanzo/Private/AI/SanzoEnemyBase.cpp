@@ -1,4 +1,4 @@
-#include "AI/SanzoEnemyBase.h"
+﻿#include "AI/SanzoEnemyBase.h"
 #include "AI/SanzoAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -192,6 +192,8 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
   return ActualDamage;
 }
+
+
 
 void ASanzoEnemyBase::Die()
 {

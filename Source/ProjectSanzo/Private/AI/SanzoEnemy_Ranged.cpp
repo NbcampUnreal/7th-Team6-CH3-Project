@@ -19,6 +19,7 @@ ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
   PrimaryActorTick.bCanEverTick = true;
   MaxHP = 80.f;
   AttackRange = 2500.f;
+  Exp = 20.f;
 }
 
 void ASanzoEnemy_Ranged::BeginPlay()

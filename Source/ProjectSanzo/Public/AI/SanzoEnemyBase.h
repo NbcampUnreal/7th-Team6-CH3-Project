@@ -63,6 +63,8 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float AttackRange = 150.f;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+  float Exp = 0;
   // 중복 사망 처리를 막기 위한 플래그
   bool bIsDead = false;
 
