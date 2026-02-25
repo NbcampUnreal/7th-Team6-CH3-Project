@@ -6,7 +6,7 @@
 #pragma region ItemBase
 ASanzoItemBase::ASanzoItemBase()
 {
-  PrimaryActorTick.bCanEverTick = false;
+  PrimaryActorTick.bCanEverTick = true;
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(Scene);
 
@@ -17,8 +17,33 @@ ASanzoItemBase::ASanzoItemBase()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(Collision);
 
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComp"));
+	NiagaraComp->SetupAttachment(RootComponent);
+
+	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Collision->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	// 이벤트 바인딩
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ASanzoItemBase::OnItemOverlap);
+}
+
+void ASanzoItemBase::BeginPlay()
+{
+  Super::BeginPlay();
+	if (SpawnEffect)
+	{
+		NiagaraComp->SetAsset(SpawnEffect);
+		NiagaraComp->Activate();
+	}
+}
+
+void ASanzoItemBase::Tick(float DeltaTime)
+{
+  Super::Tick(DeltaTime);
+	// 회전
+  FRotator Rotation = GetActorRotation();
+  Rotation.Yaw += DeltaTime * 45.f; // 초당 45도 회전
+  SetActorRotation(Rotation);
 }
 
 void ASanzoItemBase::OnItemOverlap(
@@ -38,16 +63,16 @@ void ASanzoItemBase::OnItemOverlap(
 void ASanzoItemBase::ActivateItem(AActor* Activator)
 {
 	UParticleSystemComponent* Particle = nullptr;
-	if (PickupParticle)
-	{
-		Particle = UGameplayStatics::SpawnEmitterAtLocation(
-			GetWorld(),
-			PickupParticle,
-			GetActorLocation(),
-			GetActorRotation(),
-			true
-		);
-	}
+	//if (PickupParticle)
+	//{
+	//	Particle = UGameplayStatics::SpawnEmitterAtLocation(
+	//		GetWorld(),
+	//		PickupParticle,
+	//		GetActorLocation(),
+	//		GetActorRotation(),
+	//		true
+	//	);
+	//}
 	if (PickupSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -57,25 +82,25 @@ void ASanzoItemBase::ActivateItem(AActor* Activator)
 		);
 	}
 
-	if (Particle)
-	{
-		FTimerHandle DestroyParticleHandle;
+	//if (Particle)
+	//{
+	//	FTimerHandle DestroyParticleHandle;
 
-		TWeakObjectPtr<UParticleSystemComponent> WeakParticle = Particle;
+	//	TWeakObjectPtr<UParticleSystemComponent> WeakParticle = Particle;
 
-		GetWorld()->GetTimerManager().SetTimer(
-			DestroyParticleHandle,
-			[WeakParticle]()
-			{
-				if (WeakParticle.IsValid())
-				{
-					WeakParticle->DestroyComponent();
-				}
-			},
-			2.0f,
-			false
-		);
-	}
+	//	GetWorld()->GetTimerManager().SetTimer(
+	//		DestroyParticleHandle,
+	//		[WeakParticle]()
+	//		{
+	//			if (WeakParticle.IsValid())
+	//			{
+	//				WeakParticle->DestroyComponent();
+	//			}
+	//		},
+	//		2.0f,
+	//		false
+	//	);
+	//}
 }
 
 void ASanzoItemBase::DestroyItem()

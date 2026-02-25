@@ -1,4 +1,5 @@
 #include "Items/SanzoItem_Health.h"
+#include "Common/SanzoLog.h"
 
 #pragma region ItemHealth
 ASanzoItem_Health::ASanzoItem_Health()
@@ -14,6 +15,7 @@ void ASanzoItem_Health::ActivateItem(AActor* Activator)
   if (Activator && Activator->ActorHasTag("Player"))
   {
     // TODO: 체력 증가 로직
+    UE_LOG(LogCYS, Warning, TEXT("HP 획득 : %d"), HealAmount);
     DestroyItem();
   }
 }
