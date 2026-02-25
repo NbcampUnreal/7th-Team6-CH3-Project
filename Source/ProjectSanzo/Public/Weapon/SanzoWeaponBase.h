@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Core/UpgradeSystem/UpgradeDataRow.h"
 #include "SanzoWeaponBase.generated.h"
 
 class UNiagaraSystem;
@@ -94,6 +95,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 
+	//업그레이드 적용 함수
+	virtual void ApplyWeaponStatUpgrade(EUpgradeType Type, float Value);
 	// 무기 장착했을 때 캐릭터 메쉬에 적용할 ABP 클래스
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Swap")
 	TSubclassOf<class UAnimInstance> WeaponAnimInstanceClass;

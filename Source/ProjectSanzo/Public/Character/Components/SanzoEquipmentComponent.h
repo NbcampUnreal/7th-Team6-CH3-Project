@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Character/Interface/SanzoUpgradeInterface.h"
 #include "SanzoEquipmentComponent.generated.h"
 
 #pragma region UIDataTransfer
@@ -15,7 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAmmoChanged, FText, NewAmmo
 class ASanzoCharacter;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PROJECTSANZO_API USanzoEquipmentComponent : public UActorComponent
+class PROJECTSANZO_API USanzoEquipmentComponent : public UActorComponent, public ISanzoUpgradeInterface
 {
   GENERATED_BODY()
 
@@ -26,6 +27,7 @@ protected:
   virtual void BeginPlay() override;
   ASanzoCharacter* GetOwnerCharacter();
 
+  virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
 
 public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

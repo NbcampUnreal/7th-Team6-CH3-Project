@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -20,7 +20,8 @@ enum class EUpgradeRarity : uint8
 UENUM(BlueprintType)
 enum class EUpgradeTarget : uint8
 {
-	Character,
+	Character, //이동속도, 이쁨
+	Stat, //체력, 스태미나
 	Gun,
 	Bow
 };

@@ -160,6 +160,27 @@ void USanzoStatComponent::ExhaustionRecovery()
 	if (ISanzoTagEditorInterface* TagEditor = Cast<ISanzoTagEditorInterface>(GetOwner()))
 	{
     TagEditor->RemoveGameplayTag(SanzoTags::Exhausted);
+  }
+}
+
+void USanzoStatComponent::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value)
+{
+  if (Target == EUpgradeTarget::Stat) //받은게 스탯일 경우에만 실행 
+  {
+    switch (Type)
+    {
+    case EUpgradeType::MaxHealth:
+			MaxHealth += Value;
+      break;
+    case EUpgradeType::MaxStamina:
+			MaxStamina += Value;
+      break;
+
+    default:
+			GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
+      break;
+
+    }
 	}
 }
 

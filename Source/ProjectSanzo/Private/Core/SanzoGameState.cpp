@@ -24,16 +24,19 @@ void ASanzoGameState::BeginPlay()
 		}
 	}
 
-	OpenHUD();
+	FString CurrentMapName = GetWorld()->GetMapName();
+	if (!CurrentMapName.Contains("L_MainMenu"))
+	{
+		OpenHUD();
 	
-	GetWorldTimerManager().SetTimer(
-		OpenAnnouncerUITimer,
-		this,
-		&ASanzoGameState::OpenAnnouncerUI,
-		0.01f,
-		false
-	);
-	
+		GetWorldTimerManager().SetTimer(
+			OpenAnnouncerUITimer,
+			this,
+			&ASanzoGameState::OpenAnnouncerUI,
+			0.01f,
+			false
+		);
+	}
 }
 
 #pragma region UpdateStage
