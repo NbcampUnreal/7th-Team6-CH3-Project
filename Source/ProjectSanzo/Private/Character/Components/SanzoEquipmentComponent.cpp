@@ -5,7 +5,7 @@
 #include "Character/SanzoCharacter.h"
 #include "Weapon/SanzoBow.h"
 #include "Weapon/SanzoGun.h"
-#include "Weapon/SanzoWeaponBase.h"
+#include "Weapon/SanzoWeaponBase.h" //SanzoBow, SanzoGun 으로 3번 참조, Pragmaonce때문에 충돌 날 수있으니(불러와야하는데 못불러오는등) 수정예정
 
 USanzoEquipmentComponent::USanzoEquipmentComponent()
 {
@@ -68,6 +68,18 @@ ASanzoCharacter* USanzoEquipmentComponent::GetOwnerCharacter()
   }	
 
 	return OwnerCharacter;
+}
+
+void USanzoEquipmentComponent::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value)
+{
+	if (Target == EUpgradeTarget::Gun) //받은게 총일경우에만 실행
+	{
+		CurrentWeapon->ApplyWeaponStatUpgrade(Type, Value);
+	}
+	if (Target == EUpgradeTarget::Bow) //받은게 보~우일경우에만 싱행
+	{
+		CurrentWeapon->ApplyWeaponStatUpgrade(Type, Value);
+	}
 }
 
 #pragma region UIDataTransfer

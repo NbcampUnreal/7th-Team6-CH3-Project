@@ -31,6 +31,7 @@ class PROJECTSANZO_API ASanzoCharacter :
   public IGameplayTagAssetInterface, 
   public ISanzoTagEditorInterface,
   public ISanzoUpgradeInterface
+
 {
   GENERATED_BODY()
 #pragma region Component
@@ -135,6 +136,7 @@ public:
   virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
   virtual void AddGameplayTag(FGameplayTag TagToAdd) override;
   virtual void RemoveGameplayTag(FGameplayTag TagToRemove) override;
+  virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
 
 protected:
 #pragma region InputFunctions

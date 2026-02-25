@@ -39,14 +39,35 @@ void USanzoUpgradeComponent::ProcessUpgradeValue(EUpgradeTarget Target, EUpgrade
 {
 	AActor* Owner = GetOwner();
 	if (!Owner) return;
-	
+
 	//로그용 임시함수
 	FString TargetStr = UEnum::GetValueAsString(Target);
 	FString TypeStr = UEnum::GetValueAsString(Type);
-	
+
 	UE_LOG(LogLJR, Warning, TEXT("[Upgrade] Target: %s, Type: %s, Value: %.2f"), *TargetStr, *TypeStr, Value);
 	//여기까지
-	
+
+#pragma region ApplyUpgrade
+	//캐릭터 업그레이드 적용
+  if (ISanzoUpgradeInterface* UpgradeInterface = Cast<ISanzoUpgradeInterface>(Owner))
+  {
+    UpgradeInterface->ApplyUpgrade(Target, Type, Value);
+  }
+
+	//컴포넌트들(stat, Equip 의 업그레이드 적용)
+  TArray<UActorComponent*> UpgradeComponents;
+  UpgradeComponents = Owner->GetComponentsByInterface(USanzoUpgradeInterface::StaticClass());
+  for (UActorComponent* Comp : UpgradeComponents)
+  {
+    if (ISanzoUpgradeInterface* Receiver = Cast<ISanzoUpgradeInterface>(Comp))
+    {
+      Receiver->ApplyUpgrade(Target, Type, Value);
+    }
+  }
+#pragma endregion 김형백
+
+	//임시로 주석처리 후에 제거필요
+	/*
 	if (Target == EUpgradeTarget::Character)
 	{
 		if (Type == EUpgradeType::Beauty)
@@ -78,6 +99,7 @@ void USanzoUpgradeComponent::ProcessUpgradeValue(EUpgradeTarget Target, EUpgrade
 			//EquipmentComponent->ApplyWeaponUpgrade(Target,Type,Value);
 		}
 	}
+	*/
 }
 
 void USanzoUpgradeComponent::InitializeUpgradeFromSubsystem(const TMap<FUpgradeStatKey, float> TotalMap)

@@ -34,7 +34,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzo
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PROJECTSANZO_API USanzoStatComponent : public UActorComponent, public ISanzoUpgradeInterface
+class PROJECTSANZO_API USanzoStatComponent :
+  public UActorComponent,
+  public ISanzoUpgradeInterface
 {
 	GENERATED_BODY()
 
@@ -77,8 +79,10 @@ protected:
 	void RestoreStamina(float Amount);
 
 	FTimerHandle ExhaustionRecoveryTimerHandle;
-	void ExhaustionRecovery(); // 콜백함수
-	
+  void ExhaustionRecovery(); // 콜백함수
+
+  //인터페이스 구현 함수
+  virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
 
 public:
 	void BeginExhaustionCooldown(); //타이머함수

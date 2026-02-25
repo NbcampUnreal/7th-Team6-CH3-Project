@@ -478,6 +478,21 @@ void ASanzoCharacter::RemoveGameplayTag(FGameplayTag TagToRemove)
   CharacterGameplayTags.RemoveTag(TagToRemove);
 }
 
+void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value)
+{
+  if (Target == EUpgradeTarget::Character)
+  {
+    switch(Type)
+    {
+    case EUpgradeType::Beauty:
+      break;
+    default:
+      GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
+      break;
+    }
+  }
+}
+
 
 #pragma endregion 김형백
 

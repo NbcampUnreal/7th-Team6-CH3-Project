@@ -27,6 +27,7 @@ protected:
   virtual void BeginPlay() override;
   ASanzoCharacter* GetOwnerCharacter();
 
+  virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
 
 public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

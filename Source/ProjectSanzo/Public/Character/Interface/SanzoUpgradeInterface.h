@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Core/UpgradeSystem/UpgradeDataRow.h" //전방선언 해도됨
 #include "SanzoUpgradeInterface.generated.h"
+
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -19,7 +21,8 @@ class USanzoUpgradeInterface : public UInterface
 class PROJECTSANZO_API ISanzoUpgradeInterface
 {
 	GENERATED_BODY()
-	virtual void ApplyUpgrade(struct EUpgradeTarget Target, struct EUpgradeType Type, float Value) = 0;
+public:
+	virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) = 0;
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 };
