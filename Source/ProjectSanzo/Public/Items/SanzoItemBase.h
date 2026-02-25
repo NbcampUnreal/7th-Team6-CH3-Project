@@ -30,7 +30,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Component")
 	UNiagaraComponent* NiagaraComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Effects")
-	//UParticleSystem* PickupParticle;
 	UNiagaraSystem* SpawnEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Effects")
 	USoundBase* PickupSound;
