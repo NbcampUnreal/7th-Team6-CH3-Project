@@ -109,6 +109,15 @@ void USanzoStatComponent::ConsumeStaminaForAction()
 
 
 
+void USanzoStatComponent::RestoreHealth(float Amount)
+{
+	CurrentHealth += Amount;
+	if (CurrentHealth > MaxHealth)
+	{
+		CurrentHealth = MaxHealth;
+	}
+}
+
 void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
   FActorComponentTickFunction* ThisTickFunction)
 {

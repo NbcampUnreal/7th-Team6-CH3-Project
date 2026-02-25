@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Items/SanzoItemBase.h"
+
 #include "SanzoItem_Ammo.generated.h"
 
 #pragma region ItemAmmo
@@ -16,5 +17,6 @@ public:
   int32 AmmoAmount;
   
   virtual void ActivateItem(AActor* Activator) override;
+
 };
 #pragma endregion 최윤서

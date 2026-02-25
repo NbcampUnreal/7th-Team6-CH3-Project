@@ -1,5 +1,7 @@
-#include "Items/SanzoItem_Ammo.h"
+﻿#include "Items/SanzoItem_Ammo.h"
 #include "Common/SanzoLog.h"
+
+#include "Character/Components/SanzoEquipmentComponent.h"
 
 #pragma region ItemAmmo
 ASanzoItem_Ammo::ASanzoItem_Ammo()
@@ -14,6 +16,11 @@ void ASanzoItem_Ammo::ActivateItem(AActor* Activator)
 
   if (Activator && Activator->ActorHasTag("Player"))
   {
+    if (USanzoEquipmentComponent* EquipComp = Activator->FindComponentByClass<USanzoEquipmentComponent>())
+    {
+      EquipComp->AddAmmo(AmmoAmount);
+    }
+    
     // TODO: 탄약 증가 로직
     UE_LOG(LogCYS, Warning, TEXT("탄약 획득 : %d"), AmmoAmount);
     DestroyItem();

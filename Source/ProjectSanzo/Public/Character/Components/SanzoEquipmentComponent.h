@@ -15,6 +15,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAmmoChanged, FText, NewAmmo
 
 class ASanzoCharacter;
 
+enum class WeaponName : uint8
+{
+  Gun,
+  Bow
+};
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTSANZO_API USanzoEquipmentComponent : public UActorComponent, public ISanzoUpgradeInterface
 {
@@ -54,6 +60,8 @@ public:
 
   // (이용호 추가) 현재 들고 있는 무기의 인덱스 저장용 변수
   int32 CurrentWeaponIndex = 0;
+
+  void AddAmmo(int32 Amount);
 
 #pragma region UIDataTransfer
 
