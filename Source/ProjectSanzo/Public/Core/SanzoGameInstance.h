@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/GameInstance.h"
 #include "SanzoGameInstance.generated.h"
 
@@ -37,5 +38,11 @@ public:
   // 외형 업데이트 함수
 
 #pragma endregion 최윤서
-
+	
+#pragma region UIMediaData
+	
+	UPROPERTY(BlueprintReadWrite, Category="UIMediaData")
+	FGameplayTag MediaPlayTag = FGameplayTag::RequestGameplayTag(FName("UI.State.Opening"));
+	
+#pragma endregion 이준로
 };
