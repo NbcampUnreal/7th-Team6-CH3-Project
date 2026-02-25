@@ -53,6 +53,18 @@ protected:
 	// 차징에 따른 최대 데미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
 	float MaxArrowDamage = 30.0f;
+
+	// 활시위가 당겨지는 애니메이션 시퀀스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Animation")
+	class UAnimSequence* BowDrawAnim;
+
+	// 시위 당길 때 보일 가짜 화살 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bow|Components")
+	class UStaticMeshComponent* DummyArrowMesh;
+
+	// 가짜 화살이 부착될 활 시위 쪽의 소켓
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bow|Attachment")
+	FName StringSocketName;
 	
 #pragma region DataForHUD
 	

@@ -27,6 +27,8 @@ ASanzoWeaponBase::ASanzoWeaponBase()
   MaxRange = 5000.0f;
   CurrentAmmo = 30;
   bInfiniteAmmo = false;
+
+  AttachSocketName = TEXT("HandGrip_R");
 }
 
 void ASanzoWeaponBase::StartFire()

@@ -219,6 +219,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ASanzoCharacter::AimStart);
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
     EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ASanzoCharacter::Parry);
+    // 이용호 추가
+    EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
   }
   else
   {
@@ -453,6 +455,17 @@ void ASanzoCharacter::PlayAimTimeLine()
   }
 }
 #pragma endregion 김형백
+
+#pragma region 스왑 액션 추가
+void ASanzoCharacter::SwapWeaponAction(const FInputActionValue& Value)
+{
+  // 컴포넌트가 제대로 있으면 컴포넌트에 SwapWeapon() 함수 실행
+  if (EquipmentComp)
+  {
+    EquipmentComp->SwapWeapon();
+  }
+}
+#pragma endregion 이용호
 
 #pragma endregion 김형백
 

@@ -94,6 +94,11 @@ class PROJECTSANZO_API ASanzoCharacter :
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* ParryAction;
 #pragma endregion 김형백
+#pragma region 스왑 액션 추가
+  // 스왑용 액션(임시로 Q키 지정)
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* SwapAction;
+#pragma endregion 이용호
 public:
 #pragma region Aiming
 
@@ -163,6 +168,10 @@ protected:
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma endregion 김형백
+#pragma region 스왑 액션 추가
+  // 스왑용 액션(임시로 Q키 지정)
+  void SwapWeaponAction(const FInputActionValue& Value);
+#pragma endregion 이용호
 
 #pragma region ActorLifecycle
   virtual void PostInitializeComponents() override;

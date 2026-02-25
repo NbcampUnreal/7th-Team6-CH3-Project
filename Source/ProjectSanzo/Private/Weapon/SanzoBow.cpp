@@ -6,7 +6,14 @@
 
 ASanzoBow::ASanzoBow()
 {
+	// 시위에 보일 가짜화살 생성
+	DummyArrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyArrowMesh"));
+	DummyArrowMesh->SetupAttachment(WeaponMesh, TEXT("StringSocket"));
+	DummyArrowMesh->SetCollisionProfileName(TEXT("NoCollision")); // 콜리전 판정 없애기
+	DummyArrowMesh->SetHiddenInGame(true); // 평소에는 안보이게 설정
 
+	// 소켓 이름 기본값 설정 (후에 에디터에서 수정 가능)
+	StringSocketName = TEXT("StringSocket");
 }
 
 void ASanzoBow::StartFire()
@@ -15,11 +22,62 @@ void ASanzoBow::StartFire()
 
 	// 차징 시작한 현재 시간 기록
 	ChargeStartTime = GetWorld()->GetTimeSeconds();
+
+	// 차징 시작하면 더미 화살 보여주기
+	if (DummyArrowMesh)
+	{
+		DummyArrowMesh->SetHiddenInGame(false);
+	}
+
+	// 활든 사람 몽타지 재생
+	PlayFireEffects();
+	// 활 애니메이션 재생
+	if (WeaponMesh && BowDrawAnim)
+	{
+		// 활을 발사하는 사람 몽타지 중 Draw 섹션의 재생 길이를 가져옴
+		int32 SectionIndex = CharacterFireMontage->GetSectionIndex(FName("Draw"));
+		float CurrentSectionLength = CharacterFireMontage->GetSectionLength(SectionIndex);
+
+		// 활 애니메이션 길이 가져옴
+		float BowAnimOriginalLength = BowDrawAnim->GetPlayLength();
+
+		// 활 애니메이션을 몇 배속 해야지 사람 모션과 재생 시간이 같이지는지 계산
+		float SyncPlayRate = (CurrentSectionLength > 0.f) ? (BowAnimOriginalLength / CurrentSectionLength) : 1.0f;
+
+		// 활 애니메이션 재생 속도 조정
+		WeaponMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		WeaponMesh->PlayAnimation(BowDrawAnim, false);
+		WeaponMesh->SetPlayRate(SyncPlayRate);
+	}
 }
 
 void ASanzoBow::StopFire()
 {
 	Super::StopFire();
+
+	// 화살 발사하면 더미화살 다시 안보이게 변경
+	if (DummyArrowMesh)
+	{
+		DummyArrowMesh->SetHiddenInGame(true);
+	}
+
+	// 활 애니메이션 초기화
+	if (WeaponMesh)
+	{
+		WeaponMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	}
+
+	// 활 캐릭터 애니메이션 풀기
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (OwnerCharacter)
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (AnimInstance && CharacterFireMontage)
+		{
+			// 활 발사 몽타지의  Fire 섹션으로 점프
+			AnimInstance->Montage_JumpToSection(FName("Fire"), CharacterFireMontage);
+		}
+	}
 
 	// 누르고 있던 시간 계산
 	float ChargeDuration = GetWorld()->GetTimeSeconds() - ChargeStartTime;
