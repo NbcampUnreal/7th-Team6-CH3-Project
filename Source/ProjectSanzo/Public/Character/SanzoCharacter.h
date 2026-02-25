@@ -172,10 +172,6 @@ protected:
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma endregion 김형백
-#pragma region 스왑 액션 추가
-  // 스왑용 액션(임시로 Q키 지정)
-  void SwapWeaponAction(const FInputActionValue& Value);
-#pragma endregion 이용호
 
 #pragma region ActorLifecycle
   virtual void PostInitializeComponents() override;
@@ -193,6 +189,18 @@ protected:
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
   FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+#pragma region 스왑 액션 추가
+  // 스왑용 액션(임시로 Q키 지정)
+  void SwapWeaponAction(const FInputActionValue& Value);
+
+  // 애니메이션 노티파이에서 호출될 실제 스왑 실행 함수
+  UFUNCTION(BlueprintCallable, Category = "Equipment")
+  void ExecuteWeaponSwap();
+
+  // 몽타주 종료 시 호출될 델리게이트 함수
+  void EndWeaponSwap(UAnimMontage* Montage, bool bInterrupted);
+#pragma endregion 이용호
 
 #pragma region PlayerTakeDamage
 public:

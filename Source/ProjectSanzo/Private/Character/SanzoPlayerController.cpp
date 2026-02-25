@@ -3,6 +3,7 @@
 #include "Character/SanzoPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+#include "Common/SanzoLog.h"
 #include "UI/SanzoMainWidget.h"
 #include "UI/SanzoHUDWidget.h"
 #include "UI/SanzoPopUpWidget.h"
@@ -13,6 +14,7 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/GameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/SanzoMediaPlayerWidget.h"
 
 ASanzoPlayerController::ASanzoPlayerController()
 {
@@ -22,6 +24,8 @@ ASanzoPlayerController::ASanzoPlayerController()
 	MenuWidgetInstance = nullptr;
 	PopUpWidgetClass = nullptr;
 	PopUpWidgetInstance = nullptr;
+	MediaPlayerWidgetClass = nullptr;
+	MediaPlayerWidgetInstance = nullptr;
 }
 
 void ASanzoPlayerController::BeginPlay()
@@ -40,11 +44,31 @@ void ASanzoPlayerController::BeginPlay()
   PlayerCameraManager->ViewPitchMax = MaxPitchAngle;
   PlayerCameraManager->ViewPitchMin = MinPitchAngle;
 
+#pragma region InitUI
+	
+	USanzoGameInstance* GameInstance = Cast<USanzoGameInstance>(GetGameInstance());
+	if (!GameInstance) return;
+	
 	FString CurrentMapName = GetWorld()->GetMapName();
 	if (CurrentMapName.Contains("L_MainMenu"))
 	{
-		ShowMainUI(MainMenuTag);
+		FGameplayTag VideoToPlay = GameInstance->MediaPlayTag;
+		if (VideoToPlay.IsValid())
+		{
+			if (!VideoToPlay.MatchesTag(FGameplayTag::RequestGameplayTag(FName("UI.State.None"))))
+			{
+				UE_LOG(LogLJR, Warning, TEXT("영상 재생 태그: %s"), *VideoToPlay.ToString());
+				ShowMediaPlayer(VideoToPlay);
+			}
+			else
+			{
+				ShowMainUI(MainMenuTag);
+			}
+		}
+		
+		GameInstance->MediaPlayTag = FGameplayTag::RequestGameplayTag(FName("UI.State.None"));		
 	}
+#pragma endregion 이준로
 }
 
 #pragma region UI
@@ -263,5 +287,51 @@ void ASanzoPlayerController::ShowAnnouncerUI(FGameplayTag State, ESanzoStageType
 void ASanzoPlayerController::AnnounceEnded()
 {
 	ResumeGame();
+}
+
+void ASanzoPlayerController::ShowMediaPlayer(FGameplayTag State)
+{
+	if (MenuWidgetInstance)
+	{
+		MenuWidgetInstance->RemoveFromParent();
+		MenuWidgetInstance = nullptr;
+	}
+	
+	if (PopUpWidgetInstance)
+	{
+		PopUpWidgetInstance->RemoveFromParent();
+		PopUpWidgetInstance = nullptr;
+	}
+	
+	if (HUDWidgetInstance)
+	{
+		HUDWidgetInstance->RemoveFromParent();
+		HUDWidgetInstance = nullptr;
+	}
+	
+	if (MediaPlayerWidgetClass)
+	{
+		MediaPlayerWidgetInstance = CreateWidget<USanzoMediaPlayerWidget>(this,MediaPlayerWidgetClass);
+		if (MediaPlayerWidgetInstance)
+		{
+			MediaPlayerWidgetInstance->OnMediaSceneFinished.AddDynamic(this, &ASanzoPlayerController::MediaSceneFinished);
+			
+			MediaPlayerWidgetInstance->AddToViewport();
+			MediaPlayerWidgetInstance->PlayMediaScene(State);
+			
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(MediaPlayerWidgetInstance->TakeWidget()); // 위젯에 강제 포커스
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+			InputMode.SetHideCursorDuringCapture(true);
+			
+			SetInputMode(InputMode);	
+			bShowMouseCursor = false;
+		}
+	}
+}
+
+void ASanzoPlayerController::MediaSceneFinished()
+{
+	ShowMainUI(MainMenuTag);
 }
 #pragma endregion 이준로

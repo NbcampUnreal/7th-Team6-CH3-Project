@@ -459,11 +459,49 @@ void ASanzoCharacter::PlayAimTimeLine()
 #pragma region 스왑 액션 추가
 void ASanzoCharacter::SwapWeaponAction(const FInputActionValue& Value)
 {
-  // 컴포넌트가 제대로 있으면 컴포넌트에 SwapWeapon() 함수 실행
+  // 고정 액션, 공격, 조준, 스왑 중이면 안켜짐
+  if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed) ||
+    CharacterGameplayTags.HasTag(SanzoTags::Attack) ||
+    CharacterGameplayTags.HasTag(SanzoTags::Aiming) ||
+    CharacterGameplayTags.HasTag(SanzoTags::Swap))
+  {
+    return;
+  }
+
   if (EquipmentComp)
   {
-    EquipmentComp->SwapWeapon();
+    // 이큅컴포넌트에서 몽타지 재생 시키고 몽타지 받아옴
+    UAnimMontage* PlayedMontage = EquipmentComp->BeginSwapWeapon();
+
+    if (PlayedMontage)
+    {
+      // 스왑 태그 붙이기
+      CharacterGameplayTags.AddTag(SanzoTags::Swap);
+
+      // 몽타지 종료 시 락을 풀기 위한 델리게이트 바인딩
+      if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+      {
+        FOnMontageEnded EndDelegate;
+        EndDelegate.BindUObject(this, &ASanzoCharacter::EndWeaponSwap);
+        AnimInstance->Montage_SetEndDelegate(EndDelegate, PlayedMontage);
+      }
+    }
   }
+}
+// 노티파이 들어왔을 때 실제로 무기 교체 처리할 함수
+void ASanzoCharacter::ExecuteWeaponSwap()
+{
+  if (EquipmentComp)
+  {
+    // 무기 배열의 다음 인덱스 무기로 교체
+    EquipmentComp->SwapWeapon(false);
+  }
+}
+// 스왑 몽타지 끝날 떄 호출됨
+void ASanzoCharacter::EndWeaponSwap(UAnimMontage* Montage, bool bInterrupted)
+{
+  // 태그 제거
+  CharacterGameplayTags.RemoveTag(SanzoTags::Swap);
 }
 #pragma endregion 이용호
 

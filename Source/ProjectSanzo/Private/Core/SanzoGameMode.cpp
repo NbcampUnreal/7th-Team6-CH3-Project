@@ -8,6 +8,7 @@
 #include "Stage/SanzoStageManager.h"
 #include "EngineUtils.h"
 #include "Common/SanzoLog.h"
+#include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
 
 ASanzoGameMode::ASanzoGameMode()
 {
@@ -69,7 +70,12 @@ void ASanzoGameMode::StartStage()
 void ASanzoGameMode::OnStageCleared()
 {
   UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 클리어"));
-  
+  if(CurrentStageType == ESanzoStageType::Boss)
+  {
+  	DecideEnding();
+    MoveToNextStage();
+    return;
+  }
 	ASanzoGameState* SanzoGameState = GetWorld() ? GetWorld()->GetGameState<ASanzoGameState>() : nullptr;
 	if (SanzoGameState)
 	{
@@ -106,3 +112,31 @@ void ASanzoGameMode::OnUpgradeSelected()
 
 }
 #pragma endregion 최윤서
+
+#pragma region Ending Decision
+
+void ASanzoGameMode::DecideEnding()
+{
+	USanzoGameInstance* SanzoGameInstance = Cast<USanzoGameInstance>(GetGameInstance());
+	if (SanzoGameInstance)
+	{
+		USanzoUpgradeSubsystem* UpgradeSubsystem = SanzoGameInstance->GetSubsystem<USanzoUpgradeSubsystem>();
+		if (UpgradeSubsystem)
+		{
+			const TMap<FName, int32> SelectedTotalMap = UpgradeSubsystem->GetSelectedTotalMap();
+			const int32* BeautyValuePtr = SelectedTotalMap.Find(FName("Chr_Beauty_L"));
+			if (BeautyValuePtr && *BeautyValuePtr >= 3)
+			{
+				UE_LOG(LogLJR, Warning, TEXT("외모 3단계 업그레이드 확인 진엔딩 태그 적용"))
+				SanzoGameInstance->MediaPlayTag = FGameplayTag::RequestGameplayTag(FName("UI.State.TrueEnding"));
+			}
+			else
+			{
+				UE_LOG(LogLJR, Warning, TEXT("외모 3단계 업그레이드 아님 그냥엔딩 태그 적용"))
+				SanzoGameInstance->MediaPlayTag = FGameplayTag::RequestGameplayTag(FName("UI.State.Ending"));
+			}
+		}
+	}
+}
+
+#pragma endregion 이준로
