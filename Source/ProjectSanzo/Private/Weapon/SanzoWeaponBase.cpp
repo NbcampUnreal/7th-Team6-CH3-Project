@@ -9,6 +9,7 @@
 
 
 
+
 ASanzoWeaponBase::ASanzoWeaponBase()
 {
   PrimaryActorTick.bCanEverTick = false;
@@ -114,6 +115,23 @@ void ASanzoWeaponBase::PlayImpactEffects(FHitResult HitInfo)
       }
 
     }
+  }
+}
+
+void ASanzoWeaponBase::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
+{
+  switch (Type)
+  {
+  case EUpgradeType::FireRate:
+    FireRate += Value;
+    break;
+  case EUpgradeType::Damage:
+    BaseDamage += Value;
+    break;
+    //TODO : 스탯 추가
+  default:
+    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
+    break;
   }
 }
 

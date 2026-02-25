@@ -9,6 +9,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameplayTagAssetInterface.h"
 #include "Interface/SanzoTagEditorInterface.h"
+#include "Interface/SanzoUpgradeInterface.h"
 #include "SanzoCharacter.generated.h" 
 
 class USanzoUpgradeComponent;
@@ -28,8 +29,9 @@ UCLASS(abstract)
 class PROJECTSANZO_API ASanzoCharacter : 
   public ACharacter, 
   public IGameplayTagAssetInterface, 
-  public ISanzoTagEditorInterface
-  
+  public ISanzoTagEditorInterface,
+  public ISanzoUpgradeInterface
+
 {
   GENERATED_BODY()
 #pragma region Component
@@ -139,6 +141,7 @@ public:
   virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
   virtual void AddGameplayTag(FGameplayTag TagToAdd) override;
   virtual void RemoveGameplayTag(FGameplayTag TagToRemove) override;
+  virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
 
 protected:
 #pragma region InputFunctions

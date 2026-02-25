@@ -169,6 +169,24 @@ void ASanzoBow::Fire()
 
 }
 
+void ASanzoBow::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
+{
+	//나중에 Bow의 업그레이드 값이 생기면 수정
+  /*switch (Type)
+  {
+  case EUpgradeType::FireRate:
+    FireRate += Value;
+    break;
+  case EUpgradeType::Damage:
+    BaseDamage += Value;
+    break;
+
+  default:
+    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
+    break;
+  }*/
+}
+
 #pragma region DataForHUD
 	
 FText ASanzoBow::GetAmmoTextForHUD() const
