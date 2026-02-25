@@ -1,4 +1,4 @@
-﻿#include "AI/SanzoEnemyBase.h"
+#include "AI/SanzoEnemyBase.h"
 #include "AI/SanzoAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -205,7 +205,9 @@ void ASanzoEnemyBase::Die()
   if (CurrentRoom)
   {
     UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
-    CurrentRoom->OnEnemyKilled();
+    FVector Position = GetActorLocation();
+    Position.Z -= 50.f; // 높이 조절
+    CurrentRoom->OnEnemyKilled(Position);
   }
 #pragma endregion 최윤서
 

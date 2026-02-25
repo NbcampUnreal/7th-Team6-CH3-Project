@@ -1,5 +1,6 @@
 #include "Stage/SanzoRoomBase.h"
 #include "Stage/SanzoEnemySpawnVolume.h"
+#include "Items/SanzoItemSpawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
 #include "Core/SanzoGameState.h"
@@ -36,7 +37,7 @@ void ASanzoRoomBase::BeginPlay()
 		UE_LOG(LogCYS, Error, TEXT("RB: Gate Not Found"));
 	}
 
-  // 스폰 볼륨 찾기
+  // 적 스폰 볼륨 찾기
 	TArray<AActor*> FoundVolumes;
 	UGameplayStatics::GetAllActorsOfClass(
 		GetWorld(), 
@@ -57,6 +58,14 @@ void ASanzoRoomBase::BeginPlay()
 	if (Found)
 	{
 		GameState = Found;
+	}
+	
+	// 아이템 스폰 찾기
+	AActor* FoundActor = UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoItemSpawn::StaticClass());
+	ItemSpawn = Cast<ASanzoItemSpawn>(FoundActor);
+	if (ItemSpawn)
+	{
+    UE_LOG(LogCYS, Warning, TEXT("RB: Item Spawn Found"));
 	}
 }
 
@@ -89,10 +98,15 @@ void ASanzoRoomBase::Tick(float DeltaTime)
 
 }
 
-void ASanzoRoomBase::OnEnemyKilled()
+void ASanzoRoomBase::OnEnemyKilled(FVector Position)
 {
 	// 처치 수 카운트
 	CurrentEnemyCount++;
+	// 아이템 드롭
+	if (ItemSpawn)
+	{
+    ItemSpawn->SpawnRandomItem(Position);
+	}
 }
 
 void ASanzoRoomBase::UpdateTime()

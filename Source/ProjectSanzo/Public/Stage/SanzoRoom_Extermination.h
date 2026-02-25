@@ -14,6 +14,6 @@ public:
   virtual void EndRoomSequence() override;
 
   // 적 처치
-  virtual void OnEnemyKilled() override;
+  virtual void OnEnemyKilled(FVector Position) override;
 #pragma endregion 최윤서
 };
