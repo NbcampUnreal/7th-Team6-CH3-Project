@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
+#include "Character/Interface/SanzoUpgradeInterface.h"
 #include "SanzoStatComponent.generated.h"
 
 
@@ -33,7 +34,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzo
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PROJECTSANZO_API USanzoStatComponent : public UActorComponent
+class PROJECTSANZO_API USanzoStatComponent : public UActorComponent, public ISanzoUpgradeInterface
 {
 	GENERATED_BODY()
 

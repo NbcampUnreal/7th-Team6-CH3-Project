@@ -9,6 +9,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameplayTagAssetInterface.h"
 #include "Interface/SanzoTagEditorInterface.h"
+#include "Interface/SanzoUpgradeInterface.h"
 #include "SanzoCharacter.generated.h" 
 
 class USanzoUpgradeComponent;
@@ -28,8 +29,8 @@ UCLASS(abstract)
 class PROJECTSANZO_API ASanzoCharacter : 
   public ACharacter, 
   public IGameplayTagAssetInterface, 
-  public ISanzoTagEditorInterface
-  
+  public ISanzoTagEditorInterface,
+  public ISanzoUpgradeInterface
 {
   GENERATED_BODY()
 #pragma region Component
