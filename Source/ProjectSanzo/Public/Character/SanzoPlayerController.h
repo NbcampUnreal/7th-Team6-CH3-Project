@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "SanzoPlayerController.generated.h"
 
+class USanzoMediaPlayerWidget;
 class USanzoStageAnnouncerWidget;
 class USanzoPopUpWidget;
 struct FGameplayTag;
@@ -59,6 +60,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Announcer")
 	USanzoStageAnnouncerWidget* StageAnnouncerWidgetInstance;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MediaPlayer")
+	TSubclassOf<USanzoMediaPlayerWidget> MediaPlayerWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MediaPlayer")
+	USanzoMediaPlayerWidget* MediaPlayerWidgetInstance;
+	
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	USanzoHUDWidget* GetHUDWidget() const { return HUDWidgetInstance; }
 
@@ -91,6 +97,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Announcer")
 	void AnnounceEnded();
 	
+	UFUNCTION(BlueprintCallable, Category = "MediaPlayer")
+	void ShowMediaPlayer(FGameplayTag State);
+	UFUNCTION(BlueprintCallable, Category = "MediaPlayer")
+	void MediaSceneFinished();
+	
 	//Tag
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag MainMenuTag;
@@ -106,6 +117,8 @@ public:
 	FGameplayTag GameUpgradeTag;
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag GamePlayingTag;
-
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	FGameplayTag GameOpening;
+	
 #pragma endregion 이준로
 };
