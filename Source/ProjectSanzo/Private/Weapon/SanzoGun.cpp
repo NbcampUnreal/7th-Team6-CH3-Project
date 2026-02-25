@@ -196,6 +196,28 @@ void ASanzoGun::Fire()
 	}
 }
 
+void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
+{
+	/*
+	추후 업그레이드 타입이 생기면 수정
+	switch (Type)
+	{
+	case EUpgradeType::FireRate:
+		FireRate += Value;
+		break;
+	case EUpgradeType::Damage:
+		BaseDamage += Value;
+		break;
+
+	default:
+		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
+		break;
+
+		
+	}
+	*/
+}
+
 void ASanzoGun::AddAmmo()
 {
 	CurrentAmmo++;

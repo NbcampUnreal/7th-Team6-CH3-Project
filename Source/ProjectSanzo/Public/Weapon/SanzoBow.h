@@ -20,6 +20,8 @@ public:
 
 	virtual void Fire() override;
 
+	virtual void ApplyWeaponStatUpgrade(EUpgradeType Type, float Value) override;
+
 protected:
 
 	// 발사할 때마다 생성할 투사체 설계도

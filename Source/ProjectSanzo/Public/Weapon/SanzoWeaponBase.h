@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Core/UpgradeSystem/UpgradeDataRow.h"
 #include "SanzoWeaponBase.generated.h"
 
 class UNiagaraSystem;
@@ -93,6 +94,9 @@ public:
 	// UI에서 사용할 현재 총알 값 가져오는 함수
 	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+
+	//업그레이드 적용 함수
+	virtual void ApplyWeaponStatUpgrade(EUpgradeType Type, float Value);
 
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
