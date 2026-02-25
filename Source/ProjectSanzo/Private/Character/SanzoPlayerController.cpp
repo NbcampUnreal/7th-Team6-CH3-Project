@@ -3,6 +3,7 @@
 #include "Character/SanzoPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+#include "Common/SanzoLog.h"
 #include "UI/SanzoMainWidget.h"
 #include "UI/SanzoHUDWidget.h"
 #include "UI/SanzoPopUpWidget.h"
@@ -56,6 +57,7 @@ void ASanzoPlayerController::BeginPlay()
 		{
 			if (!VideoToPlay.MatchesTag(FGameplayTag::RequestGameplayTag(FName("UI.State.None"))))
 			{
+				UE_LOG(LogLJR, Warning, TEXT("영상 재생 태그: %s"), *VideoToPlay.ToString());
 				ShowMediaPlayer(VideoToPlay);
 			}
 			else
