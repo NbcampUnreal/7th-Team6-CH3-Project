@@ -24,7 +24,7 @@
 #include "Common/SanzoLog.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "AI/Components/SanzoEnemyStunComponent.h"
+#include "AI/Components/SanzoEnemyStunComponent.h" //제거필요
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -338,6 +338,7 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
     {
       GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
       Weapon->StartFire();
+      //AI가 들을수 있는 Noise재생
 #pragma region MakeNoise
       MakeNoise(1.0f, this, GetActorLocation());
 #pragma endregion 김동주
@@ -505,6 +506,7 @@ float ASanzoCharacter::TakeDamage(
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
 
+    // 제거필요
     if (DamageCauser)
     {
       if (USanzoEnemyStunComponent* EnemyStunComp = DamageCauser->FindComponentByClass<USanzoEnemyStunComponent>())
