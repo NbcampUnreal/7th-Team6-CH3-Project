@@ -34,7 +34,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDataChanged, const FEnemyOve
 #pragma endregion 이준로
 
 UCLASS()
-class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter, public ISanzoEnemyInterface
+class PROJECTSANZO_API ASanzoEnemyBase : 
+  public ACharacter, 
+  public ISanzoEnemyInterface
+  
 {
   GENERATED_BODY()
 

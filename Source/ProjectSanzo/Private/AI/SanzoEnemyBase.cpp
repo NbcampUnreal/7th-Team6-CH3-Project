@@ -19,6 +19,7 @@
 #include "UI/SanzoEnemyOverHeadWidget.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "AI/Components/SanzoEnemyStunComponent.h"
+#include "Character/Interface/SanzoRewardReceiverInterface.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -188,6 +189,12 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
   if (CurrentHP <= 0.f && !bIsDead)
   {
     Die();
+
+    //형백
+    if (ISanzoRewardReceiverInterface* Reward = Cast<ISanzoRewardReceiverInterface>(EventInstigator->GetPawn()))
+    {
+      Reward->ApplyExpeReward(Exp);
+    }
   }
 
   return ActualDamage;

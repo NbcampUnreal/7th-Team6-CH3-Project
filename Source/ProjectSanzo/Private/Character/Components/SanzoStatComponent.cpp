@@ -137,6 +137,7 @@ void USanzoStatComponent::LevelUp()
 	{
 		if (ASanzoPlayerController* PlayerController = Cast<ASanzoPlayerController>(SanzoPawn->GetController()))
 		{
+			//TODO : 소리 재생
 			PlayerController->ShowPopUp(SanzoTags::UpgradeSelet);
 		}
 	}

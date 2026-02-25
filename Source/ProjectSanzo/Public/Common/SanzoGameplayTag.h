@@ -20,6 +20,7 @@ namespace SanzoTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Action_Fixed);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(ParryWindow);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(ParryPenaltyActive);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(UpgradeSelet)
 }
 //필요한 태그를 미리 선언	
 //사용법 SanzoTags::Aiming, SanzoTags::Sprint, SanzoTags::Attack, SanzoTags::Exhausted
