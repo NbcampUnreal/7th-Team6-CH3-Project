@@ -218,9 +218,9 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 	*/
 }
 
-void ASanzoGun::AddAmmo()
+void ASanzoGun::AddAmmo(int32 Amount)
 {
-	CurrentAmmo++;
+	CurrentAmmo += Amount;
 	OnAmmoChanged.Broadcast();
 	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %d"), CurrentAmmo);
 }

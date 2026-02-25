@@ -15,6 +15,7 @@ UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Action_Fixed, "Character.Action.Fixed");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::ParryWindow, "Character.State.ParryWindow");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::IFrame, "Character.State.IFrame");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::ParryPenaltyActive, "Character.State.ParryPenaltyActive");
+UE_DEFINE_GAMEPLAY_TAG(SanzoTags::UpgradeSelet, "Game.State.UpgradeSelecting");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Swap, "Character.Action.Movable.Swap");
 
 SanzoGameplayTag::SanzoGameplayTag()

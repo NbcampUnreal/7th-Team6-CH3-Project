@@ -10,6 +10,7 @@
 #include "GameplayTagAssetInterface.h"
 #include "Interface/SanzoTagEditorInterface.h"
 #include "Interface/SanzoUpgradeInterface.h"
+#include "Interface/SanzoRewardReceiverInterface.h"
 #include "SanzoCharacter.generated.h" 
 
 class USanzoUpgradeComponent;
@@ -30,7 +31,9 @@ class PROJECTSANZO_API ASanzoCharacter :
   public ACharacter, 
   public IGameplayTagAssetInterface, 
   public ISanzoTagEditorInterface,
-  public ISanzoUpgradeInterface
+  public ISanzoUpgradeInterface,
+  public ISanzoRewardReceiverInterface
+
 
 {
   GENERATED_BODY()
@@ -142,6 +145,7 @@ public:
   virtual void AddGameplayTag(FGameplayTag TagToAdd) override;
   virtual void RemoveGameplayTag(FGameplayTag TagToRemove) override;
   virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
+  virtual void ApplyExpeReward(float Amount) override; //다른 보상이 있다면 추가가능
 
 protected:
 #pragma region InputFunctions
