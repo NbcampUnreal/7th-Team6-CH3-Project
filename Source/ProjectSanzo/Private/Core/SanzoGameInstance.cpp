@@ -15,13 +15,13 @@ void USanzoGameInstance::MoveToNextStage()
   UE_LOG(LogCYS, Warning, TEXT("정보 업데이트 함수 호출"), CurrentStageIndex);
 
   // 다음 스테이지로 이동
-  if (CurrentStageIndex >= StageLevels.Num() - 1)
+  CurrentStageIndex++;
+  if (CurrentStageIndex >= StageLevels.Num())
   {
-    UE_LOG(LogCYS, Warning, TEXT("GI: 이동할 스테이지가 없음"));
-    return;
+    UE_LOG(LogCYS, Warning, TEXT("GI: 처음으로 돌아감"));
+    CurrentStageIndex = 0;
   }
 
-  CurrentStageIndex++;
   UE_LOG(LogCYS, Warning, TEXT("GI: 다음 스테이지로 이동, 인덱스: %d"), CurrentStageIndex);
 
   UGameplayStatics::OpenLevel(
