@@ -10,6 +10,7 @@
 #pragma region UIDataTransfer
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAmmoChanged, FText, NewAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwapped, int32, CurrentIndex);
 
 #pragma endregion 이준로
 
@@ -59,6 +60,7 @@ public:
 
 public:
   FOnWeaponAmmoChanged OnAmmoChanged;
+	FOnWeaponSwapped OnSwapped;
 
 protected:
   UFUNCTION()

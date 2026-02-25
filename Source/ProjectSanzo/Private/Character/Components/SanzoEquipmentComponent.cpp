@@ -151,6 +151,12 @@ void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index)
 			OwnerCharacter->GetMesh()->SetAnimInstanceClass(CurrentWeapon->WeaponAnimInstanceClass);
 		}
 	}
+	
+	if (OnSwapped.IsBound())
+	{
+		OnSwapped.Broadcast(CurrentWeaponIndex);
+	}
+	
 }
 #pragma endregion 이용호
 

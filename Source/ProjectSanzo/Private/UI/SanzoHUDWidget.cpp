@@ -5,6 +5,8 @@
 
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Character/Components/SanzoStatComponent.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/Overlay.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/SanzoGameState.h"
@@ -28,6 +30,7 @@ void USanzoHUDWidget::NativeConstruct()
 		if (EquipmentComponent)
 		{
 			EquipmentComponent->OnAmmoChanged.AddDynamic(this, &USanzoHUDWidget::HandleAmmoChanged);
+			EquipmentComponent->OnSwapped.AddDynamic(this, &USanzoHUDWidget::HandleWeaponSwapped);
 		}
 		
 	}
@@ -75,5 +78,34 @@ void USanzoHUDWidget::HandleStageProgressChanged(float percent)
 
 void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
 {
-	AmmoCountText->SetText(NewAmmoText);
+	GunAmmoCount->SetText(NewAmmoText);
+}
+
+void USanzoHUDWidget::HandleWeaponSwapped(int32 CurrentWeaponIndex)
+{
+	bool bIsGunMain = true;
+	if (CurrentWeaponIndex)
+	{
+		bIsGunMain = (CurrentWeaponIndex == 0);
+	}
+	UCanvasPanelSlot* GunSlot = Cast<UCanvasPanelSlot>(GunInfoOverlay->Slot);
+	UCanvasPanelSlot* BowSlot = Cast<UCanvasPanelSlot>(BowInfoOverlay->Slot);
+	
+	if (BowSlot && BowSlot)
+	{
+		if (bIsGunMain)
+		{
+			GunSlot->SetZOrder(1);
+			BowSlot->SetZOrder(0);
+		
+			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+		}
+		else
+		{
+			GunSlot->SetZOrder(0);
+			BowSlot->SetZOrder(1);
+			
+			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Forward);
+		}
+	}
 }

@@ -26,6 +26,9 @@ protected:
 	
 	UFUNCTION()
 	void HandleAmmoChanged(FText NewAmmoText);
+	
+	UFUNCTION()
+	void HandleWeaponSwapped(int32 CurrentWeaponIndex);
 
 public:
 	//Stat Component 로 부터 받아올 정보 위젯 연결
@@ -44,10 +47,15 @@ public:
 
 	// Weapon Component 로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* AmmoCountText;
-
+	class UOverlay* BowInfoOverlay;
+	
 	UPROPERTY(meta = (BindWidget))
-	class UImage* WeaponImage;
+	class UOverlay* GunInfoOverlay;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* GunAmmoCount;
+	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* GunInfoSwapBackAnim;
 
 	//Game State로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))
