@@ -69,7 +69,11 @@ void ASanzoGameMode::StartStage()
 void ASanzoGameMode::OnStageCleared()
 {
   UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 클리어"));
-  
+  if(CurrentStageType == ESanzoStageType::Boss)
+  {
+    MoveToNextStage();
+    return;
+  }
 	ASanzoGameState* SanzoGameState = GetWorld() ? GetWorld()->GetGameState<ASanzoGameState>() : nullptr;
 	if (SanzoGameState)
 	{
