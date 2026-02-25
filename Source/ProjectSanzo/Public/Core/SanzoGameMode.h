@@ -30,4 +30,10 @@ public:
   void TriggerUpgradeSelection();
   void OnUpgradeSelected();
 #pragma endregion 최윤서
+	
+#pragma region EndingDecision
+	
+	void DecideEnding();
+	
+#pragma endregion 이준로
 };
