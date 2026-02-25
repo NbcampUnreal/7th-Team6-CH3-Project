@@ -11,6 +11,7 @@
 DECLARE_MULTICAST_DELEGATE(FOnRoomCleared);
 class ASanzoEnemySpawnVolume;
 class ASanzoGameState;
+class ASanzoItemSpawn;
 
 UCLASS()
 class PROJECTSANZO_API ASanzoRoomBase : public AActor
@@ -26,7 +27,7 @@ public:
 
   virtual void BeginRoomSequence();
   virtual void EndRoomSequence();
-  virtual void OnEnemyKilled();
+  virtual void OnEnemyKilled(FVector Position);
   virtual void EnemySpawned();
 
 public:
@@ -51,5 +52,8 @@ public:
   // 전투 정보 State에 전달
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Core")
   ASanzoGameState* GameState;
+
+  // 아이템 스폰
+  ASanzoItemSpawn* ItemSpawn;
 #pragma endregion 최윤서
 };

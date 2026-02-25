@@ -38,9 +38,9 @@ void ASanzoRoom_Extermination::EndRoomSequence()
 #pragma endregion 최윤서
 
 #pragma region Battle Event
-void ASanzoRoom_Extermination::OnEnemyKilled()
+void ASanzoRoom_Extermination::OnEnemyKilled(FVector Position)
 {
-  Super::OnEnemyKilled();
+  Super::OnEnemyKilled(Position);
   if (GameState)
   {
     GameState->UpdateStageInfo(CurrentEnemyCount, TotalEnemyCount);
