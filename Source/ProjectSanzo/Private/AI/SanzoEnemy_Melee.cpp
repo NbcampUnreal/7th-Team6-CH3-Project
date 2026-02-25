@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "Common/SanzoGameplayTag.h"
 #include "AI/Components/SanzoEnemyStunComponent.h" 
+#include "GameplayTagAssetInterface.h"
 
 ASanzoEnemy_Melee::ASanzoEnemy_Melee()
 {
@@ -51,6 +52,17 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
       this,
       UDamageType::StaticClass()
     );
+
+#pragma region NotifyParried
+    if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+    {
+      IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character);
+      if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+      {
+        StunComponent->NotifyParried();
+      }
+    }
+#pragma endregion 김형백
 
     // 한 번 때리면 콜리전을 즉시 비활성화 
     DisableWeaponCollision();

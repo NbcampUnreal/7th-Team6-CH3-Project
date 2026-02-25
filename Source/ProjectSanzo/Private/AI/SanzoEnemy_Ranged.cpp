@@ -13,6 +13,7 @@
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
 #include "AI/Components/SanzoEnemyStunComponent.h" 
+#include "GameplayTagAssetInterface.h"
 
 ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
 {
@@ -107,6 +108,18 @@ void ASanzoEnemy_Ranged::FireHitScan()
       {
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
       }
+
+#pragma region NotifyParried
+      if (ACharacter* Character = Cast<ACharacter>(HitResult.GetActor()))
+      {
+        IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character);
+        if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+        {
+          StunComponent->NotifyParried();
+        }
+      }
+#pragma endregion 김형백
+
     }
 
     // [디버그용] 명중 시 초록색 선 출력

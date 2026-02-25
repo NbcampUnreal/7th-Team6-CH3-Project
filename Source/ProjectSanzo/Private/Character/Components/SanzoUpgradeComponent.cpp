@@ -3,9 +3,9 @@
 
 #include "Character/Components/SanzoUpgradeComponent.h"
 
-#include "Character/SanzoCharacter.h" // 제거필요
-#include "Character/Components/SanzoEquipmentComponent.h" //제거필요
-#include "Character/Components/SanzoStatComponent.h" //제거필요
+//#include "Character/SanzoCharacter.h" // 제거필요
+//#include "Character/Components/SanzoEquipmentComponent.h" //제거필요
+//#include "Character/Components/SanzoStatComponent.h" //제거필요
 #include "Common/SanzoLog.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
 
