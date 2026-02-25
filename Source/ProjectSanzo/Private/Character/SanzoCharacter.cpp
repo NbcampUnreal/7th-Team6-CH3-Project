@@ -506,6 +506,15 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
   }
 }
 
+void ASanzoCharacter::ApplyExpeReward(float Amount)
+{
+  //겸치증가
+  if(StatComp)
+  {
+    StatComp->AddExperience(Amount);
+  }
+}
+
 
 #pragma endregion 김형백
 
