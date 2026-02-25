@@ -29,14 +29,29 @@ protected:
 
 public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-  
+#pragma region 스왑 시스템
+  // 무기 교체 함수 추가
+  UFUNCTION(BlueprintCallable, Category = "Equipment|Action")
+  void SwapWeapon();
 
-  UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Equipment|Class")
-  TSubclassOf<class ASanzoWeaponBase> WeaponClass;
+  // 내부 인덱스에 맞는 무기를 장착시키는 함수
+  void EquipWeaponByIndex(int32 Index);
+
+  // 원래 무기 하나 소환했지만 무기를 인덱스로 갖는 배열로 수정
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment|Class")
+  TArray<TSubclassOf<class ASanzoWeaponBase>> DefaultWeaponClasses;
+
+  // (이용호 추가)실제 월드에 스폰되어 인벤토리에 들어온 무기 인스턴스
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment|Instances")
+  TArray<ASanzoWeaponBase*> Inventory;
+#pragma endregion 이용호
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Equipment|Class")
   ASanzoWeaponBase* CurrentWeapon;
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Equipment|Class")
   ASanzoCharacter* OwnerCharacter;
+
+  // (이용호 추가) 현재 들고 있는 무기의 인덱스 저장용 변수
+  int32 CurrentWeaponIndex = 0;
 
 #pragma region UIDataTransfer
 
