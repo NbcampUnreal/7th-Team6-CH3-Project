@@ -39,9 +39,9 @@ struct FSanzoSaveStatData
 {
 	GENERATED_BODY()
 	UPROPERTY()
-	int32 Level;
+	int32 Level = 1;
 	UPROPERTY()
-	float CurrentExp;
+	float CurrentExp = 0.f;
 };
 #pragma endregion 최윤서
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
