@@ -31,12 +31,14 @@ public:
 	// 스탯 정보
 	UPROPERTY()
 	FSanzoSaveStatData CachedStatData;
+	UPROPERTY()
+	int32 CachedAmmo;
 
 	// 스탯 백업
 	void BackupStat(ASanzoCharacter* Player);
   // 스탯 복원
 	void RestoreStat(ASanzoCharacter* Player);
-
+	void InitSetup();
 
 #pragma endregion 최윤서
 	
