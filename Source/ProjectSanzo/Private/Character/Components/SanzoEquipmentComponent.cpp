@@ -181,7 +181,7 @@ UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
 			// 교체된 애님인스턴스 가져와서 몽타지 재생
 			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
-				AnimInstance->Montage_Play(NextWeapon->EquipMontage);
+				AnimInstance->Montage_Play(NextWeapon->EquipMontage,2.0f);
 				return NextWeapon->EquipMontage;
 			}
 		}
