@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemyBase.h"
@@ -78,4 +78,9 @@ public:
 private:
   // 실제 트레이스 로직을 수행할 함수
   void PerformWeaponTrace();
+#pragma region Sound
+public:
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  TArray<USoundBase*> AttackSounds;
+#pragma endregion 최윤서
 };

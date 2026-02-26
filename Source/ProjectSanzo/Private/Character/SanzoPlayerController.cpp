@@ -145,11 +145,6 @@ void ASanzoPlayerController::ResumeGame()
 		PopUpWidgetInstance->RemoveFromParent();
 		PopUpWidgetInstance = nullptr;
 	}
-	if (StageAnnouncerWidgetInstance)
-	{
-		StageAnnouncerWidgetInstance->RemoveFromParent();
-		StageAnnouncerWidgetInstance = nullptr;
-	}
 
 	SetPause(false);
 	bShowMouseCursor = false;
@@ -286,7 +281,18 @@ void ASanzoPlayerController::ShowAnnouncerUI(FGameplayTag State, ESanzoStageType
 
 void ASanzoPlayerController::AnnounceEnded()
 {
-	ResumeGame();
+	if (StageAnnouncerWidgetInstance)
+	{
+		StageAnnouncerWidgetInstance->RemoveFromParent();
+		StageAnnouncerWidgetInstance = nullptr;
+	}
+	
+	if (PopUpWidgetInstance)
+	{
+		return;
+	}
+	
+	SetPause(false);
 }
 
 void ASanzoPlayerController::ShowMediaPlayer(FGameplayTag State)

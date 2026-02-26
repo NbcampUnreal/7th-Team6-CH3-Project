@@ -5,9 +5,13 @@
 
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Character/Components/SanzoStatComponent.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/Image.h"
+#include "Components/Overlay.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Core/SanzoGameState.h"
+#include "Weapon/SanzoBow.h"
 
 void USanzoHUDWidget::NativeConstruct()
 {
@@ -28,7 +32,20 @@ void USanzoHUDWidget::NativeConstruct()
 		if (EquipmentComponent)
 		{
 			EquipmentComponent->OnAmmoChanged.AddDynamic(this, &USanzoHUDWidget::HandleAmmoChanged);
+			EquipmentComponent->OnSwapped.AddDynamic(this, &USanzoHUDWidget::HandleWeaponSwapped);
+			EquipmentComponent->OnAnyWeaponHitEnemy.AddDynamic(this, &USanzoHUDWidget::HandleEnemyHitAnim);
 		}
+		
+		if (BowAimProgressBar)
+		{
+			BowAimProgressBarDynamic = BowAimProgressBar->GetDynamicMaterial();
+			
+			if (BowAimProgressBarDynamic)
+			{
+				BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"),0.0f);
+			}
+		}
+		
 		
 	}
 
@@ -75,5 +92,85 @@ void USanzoHUDWidget::HandleStageProgressChanged(float percent)
 
 void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
 {
-	AmmoCountText->SetText(NewAmmoText);
+	GunAmmoCount->SetText(NewAmmoText);
+}
+
+void USanzoHUDWidget::HandleWeaponSwapped(int32 CurrentWeaponIndex)
+{
+	bool bIsGunMain = (CurrentWeaponIndex == 0);
+	
+	UCanvasPanelSlot* GunSlot = Cast<UCanvasPanelSlot>(GunInfoOverlay->Slot);
+	UCanvasPanelSlot* BowSlot = Cast<UCanvasPanelSlot>(BowInfoOverlay->Slot);
+	
+	if (GunSlot && BowSlot)
+	{
+		if (bIsGunMain)
+		{
+			GunSlot->SetZOrder(1);
+			BowSlot->SetZOrder(0);
+		
+			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+		}
+		else
+		{
+			GunSlot->SetZOrder(0);
+			BowSlot->SetZOrder(1);
+			
+			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Forward);
+		}
+	}
+	
+	if (APawn* PlayerCharacter = GetOwningPlayerPawn())
+	{
+		USanzoEquipmentComponent* EquipmentComponent = PlayerCharacter->FindComponentByClass<USanzoEquipmentComponent>();
+		if (EquipmentComponent)
+		{
+			ASanzoWeaponBase* CurrentWeapon = EquipmentComponent->GetCurrentWeapon();
+			if (ASanzoBow* Bow = Cast<ASanzoBow>(CurrentWeapon))
+			{
+				Bow->OnChargePercentChanged.RemoveAll(this);
+				Bow->OnChargePercentChanged.AddDynamic(this, &USanzoHUDWidget::UpdateBowChargingProgress);
+			}
+			else
+			{
+				UpdateBowChargingProgress(0.0f);
+			}
+		}
+	}
+}
+
+void USanzoHUDWidget::UpdateBowChargingProgress(float NewPercent)
+{
+	if (BowAimProgressBarDynamic)
+	{
+		BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"), NewPercent);
+	}
+	
+	if (BowAimProgressBar)
+	{
+		bool bIsVisible = NewPercent > 0.0f;
+		ESlateVisibility BowAimProgressBarVisibility = bIsVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
+		BowAimProgressBar->SetVisibility(BowAimProgressBarVisibility);
+		
+		if (bIsVisible)
+		{
+			FLinearColor StartColor = FLinearColor::White;
+			FLinearColor EndColor = FLinearColor::Green;
+
+			// NewPercent(0~1)에 따라 두 색상 사이의 값을 계산
+			FLinearColor CurrentColor = FLinearColor::LerpUsingHSV(StartColor, EndColor, NewPercent);
+
+			// 위젯의 색조(Tint)를 설정
+			BowAimProgressBar->SetColorAndOpacity(CurrentColor);
+		}
+	}
+	
+}
+
+void USanzoHUDWidget::HandleEnemyHitAnim()
+{
+	if (HitEffectAnim)
+	{
+		PlayAnimation(HitEffectAnim);
+	}
 }

@@ -226,7 +226,7 @@ void ASanzoGun::AddAmmo(int32 Amount)
 }
 
 #pragma region DataForHUD
-	
+
 FText ASanzoGun::GetAmmoTextForHUD() const
 {
 	return FText::AsNumber(CurrentAmmo);
