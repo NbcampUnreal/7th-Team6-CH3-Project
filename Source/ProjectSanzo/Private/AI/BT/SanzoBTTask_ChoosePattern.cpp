@@ -39,6 +39,11 @@ EBTNodeResult::Type USanzoBTTask_ChoosePattern::ExecuteTask(UBehaviorTreeCompone
     }
   }
 
+  if (ForcePattern > 0)
+  {
+    SelectedPattern = ForcePattern;
+  }
+
   BlackboardComp->SetValueAsInt(BlackboardKey.SelectedKeyName, SelectedPattern);
 
   return EBTNodeResult::Succeeded;

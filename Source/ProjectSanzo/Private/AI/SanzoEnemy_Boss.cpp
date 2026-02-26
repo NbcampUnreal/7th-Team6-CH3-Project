@@ -124,24 +124,15 @@ void ASanzoEnemy_Boss::PerformWeaponTrace()
   // bTraceComplex=false, ActorsToIgnore=HitActorsToIgnore, DrawDebugType=EDrawDebugTrace::ForDuration (디버그용 표시)
   bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
     GetWorld(),
-    PrevStartLocation, CurrentStart, // 시작점의 이동 궤적
+    CurrentStart, CurrentEnd, // 시작점과 끝점 변경!
     TraceRadius,
     ObjectTypes,
     false,
     HitActorsToIgnore,
-    EDrawDebugTrace::ForDuration, // 테스트 끝나면 None으로 변경!
+    EDrawDebugTrace::ForDuration, // 테스트 후 None으로 끄기
     OutHits,
-    true,
-    FLinearColor::Red, FLinearColor::Green, 5.0f
-  );
-
-  // 칼날 전체를 커버하기 위해 End 소켓쪽 궤적도 추가로 트레이스
-  UKismetSystemLibrary::SphereTraceMultiForObjects(
-    GetWorld(),
-    PrevEndLocation, CurrentEnd,
-    TraceRadius,
-    ObjectTypes,
-    false, HitActorsToIgnore, EDrawDebugTrace::ForDuration, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.0f
+    true, // IgnoreSelf
+    FLinearColor::Red, FLinearColor::Green, 2.0f
   );
 
   // 충돌 결과 처리
@@ -161,21 +152,11 @@ void ASanzoEnemy_Boss::PerformWeaponTrace()
           this,
           UDamageType::StaticClass()
         );
-
+        // 한 번 맞은 적은 이번 공격에서 다시 맞지 않도록 목록에 추가
+        HitActorsToIgnore.Add(HitActor);
         // 한 번 때리면 콜리전을 즉시 비활성화 
         DisableWeaponCollision();
       }
-
-      // 패링 실패 시 데미지 적용
-      UGameplayStatics::ApplyDamage(HitActor, MeleeDamage, GetController(), this, UDamageType::StaticClass());
-
-      // 한 번 맞은 적은 이번 공격에서 다시 맞지 않도록 목록에 추가
-      HitActorsToIgnore.Add(HitActor);
     }
   }
-
-  // 다음 프레임을 위해 
-  // 현재 위치를 '이전 위치'로 업데이트
-  PrevStartLocation = CurrentStart;
-  PrevEndLocation = CurrentEnd;
 }
