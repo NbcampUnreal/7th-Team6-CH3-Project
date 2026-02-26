@@ -26,6 +26,7 @@ void USanzoHUDWidget::NativeConstruct()
 			//Delegate 등록
 			//this : 대상 객체, &USanzoHUDWidget::HandleStatChanged: 실행할 함수
 			StatComponent->OnStatChanged.AddDynamic(this, &USanzoHUDWidget::HandleStatChanged);
+			StatComponent->OnExhaustedChanged.AddDynamic(this, &USanzoHUDWidget::HandleStaminaColorChange);
 		}
 		
 		USanzoEquipmentComponent* EquipmentComponent = PlayerCharacter->FindComponentByClass<USanzoEquipmentComponent>();
@@ -79,6 +80,48 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 	if (LevelText)
 	{
 		LevelText->SetText(FText::AsNumber(Data.CurrentLevel));
+	}
+}
+
+void USanzoHUDWidget::HandleStaminaColorChange(bool bNewExhausted)
+{
+	bIsExhausted = bNewExhausted;
+	if (bIsExhausted)
+	{
+		ExhaustionStartTime = GetWorld()->GetTimeSeconds();
+		if (StaminaBar)
+		{
+			StaminaBar->SetFillColorAndOpacity(ExhaustedColor);
+		}
+	}
+}
+
+void USanzoHUDWidget::UpdateStaminaColor(float DeltaTime)
+{
+	if (!StaminaBar) return;
+	
+	float ElapsedTime = GetWorld()->GetTimeSeconds() - ExhaustionStartTime;
+	
+	float Percent = FMath::Clamp(ElapsedTime/ExhaustionDuration, 0.f, 1.f);
+	
+	FLinearColor CurrentColor = FLinearColor::LerpUsingHSV(ExhaustedColor, NormalStaminaColor, Percent);
+	
+	StaminaBar->SetFillColorAndOpacity(CurrentColor);
+	
+	if (Percent >= 1.0f)
+	{
+		bIsExhausted = false;
+		StaminaBar->SetFillColorAndOpacity(NormalStaminaColor);
+	}
+}
+
+void USanzoHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	if (bIsExhausted)
+	{
+		UpdateStaminaColor(InDeltaTime);
 	}
 }
 

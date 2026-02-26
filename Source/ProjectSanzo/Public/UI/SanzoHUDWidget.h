@@ -80,4 +80,25 @@ protected:
 	class UProgressBar* StageProgressBar;
 
 #pragma endregion 이준로
+	
+#pragma region StaminaBarDynamic
+public:
+	
+	UFUNCTION()
+	void HandleStaminaColorChange(bool bNewExhausted);
+	
+	void UpdateStaminaColor(float DeltaTime);
+	
+protected:
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
+	float ExhaustionStartTime;
+	const float ExhaustionDuration = 3.0f;
+	
+	const FLinearColor NormalStaminaColor = FLinearColor(0.0f, 1.0f, 0.17f);
+	const FLinearColor ExhaustedColor = FLinearColor::Gray;
+	
+	bool bIsExhausted = false;
+	
+#pragma endregion 이준로
 };

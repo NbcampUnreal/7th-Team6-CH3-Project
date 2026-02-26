@@ -167,6 +167,8 @@ void USanzoStatComponent::ConsumeStamina(float Amount)
     if(ISanzoTagEditorInterface* TagEditor = Cast<ISanzoTagEditorInterface>(GetOwner()))
 		{
 			TagEditor->AddGameplayTag(SanzoTags::Exhausted);
+    	//HUD 업데이트 방송 - 작업자: 이준로
+    	OnExhaustedChanged.Broadcast(true);
     }
 		BeginExhaustionCooldown(); // 탈진 회복 시작
     return;
