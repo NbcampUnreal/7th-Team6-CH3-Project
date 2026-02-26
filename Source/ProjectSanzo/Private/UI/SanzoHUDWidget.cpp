@@ -33,6 +33,7 @@ void USanzoHUDWidget::NativeConstruct()
 		{
 			EquipmentComponent->OnAmmoChanged.AddDynamic(this, &USanzoHUDWidget::HandleAmmoChanged);
 			EquipmentComponent->OnSwapped.AddDynamic(this, &USanzoHUDWidget::HandleWeaponSwapped);
+			EquipmentComponent->OnAnyWeaponHitEnemy.AddDynamic(this, &USanzoHUDWidget::HandleEnemyHitAnim);
 		}
 		
 		if (BowAimProgressBar)
@@ -44,6 +45,7 @@ void USanzoHUDWidget::NativeConstruct()
 				BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"),0.0f);
 			}
 		}
+		
 		
 	}
 
@@ -166,4 +168,12 @@ void USanzoHUDWidget::UpdateBowChargingProgress(float NewPercent)
 		}
 	}
 	
+}
+
+void USanzoHUDWidget::HandleEnemyHitAnim()
+{
+	if (HitEffectAnim)
+	{
+		PlayAnimation(HitEffectAnim);
+	}
 }

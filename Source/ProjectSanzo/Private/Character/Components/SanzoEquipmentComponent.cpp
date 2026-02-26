@@ -46,6 +46,9 @@ void USanzoEquipmentComponent::BeginPlay()
 				// 스폰된 무기 전부 안보이게 변경
 				SpawnedWeapon->SetActorHiddenInGame(true);
 				Inventory.Add(SpawnedWeapon);
+				
+				// 적 타격시 HUD 이펙트 재생용 Broadcast - 작업자: 이준로
+				SpawnedWeapon->OnEnemyHit.AddDynamic(this, &USanzoEquipmentComponent::HandleWeaponHitEnemy);
 			}
 		}
 	}
@@ -107,6 +110,14 @@ void USanzoEquipmentComponent::UpdateHUDAmmo()
 	if (CurrentWeapon)
 	{
 		OnAmmoChanged.Broadcast(CurrentWeapon->GetAmmoTextForHUD());
+	}
+}
+
+void USanzoEquipmentComponent::HandleWeaponHitEnemy()
+{
+	if (OnAnyWeaponHitEnemy.IsBound())
+	{
+		OnAnyWeaponHitEnemy.Broadcast();
 	}
 }
 

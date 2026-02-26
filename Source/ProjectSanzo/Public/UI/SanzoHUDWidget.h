@@ -32,6 +32,9 @@ public:
 	
 	UFUNCTION()
 	void UpdateBowChargingProgress(float NewPercent);
+	
+	UFUNCTION()
+	void HandleEnemyHitAnim();
 
 protected:
 	//Stat Component 로 부터 받아올 정보 위젯 연결
@@ -66,6 +69,8 @@ protected:
 	
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* GunInfoSwapBackAnim;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* HitEffectAnim;
 
 	//Game State로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))

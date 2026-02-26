@@ -5,6 +5,12 @@
 #include "Core/UpgradeSystem/UpgradeDataRow.h"
 #include "SanzoWeaponBase.generated.h"
 
+#pragma region DataForHUD
+	
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnemyHit);
+
+#pragma endregion 이준로
+
 class UNiagaraSystem;
 
 UCLASS()
@@ -118,6 +124,8 @@ protected:
 #pragma region DataForHUD
 	
 public:
+	FOnEnemyHit OnEnemyHit;
+	
 	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
 	
 #pragma endregion 이준로
