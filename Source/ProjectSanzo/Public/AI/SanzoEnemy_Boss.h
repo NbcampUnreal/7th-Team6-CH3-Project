@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "AI/SanzoEnemyBase.h"
+#include "AI/SanzoEnemy_MeleeBase.h"
 #include "SanzoEnemy_Boss.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBossAttackWarning, FName, PatternName);
 
 UCLASS()
-class PROJECTSANZO_API ASanzoEnemy_Boss : public ASanzoEnemyBase
+class PROJECTSANZO_API ASanzoEnemy_Boss : public ASanzoEnemy_MeleeBase
 {
   GENERATED_BODY()
 
@@ -34,43 +34,4 @@ protected:
 
   // 페이즈 2 진입 처리
   void EnterPhase2();
-
-  // 보스의 근접 공격 데미지
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
-  float MeleeDamage = 40.f;
-
-  // 트레이스 활성화 여부 플래그
-  bool bIsWeaponActive = false;
-
-  // 무기 시작 부분 소켓 이름
-  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
-  FName SocketStartName = TEXT("TraceStart");
-
-  // 무기 끝 부분 소켓 이름
-  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
-  FName SocketEndName = TEXT("TraceEnd");
-
-  // 무기 트레이스 반경
-  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
-  float TraceRadius = 15.0f;
-
-  // 중복 타격 방지 배열
-  UPROPERTY()
-  TArray<AActor*> HitActorsToIgnore;
-
-public:
-  // 매 프레임 트레이스를 수행하기 위해 Tick 사용
-  virtual void Tick(float DeltaTime) override;
-
-  // 무기 콜리전 켜기
-  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
-  void EnableWeaponCollision();
-
-  // 무기 콜리전 끄기
-  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
-  void DisableWeaponCollision();
-
-private:
-  // 실제 트레이스 로직을 수행할 함수
-  void PerformWeaponTrace();
 };

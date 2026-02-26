@@ -14,6 +14,7 @@ ASanzoEnemy_Boss::ASanzoEnemy_Boss()
   // 보스 기본 스탯
   MaxHP = 1000.f;
   AttackRange = 300.f;
+  MeleeDamage = 40.f;
   Exp = 500.f; // 레벨업 5번, 외모 업글 찍으라고 협박
 }
 
@@ -21,14 +22,6 @@ void ASanzoEnemy_Boss::BeginPlay()
 {
   Super::BeginPlay();
   bIsPhase2 = false;
-}
-
-void ASanzoEnemy_Boss::Tick(float DeltaTime)
-{
-  if (bIsWeaponActive)
-  {
-    PerformWeaponTrace();
-  }
 }
 
 float ASanzoEnemy_Boss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -81,77 +74,4 @@ void ASanzoEnemy_Boss::BroadcastAttackWarning(FName PatternName)
   UE_LOG(LogKDJ, Warning, TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
   
   OnBossAttackWarning.Broadcast(PatternName);
-}
-
-// 무기 콜리전 활성화
-void ASanzoEnemy_Boss::EnableWeaponCollision()
-{
-  // 공격 시작
-  bIsWeaponActive = true;
-  // 맞은 적 목록 초기화
-  HitActorsToIgnore.Empty();
-  HitActorsToIgnore.Add(this);
-}
-
-// 무기 콜리전 비활성화
-void ASanzoEnemy_Boss::DisableWeaponCollision()
-{
-  // 공격 종료
-  bIsWeaponActive = false;
-}
-
-void ASanzoEnemy_Boss::PerformWeaponTrace()
-{
-  if (!StaticWeaponMesh) return;
-
-  // 현재 프레임의 소켓 위치 가져오기
-  FVector CurrentStart = StaticWeaponMesh->GetSocketLocation(SocketStartName);
-  FVector CurrentEnd = StaticWeaponMesh->GetSocketLocation(SocketEndName);
-
-  // 트레이스 설정
-  TArray<FHitResult> OutHits;
-  TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-  ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-  // 스피어 스윕 수행
-  // bTraceComplex=false, ActorsToIgnore=HitActorsToIgnore, DrawDebugType=EDrawDebugTrace::ForDuration (디버그용 표시)
-  bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
-    GetWorld(),
-    CurrentStart, CurrentEnd, // 시작점과 끝점 변경!
-    TraceRadius,
-    ObjectTypes,
-    false,
-    HitActorsToIgnore,
-    EDrawDebugTrace::ForDuration, // 테스트 후 None으로 끄기
-    OutHits,
-    true, // IgnoreSelf
-    FLinearColor::Red, FLinearColor::Green, 2.0f
-  );
-
-  // 충돌 결과 처리
-  if (bHit)
-  {
-    for (const FHitResult& Hit : OutHits)
-    {
-      AActor* HitActor = Hit.GetActor();
-      if (!HitActor || HitActorsToIgnore.Contains(HitActor)) continue;
-
-      if (HitActor->IsA<ASanzoEnemyBase>()) continue;
-
-      if (HitActor && HitActor != this)
-      {
-        UGameplayStatics::ApplyDamage(
-          HitActor,
-          MeleeDamage,
-          GetController(),
-          this,
-          UDamageType::StaticClass()
-        );
-        // 한 번 맞은 적은 이번 공격에서 다시 맞지 않도록 목록에 추가
-        HitActorsToIgnore.Add(HitActor);
-        // 한 번 때리면 콜리전을 즉시 비활성화 
-        DisableWeaponCollision();
-      }
-    }
-  }
 }
