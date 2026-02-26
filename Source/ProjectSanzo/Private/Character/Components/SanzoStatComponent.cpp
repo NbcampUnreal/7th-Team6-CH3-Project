@@ -138,7 +138,20 @@ void USanzoStatComponent::LevelUp()
 		if (ASanzoPlayerController* PlayerController = Cast<ASanzoPlayerController>(SanzoPawn->GetController()))
 		{
 			//TODO : 소리 재생
-			PlayerController->ShowPopUp(SanzoTags::UpgradeSelet);
+
+
+			TWeakObjectPtr<ASanzoPlayerController> WeakPC(PlayerController); //약한 참조로
+			GetWorld()->GetTimerManager().SetTimer(LevelUpLateHandle,
+				[WeakPC]()
+				{
+					WeakPC->ShowPopUp(SanzoTags::UpgradeSelet);
+				},
+				1.2f,
+				false
+			);
+
+			
+				
 		}
 	}
 	BroadCastStatUpdate();

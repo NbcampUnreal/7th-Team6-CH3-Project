@@ -61,6 +61,8 @@ protected:
 	//스태미나 지속회복 핸들
 	FTimerHandle StaminaRestoreHandle;
   FTimerHandle SprintStaminaCostHandle;
+
+	FTimerHandle LevelUpLateHandle;
 	//Health 관련 변수
 	float CurrentHealth;
 	float MaxHealth;
