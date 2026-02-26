@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -198,8 +198,7 @@ protected:
   virtual void OnParriedCallback();
 #pragma endregion 김동주
 
-  //슬로우효과 - 김형백
-  FTimerHandle SlowTimerHandle;
+
   
 #pragma region Sound
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")

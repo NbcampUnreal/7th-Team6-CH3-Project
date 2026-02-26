@@ -96,6 +96,10 @@ class PROJECTSANZO_API ASanzoCharacter :
   
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* ParryAction;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* PauseAction;
+
 #pragma endregion 김형백
 #pragma region 스왑 액션 추가
   // 스왑용 액션(임시로 Q키 지정)
@@ -117,9 +121,12 @@ public:
   void PlayAimTimeLine();
 #pragma endregion 김형백
   
+#pragma region Asset
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
   UAnimMontage* DodgeMontage;
+  USoundBase* DodgeSuccessSound;
 
+#pragma endregion 김형백
 public:
   ASanzoCharacter();
 
@@ -161,8 +168,11 @@ protected:
 
   void StopFire(const FInputActionValue& Value);
 
+  void Pause(const FInputActionValue& Value);
+
   void Dodge(const FInputActionValue& Value);
   void EndDodge(UAnimMontage* Montage, bool bInterrupted);
+  void SuccessDodge();
 
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);
@@ -170,6 +180,9 @@ protected:
   void AimStart(const FInputActionValue& Value);
 
   void AimStop(const FInputActionValue& Value);
+
+  void ZoomBow(UAnimMontage* Montage);
+  void ZoomOutBow();
 
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma endregion 김형백
@@ -181,10 +194,14 @@ protected:
   virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 #pragma endregion 김형백
 
+  //현재 FOV
+  float CurrentFOV;
+
   //타이머 핸들러 선언
   FTimerHandle SprintStaminaTimerHandle;
   FTimerHandle ParryPenaltyTimerHandle;
-
+  FTimerHandle SlowTimerHandle;
+  FTimerHandle BowDrawTimerHandle;
   void PrintGameplayTags();
 
 public:

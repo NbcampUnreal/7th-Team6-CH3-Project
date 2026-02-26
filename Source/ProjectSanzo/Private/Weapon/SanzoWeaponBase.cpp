@@ -49,6 +49,11 @@ void ASanzoWeaponBase::PlayFireEffects()
     if (AnimInstance && CharacterFireMontage)
     {
       AnimInstance->Montage_Play(CharacterFireMontage, 1.0f);
+
+      //김형백
+      
+      AnimInstance->Montage_SetBlendedInDelegate(StartBowAttackDelegate, CharacterFireMontage);
+      
     }
   }
 
