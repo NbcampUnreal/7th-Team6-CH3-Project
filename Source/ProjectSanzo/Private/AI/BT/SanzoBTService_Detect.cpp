@@ -26,6 +26,15 @@ void USanzoBTService_Detect::TickNode(
   ACharacter* AIChar = Cast<ACharacter>(ControllingPawn);
   if (!AIChar) return;
 
+  UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
+  AActor* Target = Cast<AActor>(Blackboard->GetValueAsObject(TEXT("TargetActor")));
+
+  if (Target)
+  {
+    float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), Target->GetActorLocation());
+    Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), Distance);
+  }
+
   if (UAnimInstance* AnimInstance = AIChar->GetMesh()->GetAnimInstance())
   {
     if (AnimInstance->IsAnyMontagePlaying())
@@ -34,20 +43,10 @@ void USanzoBTService_Detect::TickNode(
     }
   }
 
-  UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
-  AActor* Target = Cast<AActor>(Blackboard->GetValueAsObject(TEXT("TargetActor")));
-
   if (Target)
   {
     // 타겟 발견 시 -> 달리기
     AIChar->GetCharacterMovement()->MaxWalkSpeed = ChaseSpeed;
-
-    float Distance = FVector::Dist(
-      ControllingPawn->GetActorLocation(),
-      Target->GetActorLocation()
-    );
-
-    Blackboard->SetValueAsFloat(TEXT("DistanceToTarget"), Distance);
   }
   else
   {

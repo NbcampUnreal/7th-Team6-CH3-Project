@@ -6,6 +6,8 @@
 #include "Common/SanzoLog.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "DrawDebugHelpers.h"
 
 ASanzoEnemy_Boss::ASanzoEnemy_Boss()
 {
@@ -14,6 +16,7 @@ ASanzoEnemy_Boss::ASanzoEnemy_Boss()
   // 보스 기본 스탯
   MaxHP = 1000.f;
   AttackRange = 300.f;
+  MeleeDamage = 40.f;
   Exp = 500.f; // 레벨업 5번, 외모 업글 찍으라고 협박
 }
 
@@ -21,14 +24,7 @@ void ASanzoEnemy_Boss::BeginPlay()
 {
   Super::BeginPlay();
   bIsPhase2 = false;
-}
-
-void ASanzoEnemy_Boss::Tick(float DeltaTime)
-{
-  if (bIsWeaponActive)
-  {
-    PerformWeaponTrace();
-  }
+  OriginalDamage = MeleeDamage;
 }
 
 float ASanzoEnemy_Boss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -83,99 +79,78 @@ void ASanzoEnemy_Boss::BroadcastAttackWarning(FName PatternName)
   OnBossAttackWarning.Broadcast(PatternName);
 }
 
-// 무기 콜리전 활성화
-void ASanzoEnemy_Boss::EnableWeaponCollision()
+// 돌진 패턴 실행 함수
+void ASanzoEnemy_Boss::ExecuteDash()
 {
-  // 공격 시작
-  bIsWeaponActive = true;
-  // 맞은 적 목록 초기화
-  HitActorsToIgnore.Empty();
-  HitActorsToIgnore.Add(this);
+  ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+  if (!Player || IsDead()) return;
 
-  // 트레이스 시작 전, 현재 소켓 위치를 '이전 위치'로 초기화
+  // 플레이어를 향한 방향 벡터 계산
+  FVector StartLoc = GetActorLocation();
+  FVector TargetLoc = Player->GetActorLocation();
+  FVector Direction = (TargetLoc - StartLoc).GetSafeNormal2D();
+
+  // 돌진하기 직전, 플레이어 쪽으로 몸을 회전
+  SetActorRotation(Direction.Rotation());
+
+  if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+  {
+    MoveComp->SetMovementMode(MOVE_Falling);
+
+    FVector FinalVelocity = Direction * DashSpeed;
+    FinalVelocity.Z = 200.f;
+
+    MoveComp->Velocity = FinalVelocity;
+  }
+}
+
+void ASanzoEnemy_Boss::BeginHeavySmash()
+{
+  bIsHeavyAttack = true;
+
+  // 내려찍기 시 기본 데미지의 2배
+  MeleeDamage = OriginalDamage * 2.f;
+}
+
+void ASanzoEnemy_Boss::EndHeavySmash()
+{
+  bIsHeavyAttack = false;
+  MeleeDamage = OriginalDamage;
+}
+
+void ASanzoEnemy_Boss::ExecuteSmashShockwave()
+{
+  // 충격파가 터질 중심점 계산
+  FVector ImpactLocation;
   if (StaticWeaponMesh)
   {
-    PrevStartLocation = StaticWeaponMesh->GetSocketLocation(SocketStartName);
-    PrevEndLocation = StaticWeaponMesh->GetSocketLocation(SocketEndName);
+    ImpactLocation = StaticWeaponMesh->GetSocketLocation(SocketEndName);
   }
-}
-
-// 무기 콜리전 비활성화
-void ASanzoEnemy_Boss::DisableWeaponCollision()
-{
-  // 공격 종료
-  bIsWeaponActive = false;
-}
-
-void ASanzoEnemy_Boss::PerformWeaponTrace()
-{
-  if (!StaticWeaponMesh) return;
-
-  // 현재 프레임의 소켓 위치 가져오기
-  FVector CurrentStart = StaticWeaponMesh->GetSocketLocation(SocketStartName);
-  FVector CurrentEnd = StaticWeaponMesh->GetSocketLocation(SocketEndName);
-
-  // 트레이스 설정
-  TArray<FHitResult> OutHits;
-  TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-  ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-  // 스피어 스윕 수행
-  // bTraceComplex=false, ActorsToIgnore=HitActorsToIgnore, DrawDebugType=EDrawDebugTrace::ForDuration (디버그용 표시)
-  bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
-    GetWorld(),
-    PrevStartLocation, CurrentStart, // 시작점의 이동 궤적
-    TraceRadius,
-    ObjectTypes,
-    false,
-    HitActorsToIgnore,
-    EDrawDebugTrace::ForDuration, // 테스트 끝나면 None으로 변경!
-    OutHits,
-    true,
-    FLinearColor::Red, FLinearColor::Green, 5.0f
-  );
-
-  // 칼날 전체를 커버하기 위해 End 소켓쪽 궤적도 추가로 트레이스
-  UKismetSystemLibrary::SphereTraceMultiForObjects(
-    GetWorld(),
-    PrevEndLocation, CurrentEnd,
-    TraceRadius,
-    ObjectTypes,
-    false, HitActorsToIgnore, EDrawDebugTrace::ForDuration, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.0f
-  );
-
-  // 충돌 결과 처리
-  if (bHit)
+  else
   {
-    for (const FHitResult& Hit : OutHits)
-    {
-      AActor* HitActor = Hit.GetActor();
-      if (!HitActor || HitActorsToIgnore.Contains(HitActor)) continue;
-
-      if (HitActor && HitActor != this)
-      {
-        UGameplayStatics::ApplyDamage(
-          HitActor,
-          MeleeDamage,
-          GetController(),
-          this,
-          UDamageType::StaticClass()
-        );
-
-        // 한 번 때리면 콜리전을 즉시 비활성화 
-        DisableWeaponCollision();
-      }
-
-      // 패링 실패 시 데미지 적용
-      UGameplayStatics::ApplyDamage(HitActor, MeleeDamage, GetController(), this, UDamageType::StaticClass());
-
-      // 한 번 맞은 적은 이번 공격에서 다시 맞지 않도록 목록에 추가
-      HitActorsToIgnore.Add(HitActor);
-    }
+    ImpactLocation = GetActorLocation() + (GetActorForwardVector() * 100.0f);
   }
 
-  // 다음 프레임을 위해 
-  // 현재 위치를 '이전 위치'로 업데이트
-  PrevStartLocation = CurrentStart;
-  PrevEndLocation = CurrentEnd;
+  // 팀킬 방지
+  TArray<AActor*> IgnoredActors;
+  IgnoredActors.Add(this);
+
+  // 반경 3m(300.f) 내의 모든 액터에게 광역 데미지
+  UGameplayStatics::ApplyRadialDamage(
+    GetWorld(),
+    ShockwaveDamage,
+    ImpactLocation,
+    ShockwaveRadius,
+    UDamageType::StaticClass(),
+    IgnoredActors,
+    this,
+    GetController(),
+    true
+  );
+
+  // [디버그용] 빨간색 원(공격 범위) 그리기
+  if (GetWorld())
+  {
+    DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
+  }
 }

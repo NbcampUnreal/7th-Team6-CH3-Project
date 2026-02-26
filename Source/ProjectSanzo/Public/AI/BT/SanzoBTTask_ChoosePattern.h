@@ -22,4 +22,8 @@ private:
   // 플레이어와의 거리 키
   UPROPERTY(EditAnywhere, Category = "Blackboard")
   struct FBlackboardKeySelector DistanceKey;
+
+  // 강제 패턴 선택을 위한 디버그 변수
+  UPROPERTY(EditAnywhere, Category = "Debug")
+  int32 ForcePattern = 0;
 };

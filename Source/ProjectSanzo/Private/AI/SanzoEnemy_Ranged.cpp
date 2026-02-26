@@ -71,19 +71,45 @@ void ASanzoEnemy_Ranged::FireHitScan()
   }
 
   // 히트스캔 (LineTrace)
-  FHitResult HitResult;
   FCollisionQueryParams QueryParams;
   QueryParams.AddIgnoredActor(this);
 
-  bool bHit = GetWorld()->LineTraceSingleByChannel(
-    HitResult,
-    TraceStart,
-    TraceEnd,
-    ECC_Visibility,
-    QueryParams
-  );
+  FHitResult ValidHitResult;
+  bool bValidHit = false;
+  FVector TraceEndPoint = TraceEnd;
 
-  FVector TraceEndPoint = bHit ? HitResult.ImpactPoint : TraceEnd;
+  // 최대 10번까지 관통 시도 (무한 루프 방지)
+  for (int32 i = 0; i < 10; ++i)
+  {
+    FHitResult HitResult;
+    bool bHit = GetWorld()->LineTraceSingleByChannel(
+      HitResult,
+      TraceStart,
+      TraceEnd,
+      ECC_Visibility,
+      QueryParams
+    );
+
+    if (bHit)
+    {
+      AActor* HitActor = HitResult.GetActor();
+
+      if (HitActor && HitActor->IsA<ASanzoEnemyBase>())
+      {
+        QueryParams.AddIgnoredActor(HitActor);
+        continue;
+      }
+
+      ValidHitResult = HitResult;
+      TraceEndPoint = HitResult.ImpactPoint;
+      bValidHit = true;
+      break;
+    }
+    else
+    {
+      break;
+    }
+  }
 
   // 궤적 이펙트 생성
   if (TracerEffect)
@@ -98,10 +124,10 @@ void ASanzoEnemy_Ranged::FireHitScan()
   }
 
   // 피격 처리
-  if (bHit)
+  if (bValidHit)
   {
-    AActor* HitActor = HitResult.GetActor();
-    if (HitActor && !HitActor->IsA<ASanzoEnemyBase>())
+    AActor* HitActor = ValidHitResult.GetActor();
+    if (HitActor)
     {
       UGameplayStatics::ApplyDamage(
         HitActor,
@@ -145,7 +171,7 @@ void ASanzoEnemy_Ranged::FireHitScan()
       // 피격 위치에 이펙트 생성
       if (HitEffect)
       {
-        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, ValidHitResult.ImpactPoint, ValidHitResult.ImpactNormal.Rotation());
       }
 
 
@@ -155,7 +181,7 @@ void ASanzoEnemy_Ranged::FireHitScan()
     // [디버그용] 명중 시 초록색 선 출력
     if (bShowDebugTrace)
     {
-      DrawDebugLine(GetWorld(), TraceStart, HitResult.ImpactPoint, FColor::Green, false, 2.0f, 0, 1.0f);
+      DrawDebugLine(GetWorld(), TraceStart, ValidHitResult.ImpactPoint, FColor::Green, false, 2.0f, 0, 1.0f);
     }
   }
   else
