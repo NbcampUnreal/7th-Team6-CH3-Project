@@ -13,6 +13,9 @@ ASanzoGun::ASanzoGun()
 	CurrentAmmo = 3000;         // 시작 탄약
 	bInfiniteAmmo = false;
 
+	// 첫 발은 무조건 바로 나가도록 초기화
+	LastFireTime = 0.0f;
+
 	// 라인트레이스 시작 위치 고정
 	if (FireStartLocation)
 	{
@@ -33,16 +36,20 @@ void ASanzoGun::StartFire()
 {
 	Super::StartFire();
 
-	if (!bInfiniteAmmo && CurrentAmmo <= 0) return;
+	// 현재 플레이 시간 저장
+	float CurrentTime = GetWorld()->GetTimeSeconds();
 
-	Fire();
+	// 단발 광클을 해서 입력 텀이 FireRate(0.15f) 보다 작은지 계산
+	float FirstDelay = FMath::Max(LastFireTime + FireRate - CurrentTime, 0.0f);
 
-	GetWorld()->GetTimerManager().SetTimer(
+	// FirstDelay 의 값이 양수라면 그 시간만큼 기다렸다가 FireRate 시간 후에 Fire() 작동
+	GetWorldTimerManager().SetTimer(
 		FireTimerHandle,
 		this,
 		&ASanzoGun::Fire,
 		FireRate,
-		true
+		true,
+		FirstDelay
 	);
 
 }
@@ -63,6 +70,9 @@ void ASanzoGun::Fire()
 		StopFire();
 		return;
 	}
+
+	// 총을 쏜 시점을 LastFireTime 에 저장
+	LastFireTime = GetWorld()->GetTimeSeconds();
 
 	if (!bInfiniteAmmo)
 	{

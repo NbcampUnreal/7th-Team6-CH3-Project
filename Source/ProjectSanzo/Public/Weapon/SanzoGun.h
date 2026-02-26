@@ -38,7 +38,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Gun|Debug")
 	bool bShowDebugTrace = false;
 
-
+	// 마지막으로 총을 쏜 시간을 기록할 변수(단발 광클 방지용)
+	float LastFireTime;
 
 	// 실제 발사 로직: 라인트레이스 및 디버그 라인 그리기
 	virtual void Fire() override;
