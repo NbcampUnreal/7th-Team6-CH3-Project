@@ -24,7 +24,7 @@
 #include "Common/SanzoLog.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "AI/Components/SanzoEnemyStunComponent.h" //제거필요
+
 
 #include "Core/SanzoGameInstance.h"
 
@@ -109,7 +109,7 @@ void ASanzoCharacter::PostInitializeComponents()
     StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
   }
 
-  //몽타주 끝날때 델리게이트 바인딩
+  //패리 몽타주 끝날때 델리게이트 바인딩
   if(ParryComp)
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
@@ -332,8 +332,14 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   //} 이제 달릴때 쏘면 멈추고, 쏩니다
   if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed))
   {
+    StopFire(Value);
     return;
   }
+  if (CharacterGameplayTags.HasTag(SanzoTags::Swap))
+  {
+    return;
+  }
+
 
   if(EquipmentComp)
   {
@@ -358,11 +364,17 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 
 void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 {
+
   if (EquipmentComp)
   {
     CharacterGameplayTags.RemoveTag(SanzoTags::Attack);
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
+      if (Weapon == EquipmentComp->Inventory[1] && CharacterGameplayTags.HasTag(SanzoTags::Swap))
+      {
+        return;
+      }
+
       Weapon->StopFire();
     }
   }
@@ -370,26 +382,60 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
+  bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
+
+  if (bIsExhausted)
+  {
+    EndDodge(nullptr, false);
+    return;
+  }
+  if (CharacterGameplayTags.HasTag(SanzoTags::Action) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Aiming) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Dodge))
+  {
+    EndDodge(nullptr, false);
+    return;
+  }
+
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
     AnimInstance->Montage_Play(DodgeMontage);
+    FOnMontageBlendingOutStarted DodgeEndDelegate;
+    AnimInstance->Montage_SetBlendingOutDelegate(DodgeEndDelegate, DodgeMontage);
+    DodgeEndDelegate.BindUObject(this, &ASanzoCharacter::EndDodge);
+
+    StatComp->ConsumeStaminaForAction(EActionType::Dodge);
   }
   
 }
 
+void ASanzoCharacter::EndDodge(UAnimMontage* Montage, bool bInterrupted)
+{
+  CharacterGameplayTags.RemoveTag(SanzoTags::Dodge);
+}
+
+
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
+
   if (bIsExhausted)
   {
     EndParry(nullptr, false);
     return;
   }
-  
+  if (CharacterGameplayTags.HasTag(SanzoTags::Action) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Aiming) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Parry))
+  {
+    EndParry(nullptr, false);
+    return;
+  }
+
   if (ParryComp->TryParry())
   {
     ParryComp->PlayParryMontage();
-    StatComp->ConsumeStaminaForAction(); //스태미나 소모
+    StatComp->ConsumeStaminaForAction(EActionType::Parry); //스태미나 소모
     StatComp->BeginExhaustionCooldown(); // 지친 상태로 가는 쿨다운 시작
 
     CharacterGameplayTags.AddTag(SanzoTags::Parry);
@@ -465,8 +511,7 @@ void ASanzoCharacter::SwapWeaponAction(const FInputActionValue& Value)
 {
   // 고정 액션, 공격, 조준, 스왑 중이면 안켜짐
   if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed) ||
-    CharacterGameplayTags.HasTag(SanzoTags::Attack) ||
-    CharacterGameplayTags.HasTag(SanzoTags::Aiming) ||
+    CharacterGameplayTags.HasTag(SanzoTags::Attack)||
     CharacterGameplayTags.HasTag(SanzoTags::Swap))
   {
     return;
@@ -585,14 +630,13 @@ float ASanzoCharacter::TakeDamage(
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
 
-    // 제거필요
-    if (DamageCauser)
-    {
-      if (USanzoEnemyStunComponent* EnemyStunComp = DamageCauser->FindComponentByClass<USanzoEnemyStunComponent>())
-      {
-        EnemyStunComp->NotifyParried();
-      }
-    }
+  }
+  /*회피*/
+  if (CharacterGameplayTags.HasTag(SanzoTags::IFrame))
+  {
+    CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
+    FinalDamage = 0.f;
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
   }
 
   if (StatComp)
@@ -623,29 +667,3 @@ void ASanzoCharacter::RestoreFromGI()
     GI->RestoreStat(this);
   }
 }
-/*
-#pragma region PlayerTakeDamage
-float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-  float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-  if (StatComp)
-  {
-    StatComp->ApplyDamage(FinalDamage);
-    if (GEngine)
-    {
-      FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
-      GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
-    }
-
-    if (StatComp->IsDead())
-    {
-      UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      // TO-DO: 플레이어 래그돌, 게임 오버 UI 호출, 조작 불가 등 처리
-    }
-  }
-
-  return FinalDamage;
-}
-#pragma endregion 김동주
-*/

@@ -10,6 +10,8 @@
 #pragma region UIDataTransfer
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAmmoChanged, FText, NewAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwapped, int32, CurrentIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnyWeaponHitEnemy);
 
 #pragma endregion 이준로
 
@@ -69,11 +71,18 @@ public:
 #pragma region UIDataTransfer
 
 public:
+	UFUNCTION()
+	ASanzoWeaponBase* GetCurrentWeapon() const { return CurrentWeapon; }
+	
   FOnWeaponAmmoChanged OnAmmoChanged;
+	FOnWeaponSwapped OnSwapped;
+	FOnAnyWeaponHitEnemy OnAnyWeaponHitEnemy;
 
 protected:
   UFUNCTION()
   void UpdateHUDAmmo();
+	UFUNCTION()
+	void HandleWeaponHitEnemy();
 
 #pragma endregion 이준로
 };

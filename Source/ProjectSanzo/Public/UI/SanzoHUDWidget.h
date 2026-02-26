@@ -14,7 +14,7 @@ class PROJECTSANZO_API USanzoHUDWidget : public UUserWidget
 	GENERATED_BODY()
 #pragma region UI
 
-protected:
+public:
 	//초기 생성 로직
 	virtual void NativeConstruct() override;
 
@@ -26,8 +26,17 @@ protected:
 	
 	UFUNCTION()
 	void HandleAmmoChanged(FText NewAmmoText);
+	
+	UFUNCTION()
+	void HandleWeaponSwapped(int32 CurrentWeaponIndex);
+	
+	UFUNCTION()
+	void UpdateBowChargingProgress(float NewPercent);
+	
+	UFUNCTION()
+	void HandleEnemyHitAnim();
 
-public:
+protected:
 	//Stat Component 로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* ExpBar;
@@ -44,10 +53,24 @@ public:
 
 	// Weapon Component 로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* AmmoCountText;
-
+	class UOverlay* BowInfoOverlay;
+	
 	UPROPERTY(meta = (BindWidget))
-	class UImage* WeaponImage;
+	class UOverlay* GunInfoOverlay;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* GunAmmoCount;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UImage* BowAimProgressBar;
+	
+	UPROPERTY()
+	UMaterialInstanceDynamic* BowAimProgressBarDynamic;
+	
+	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* GunInfoSwapBackAnim;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* HitEffectAnim;
 
 	//Game State로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))

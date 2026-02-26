@@ -1,4 +1,4 @@
-#include "Weapon/SanzoWeaponBase.h"
+﻿#include "Weapon/SanzoWeaponBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,8 +23,6 @@ ASanzoWeaponBase::ASanzoWeaponBase()
   FireStartLocation->SetupAttachment(WeaponMesh);
 
   BaseDamage = 10.0f;
-  FireRate = 0.1f;
-  MaxRange = 5000.0f;
   CurrentAmmo = 30;
   bInfiniteAmmo = false;
 
@@ -122,9 +120,6 @@ void ASanzoWeaponBase::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 {
   switch (Type)
   {
-  case EUpgradeType::FireRate:
-    FireRate += Value;
-    break;
   case EUpgradeType::Damage:
     BaseDamage += Value;
     break;
@@ -146,6 +141,8 @@ void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitIn
   // 맞은 액터가 SanzoEnemyBase가 맞다면 데미지 적용
   if (HitEnemy)
   {
+  	//적 피격 HUD 이펙트 재생용 방송 - 작업자: 이준로 
+  	OnEnemyHit.Broadcast();
 
     if (HitInfo.BoneName == HeadBoneName)
     {
