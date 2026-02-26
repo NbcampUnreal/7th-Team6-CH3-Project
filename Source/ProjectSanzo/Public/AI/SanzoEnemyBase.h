@@ -198,11 +198,11 @@ protected:
 #pragma endregion 김동주
 
 #pragma region Sound
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> DeathSounds;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> HitSounds;
-  UPROPERTY(EditAnywhere, Category = "Sounds")
+  UPROPERTY(EditAnywhere, Category = "Effects|Sound")
   USoundAttenuation* EnemyAttenuation;
 #pragma endregion 최윤서
 
