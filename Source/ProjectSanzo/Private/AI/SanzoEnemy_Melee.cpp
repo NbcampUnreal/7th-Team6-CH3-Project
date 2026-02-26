@@ -54,7 +54,7 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
     );
 
 #pragma region NotifyParried
-    if (ACharacter* Character = Cast<ACharacter>(HitResult.GetActor()))
+    if (ACharacter* Character = Cast<ACharacter>(OtherActor))
     {
       if (IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
       {
@@ -62,14 +62,17 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
         {
           StunComponent->NotifyParried();
         }
+        //회피성공
         if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
         {
-          TWeakObjectPtr<ASanzoEnemyBase> WeakThis;
+          GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+          TWeakObjectPtr<ASanzoEnemyBase> WeakThis(this);
           GetWorld()->GetTimerManager().SetTimer(
             SlowTimerHandle,
             [WeakThis]()
             {
-              WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+              if (WeakThis.IsValid())
+                WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
             },
             0.1f, //0.1초 후 시간 원래대로
             false);
@@ -77,6 +80,7 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
         }
       }
     }
+  
 
 #pragma endregion 김형백
 

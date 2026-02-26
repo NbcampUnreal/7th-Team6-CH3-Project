@@ -378,6 +378,21 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
+  bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
+
+  if (bIsExhausted)
+  {
+    EndDodge(nullptr, false);
+    return;
+  }
+  if (CharacterGameplayTags.HasTag(SanzoTags::Action) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Aiming) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Dodge))
+  {
+    EndDodge(nullptr, false);
+    return;
+  }
+
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
     AnimInstance->Montage_Play(DodgeMontage);

@@ -143,12 +143,15 @@ void USanzoParryComponent::SuccessParry()
       }
 
       GetWorld()->GetWorldSettings()->SetTimeDilation(0.25f); //성공시 시간 느리게
-      TWeakObjectPtr<USanzoParryComponent> WeakThis;
+      TWeakObjectPtr<USanzoParryComponent> WeakThis(this);
       GetWorld()->GetTimerManager().SetTimer(
         SlowTimerHandle,
         [WeakThis]()
         {
-          WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+          if(WeakThis.IsValid())
+          {
+            WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+          }
         }, 
         0.1f, //0.1초 후 시간 원래대로
         false);
