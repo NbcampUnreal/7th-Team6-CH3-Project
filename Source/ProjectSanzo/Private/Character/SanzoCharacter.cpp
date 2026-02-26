@@ -410,6 +410,23 @@ void ASanzoCharacter::EndDodge(UAnimMontage* Montage, bool bInterrupted)
   CharacterGameplayTags.RemoveTag(SanzoTags::Dodge);
 }
 
+void ASanzoCharacter::SuccessDodge()
+{
+  CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
+
+  GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+  TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
+  GetWorld()->GetTimerManager().SetTimer(
+    SlowTimerHandle,
+    [WeakThis]()
+    {
+      if (WeakThis.IsValid())
+        WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+    },
+    0.1f, //0.1초 후 시간 원래대로
+    false);
+}
+
 
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
@@ -558,6 +575,7 @@ bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
   return CharacterGameplayTags.HasTag(TagsToCheck);
   
 }
+
 #pragma region InterfaceFunction
 void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
@@ -597,10 +615,9 @@ void ASanzoCharacter::ApplyExpeReward(float Amount)
     StatComp->AddExperience(Amount);
   }
 }
-
-
 #pragma endregion 김형백
 
+#pragma region TakeDamage
 float ASanzoCharacter::TakeDamage(
   float DamageAmount,
   FDamageEvent const& DamageEvent,
@@ -627,10 +644,10 @@ float ASanzoCharacter::TakeDamage(
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
 
   }
-  /*회피*/
+  /*회피성공*/
   if (CharacterGameplayTags.HasTag(SanzoTags::IFrame))
   {
-    CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
+    SuccessDodge();
     FinalDamage = 0.f;
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
   }
@@ -654,4 +671,4 @@ float ASanzoCharacter::TakeDamage(
 
   return FinalDamage;
 }
-
+#pragma endregion 김형백

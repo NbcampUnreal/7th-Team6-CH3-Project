@@ -163,7 +163,7 @@ protected:
 
   void Dodge(const FInputActionValue& Value);
   void EndDodge(UAnimMontage* Montage, bool bInterrupted);
-
+  void SuccessDodge();
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);
 
@@ -184,7 +184,7 @@ protected:
   //타이머 핸들러 선언
   FTimerHandle SprintStaminaTimerHandle;
   FTimerHandle ParryPenaltyTimerHandle;
-
+  FTimerHandle SlowTimerHandle;
   void PrintGameplayTags();
 
 public:

@@ -1,4 +1,4 @@
-#include "AI/SanzoEnemy_Ranged.h"
+﻿#include "AI/SanzoEnemy_Ranged.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Particles/ParticleSystem.h"
@@ -124,17 +124,6 @@ void ASanzoEnemy_Ranged::FireHitScan()
           //회피성공
           if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
           {
-            GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
-            TWeakObjectPtr<ASanzoEnemyBase> WeakThis(this);
-            GetWorld()->GetTimerManager().SetTimer(
-              SlowTimerHandle,
-              [WeakThis]()
-              {
-                if(WeakThis.IsValid())
-                WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
-              },
-              0.1f, //0.1초 후 시간 원래대로
-              false);
             return;
           }
         }
