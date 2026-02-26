@@ -96,7 +96,7 @@ public:
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 
 	// 총알 Setter - 최윤서
-	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
+	UFUNCTION(Category = "Weapon|Ammo")
 	void SetCurrentAmmo(int32 Ammo) { CurrentAmmo = Ammo; }
 
 	//업그레이드 적용 함수
