@@ -242,21 +242,6 @@ void ASanzoEnemyBase::Die()
   GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
   GetMesh()->SetSimulatePhysics(true);
 
-  // 들고 있던 무기도 물리 엔진을 켜서 바닥에 툭 떨어지게 만듦
-  if (WeaponMesh)
-  {
-    WeaponMesh->SetCollisionProfileName(TEXT("Ragdoll"));
-    WeaponMesh->SetSimulatePhysics(true);
-    WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-  }
-
-  if (StaticWeaponMesh)
-  {
-    StaticWeaponMesh->SetCollisionProfileName(TEXT("Ragdoll"));
-    StaticWeaponMesh->SetSimulatePhysics(true);
-    StaticWeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-  }
-
   // 일정 시간 후 액터 제거
   SetLifeSpan(5.f);
 }
