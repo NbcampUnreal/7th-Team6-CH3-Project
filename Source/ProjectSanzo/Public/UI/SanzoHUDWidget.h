@@ -101,4 +101,18 @@ protected:
 	bool bIsExhausted = false;
 	
 #pragma endregion 이준로
+	
+#pragma region ItemNotification
+	
+public:
+	void ShowItemNotification(FName ItemType, int32 Amount);
+	
+protected:
+	UPROPERTY(EditAnywhere, Category= "UI")
+	TSubclassOf<class USanzoItemNotificationWidget> ItemNotificationClass;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* NotificationContainer;
+	
+#pragma endregion 이준로
 };

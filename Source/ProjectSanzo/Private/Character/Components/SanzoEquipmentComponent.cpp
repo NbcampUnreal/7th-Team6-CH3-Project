@@ -59,6 +59,7 @@ void USanzoEquipmentComponent::BeginPlay()
 		EquipWeaponByIndex(0);
 	}
 
+	//HUD가 처음 총알 정보 받아오는 부분 - 작업자: 이준로
 	if (ASanzoGun* Gun = Cast<ASanzoGun>(CurrentWeapon))
 	{
 		Gun->OnAmmoChanged.AddDynamic(this, &USanzoEquipmentComponent::UpdateHUDAmmo);

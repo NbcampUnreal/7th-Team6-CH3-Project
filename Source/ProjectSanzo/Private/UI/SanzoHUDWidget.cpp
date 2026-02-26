@@ -10,7 +10,9 @@
 #include "Components/Overlay.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "Core/SanzoGameState.h"
+#include "UI/SanzoItemNotificationWidget.h"
 #include "Weapon/SanzoBow.h"
 
 void USanzoHUDWidget::NativeConstruct()
@@ -125,6 +127,8 @@ void USanzoHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 }
 
+
+
 void USanzoHUDWidget::HandleStageProgressChanged(float percent)
 {
 	if (StageProgressBar)
@@ -217,3 +221,20 @@ void USanzoHUDWidget::HandleEnemyHitAnim()
 		PlayAnimation(HitEffectAnim);
 	}
 }
+#pragma region ItemNotification
+
+void USanzoHUDWidget::ShowItemNotification(FName ItemType, int32 Amount)
+{
+	if (!ItemNotificationClass || !NotificationContainer) return;
+	
+	USanzoItemNotificationWidget* NewNotify = CreateWidget<USanzoItemNotificationWidget>(GetOwningPlayer(), ItemNotificationClass);
+	if (NewNotify)
+	{
+		NewNotify->SetNotify(ItemType, Amount);
+		
+		NotificationContainer->AddChildToVerticalBox(NewNotify);
+		
+	}
+}
+
+#pragma endregion 이준로
