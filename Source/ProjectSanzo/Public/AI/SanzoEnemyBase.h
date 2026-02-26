@@ -202,4 +202,6 @@ protected:
   virtual void OnParriedCallback();
 #pragma endregion 김동주
 
+  //슬로우효과 - 김형백
+  FTimerHandle SlowTimerHandle;
 };

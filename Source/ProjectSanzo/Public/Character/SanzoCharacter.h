@@ -162,6 +162,7 @@ protected:
   void StopFire(const FInputActionValue& Value);
 
   void Dodge(const FInputActionValue& Value);
+  void EndDodge(UAnimMontage* Montage, bool bInterrupted);
 
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);

@@ -107,7 +107,7 @@ void ASanzoCharacter::PostInitializeComponents()
     StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
   }
 
-  //몽타주 끝날때 델리게이트 바인딩
+  //패리 몽타주 끝날때 델리게이트 바인딩
   if(ParryComp)
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
@@ -381,9 +381,18 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
     AnimInstance->Montage_Play(DodgeMontage);
+    FOnMontageBlendingOutStarted DodgeEndDelegate;
+    AnimInstance->Montage_SetBlendingOutDelegate(DodgeEndDelegate, DodgeMontage);
+    DodgeEndDelegate.BindUObject(this, &ASanzoCharacter::EndDodge);
   }
   
 }
+
+void ASanzoCharacter::EndDodge(UAnimMontage* Montage, bool bInterrupted)
+{
+  CharacterGameplayTags.RemoveTag(SanzoTags::Dodge);
+}
+
 
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
@@ -600,14 +609,6 @@ float ASanzoCharacter::TakeDamage(
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
 
-    // 제거필요
-    /*if (DamageCauser)
-    {
-      if (USanzoEnemyStunComponent* EnemyStunComp = DamageCauser->FindComponentByClass<USanzoEnemyStunComponent>())
-      {
-        EnemyStunComp->NotifyParried();
-      }
-    }*/
   }
 
   if (StatComp)
