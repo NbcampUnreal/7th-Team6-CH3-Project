@@ -45,4 +45,9 @@ protected:
 	virtual void ActivateItem(AActor* Activator);
 	virtual void DestroyItem();
 #pragma endregion 최윤서
+	
+#pragma region ItemPickedUpNotify
+protected:
+	void NotifyItemPickedUp(AActor* Activator, int32 InAmount);
+#pragma endregion 이준로
 };

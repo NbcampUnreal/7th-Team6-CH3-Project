@@ -15,6 +15,8 @@ ASanzoBow::ASanzoBow()
 	// 소켓 이름 기본값 설정 (후에 에디터에서 수정 가능)
 	StringSocketName = TEXT("StringSocket");
 
+	BaseDamage = 40.0f;
+  
 #pragma region DataForHUD
 	//Tick 사용
 	PrimaryActorTick.bCanEverTick = true;
@@ -114,6 +116,24 @@ void ASanzoBow::StopFire()
 	// 구한 값을 0 ~ 1.0 사이의 퍼센티지로 계산
 	ChargePercent = ClampedDuration / MaxChargeTime;
 
+	// 일정 차징 시간 미만이면 화살 발사 X
+	if (ChargePercent < 0.2f)
+	{
+		// 더미화살 없애기
+		if (DummyArrowMesh)
+		{
+			DummyArrowMesh->SetHiddenInGame(true);
+		}
+
+		// 당기던 애니메이션(몽타주) 중단하기
+		if (WeaponMesh)
+		{
+			WeaponMesh->Stop();
+		}
+
+		return;
+	}
+
 	Fire();
 }
 
@@ -138,8 +158,10 @@ void ASanzoBow::Fire()
 			FVector CameraLocation;
 			FRotator CameraRotation;
 			OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-			// 카메라 정면으로부터 사거리만큼 떨어진 끝점 저장
-			FVector TraceEnd = CameraLocation + (CameraRotation.Vector() * MaxRange);
+			// 사라진 사거리 대신 사용할 트레이스 끝점 
+			float TraceDistance = 100000.f;
+			// 카메라 정면으로부터 떨어진 끝점 값 저장
+			FVector TraceEnd = CameraLocation + (CameraRotation.Vector() * TraceDistance);
 
 			FHitResult HitResult;
 			FCollisionQueryParams QueryParams;
@@ -185,6 +207,8 @@ void ASanzoBow::Fire()
 
 			if (Arrow)
 			{
+				float MinArrowDamage = BaseDamage * 0.2;
+				float MaxArrowDamage = BaseDamage;
 				// 화살의 Speed,Damage 값 계산 (최소값 + ( 최대값 - 최소값 ) * 차징퍼센트 ) 방식
 				float FinalSpeed = FMath::Lerp(MinArrowSpeed, MaxArrowSpeed, ChargePercent);
 				float FinalDamage = FMath::Lerp(MinArrowDamage, MaxArrowDamage, ChargePercent);
@@ -199,20 +223,18 @@ void ASanzoBow::Fire()
 
 void ASanzoBow::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 {
-	//나중에 Bow의 업그레이드 값이 생기면 수정
-  /*switch (Type)
+	Super::ApplyWeaponStatUpgrade(Type, Value);
+
+  switch (Type)
   {
-  case EUpgradeType::FireRate:
-    FireRate += Value;
-    break;
-  case EUpgradeType::Damage:
-    BaseDamage += Value;
-    break;
+	case EUpgradeType::MaxChargeTime:
+		MaxChargeTime = FMath::Max(0.2, MaxChargeTime - Value);
+		break;
 
   default:
     GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
     break;
-  }*/
+  }
 }
 
 #pragma region DataForHUD

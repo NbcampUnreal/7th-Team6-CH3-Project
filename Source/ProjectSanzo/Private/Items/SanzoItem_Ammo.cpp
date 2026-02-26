@@ -19,6 +19,8 @@ void ASanzoItem_Ammo::ActivateItem(AActor* Activator)
     if (USanzoEquipmentComponent* EquipComp = Activator->FindComponentByClass<USanzoEquipmentComponent>())
     {
       EquipComp->AddAmmo(AmmoAmount);
+    	//HUD에 데이터 전달
+    	NotifyItemPickedUp(Activator,AmmoAmount);
     }
     
     // TODO: 탄약 증가 로직

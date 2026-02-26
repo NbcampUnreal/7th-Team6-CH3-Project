@@ -59,4 +59,10 @@ private:
 	TSet<FName> LimitedUpgradeIDs;
 
 #pragma endregion 이준로
+#pragma region ResetUpgradeData
+	
+public:
+	void ResetUpgradeData();
+	
+#pragma endregion 이준로
 };

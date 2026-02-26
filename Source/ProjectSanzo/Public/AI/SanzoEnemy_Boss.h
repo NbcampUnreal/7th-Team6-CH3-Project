@@ -1,13 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/SanzoEnemyBase.h"
+#include "AI/SanzoEnemy_MeleeBase.h"
 #include "SanzoEnemy_Boss.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBossAttackWarning, FName, PatternName);
 
 UCLASS()
-class PROJECTSANZO_API ASanzoEnemy_Boss : public ASanzoEnemyBase
+class PROJECTSANZO_API ASanzoEnemy_Boss : public ASanzoEnemy_MeleeBase
 {
   GENERATED_BODY()
 
@@ -35,49 +35,42 @@ protected:
   // 페이즈 2 진입 처리
   void EnterPhase2();
 
-  // 보스의 근접 공격 데미지
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
-  float MeleeDamage = 40.f;
-
-  // 트레이스 활성화 여부 플래그
-  bool bIsWeaponActive = false;
-
-  // 칼날 시작 부분 소켓 이름
-  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
-  FName SocketStartName = TEXT("TraceStart");
-
-  // 칼날 끝 부분 소켓 이름
-  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
-  FName SocketEndName = TEXT("TraceEnd");
-
-  // 칼날 두께
-  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
-  float TraceRadius = 15.0f;
-
-  // 이전 프레임의 소켓 위치 저장
-  FVector PrevStartLocation;
-  FVector PrevEndLocation;
-
-  // 이미 맞은 적들을 기억해서 
-  // 한 번 휘두를 때 여러 번 데미지 주는 것 방지
-  UPROPERTY()
-  TArray<AActor*> HitActorsToIgnore;
-
 public:
-  // 매 프레임 트레이스를 수행하기 위해 Tick 사용
-  virtual void Tick(float DeltaTime) override;
-
-  // 무기 콜리전 켜기
+  // 돌진 실행 함수
   UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
-  void EnableWeaponCollision();
+  void ExecuteDash();
 
-  // 무기 콜리전 끄기
+  UPROPERTY(BlueprintReadOnly, Category = "Boss|Combat")
+  bool bIsHeavyAttack = false;
+
+  // 강공격 준비
   UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
-  void DisableWeaponCollision();
+  void BeginHeavySmash();
 
-private:
-  // 실제 트레이스 로직을 수행할 함수
-  void PerformWeaponTrace();
+  // 강공격 종료
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void EndHeavySmash();
+
+  // 강공격 충격파 실행
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void ExecuteSmashShockwave();
+
+protected:
+  // 돌진 속도
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  float DashSpeed = 4000.f;
+
+  // 원래 데미지를 기억해 둘 변수
+  float OriginalDamage;
+
+  // 충격파 반경 (3m = 300.0f)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  float ShockwaveRadius = 300.0f;
+
+  // 충격파 데미지
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  float ShockwaveDamage = 20.0f;
+
 #pragma region Sound
 public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")

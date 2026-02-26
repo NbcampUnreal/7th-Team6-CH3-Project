@@ -23,8 +23,6 @@ ASanzoWeaponBase::ASanzoWeaponBase()
   FireStartLocation->SetupAttachment(WeaponMesh);
 
   BaseDamage = 10.0f;
-  FireRate = 0.1f;
-  MaxRange = 5000.0f;
   CurrentAmmo = 30;
   bInfiniteAmmo = false;
 
@@ -127,9 +125,6 @@ void ASanzoWeaponBase::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 {
   switch (Type)
   {
-  case EUpgradeType::FireRate:
-    FireRate += Value;
-    break;
   case EUpgradeType::Damage:
     BaseDamage += Value;
     break;

@@ -1,7 +1,6 @@
 #include "Core/SanzoGameMode.h"
 #include "Core/SanzoGameState.h"
 #include "Core/SanzoStageTypes.h"
-#include "Core/SanzoGameInstance.h" 
 #include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
@@ -9,6 +8,7 @@
 #include "EngineUtils.h"
 #include "Common/SanzoLog.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 ASanzoGameMode::ASanzoGameMode()
 {
@@ -20,10 +20,11 @@ ASanzoGameMode::ASanzoGameMode()
 void ASanzoGameMode::BeginPlay()
 {
   Super::BeginPlay();
-
+  SanzoGameInstance = Cast<USanzoGameInstance>(GetGameInstance());
   InitStageType();
   if(CurrentStageType!=ESanzoStageType::None)
   {
+    // 스테이지 시작
     StartStage();
   }
 }
@@ -56,15 +57,15 @@ void ASanzoGameMode::StartStage()
 {
   // StageManager에게 스테이지 시작 지시
   UE_LOG(LogCYS, Warning, TEXT("GM: 스테이지 시작"));
-  ASanzoStageManager* SM = nullptr;
+  ASanzoStageManager* StageManager = nullptr;
   for (TActorIterator<ASanzoStageManager> It(GetWorld()); It; ++It)
   {
-    SM = *It;
+    StageManager = *It;
     break;
   }
-  if (SM)
+  if (StageManager)
   {
-    SM->StartStage();
+    StageManager->StartStage();
   }
 }
 void ASanzoGameMode::OnStageCleared()
@@ -88,10 +89,9 @@ void ASanzoGameMode::OnStageCleared()
 void ASanzoGameMode::MoveToNextStage()
 {
 	// 스테이지 이동
-	USanzoGameInstance* SGI = Cast<USanzoGameInstance>(GetGameInstance());
-	if (SGI)
+	if (SanzoGameInstance)
 	{
-		SGI->MoveToNextStage();
+    SanzoGameInstance->MoveToNextStage();
 	}
 }
 
@@ -117,7 +117,6 @@ void ASanzoGameMode::OnUpgradeSelected()
 
 void ASanzoGameMode::DecideEnding()
 {
-	USanzoGameInstance* SanzoGameInstance = Cast<USanzoGameInstance>(GetGameInstance());
 	if (SanzoGameInstance)
 	{
 		USanzoUpgradeSubsystem* UpgradeSubsystem = SanzoGameInstance->GetSubsystem<USanzoUpgradeSubsystem>();

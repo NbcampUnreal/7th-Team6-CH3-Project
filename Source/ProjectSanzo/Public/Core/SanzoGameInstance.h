@@ -4,8 +4,10 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/GameInstance.h"
+#include "Character/Components/SanzoStatComponent.h"
 #include "SanzoGameInstance.generated.h"
 
+class ASanzoCharacter;
 UCLASS()
 class PROJECTSANZO_API USanzoGameInstance : public UGameInstance
 {
@@ -27,15 +29,16 @@ public:
 	void MoveToNextStage();
 
 	// 스탯 정보
+	UPROPERTY()
+	FSanzoSaveStatData CachedStatData;
+	UPROPERTY()
+	int32 CachedAmmo;
 
-
-	// 스탯 업데이트 함수
-
-
-	// 외형 정보
-
-
-  // 외형 업데이트 함수
+	// 스탯 백업
+	void BackupStat(ASanzoCharacter* Player);
+  // 스탯 복원
+	void RestoreStat(ASanzoCharacter* Player);
+	void InitSetup();
 
 #pragma endregion 최윤서
 	

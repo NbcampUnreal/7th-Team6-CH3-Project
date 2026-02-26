@@ -12,6 +12,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponAmmoChanged, FText, NewAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwapped, int32, CurrentIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnyWeaponHitEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUp,FName, ItemType, int32, Amount);
 
 #pragma endregion 이준로
 
@@ -77,12 +78,17 @@ public:
   FOnWeaponAmmoChanged OnAmmoChanged;
 	FOnWeaponSwapped OnSwapped;
 	FOnAnyWeaponHitEnemy OnAnyWeaponHitEnemy;
-
+	FOnItemPickedUp OnItemPickedUp;
+	
+	UFUNCTION()
+	void NotifyItemPickedUp(FName InItemType, int32 InAmount);
+	
 protected:
   UFUNCTION()
   void UpdateHUDAmmo();
 	UFUNCTION()
 	void HandleWeaponHitEnemy();
+	
 
 #pragma endregion 이준로
 };

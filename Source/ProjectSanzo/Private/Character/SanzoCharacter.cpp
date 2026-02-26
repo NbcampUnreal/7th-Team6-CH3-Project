@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
@@ -25,6 +25,8 @@
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
+#include "Core/SanzoGameInstance.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -113,10 +115,7 @@ void ASanzoCharacter::PostInitializeComponents()
   if(ParryComp)
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
-  }
-
- 
-  
+  } 
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -144,7 +143,6 @@ void ASanzoCharacter::BeginPlay()
     //타임라인과 커브 연결
     AimTimeline.AddInterpFloat(AimCurve, TimelineCallback);
     AimTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
-
   }
 
   //화살 장전 몽타주 시작 델리게이 바인딩
@@ -155,8 +153,10 @@ void ASanzoCharacter::BeginPlay()
     {
       BowWeapon->StartBowAttackDelegate.BindUObject(this, &ASanzoCharacter::ZoomBow);
     }
-
   }
+  
+  // 스탯 복원 최
+  RestoreFromGI();
 }
 
 void ASanzoCharacter::Tick(float DeltaTime)
@@ -768,3 +768,12 @@ float ASanzoCharacter::TakeDamage(
   return FinalDamage;
 }
 #pragma endregion 김형백
+
+// 자가 복원 최윤서
+void ASanzoCharacter::RestoreFromGI()
+{
+  if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
+  {
+    GI->RestoreStat(this);
+  }
+}

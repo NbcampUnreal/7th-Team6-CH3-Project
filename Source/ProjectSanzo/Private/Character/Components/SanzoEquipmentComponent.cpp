@@ -59,15 +59,11 @@ void USanzoEquipmentComponent::BeginPlay()
 		EquipWeaponByIndex(0);
 	}
 
+	//HUD가 처음 총알 정보 받아오는 부분 - 작업자: 이준로
 	if (ASanzoGun* Gun = Cast<ASanzoGun>(CurrentWeapon))
 	{
 		Gun->OnAmmoChanged.AddDynamic(this, &USanzoEquipmentComponent::UpdateHUDAmmo);
 
-		UpdateHUDAmmo();
-	}
-
-	if (ASanzoBow* Bow = Cast<ASanzoBow>(CurrentWeapon))
-	{
 		UpdateHUDAmmo();
 	}
 #pragma endregion 이용호
@@ -118,9 +114,13 @@ void USanzoEquipmentComponent::AddAmmo(int32 Amount)
 
 void USanzoEquipmentComponent::UpdateHUDAmmo()
 {
-	if (CurrentWeapon)
+	for (ASanzoWeaponBase* Weapon : Inventory)
 	{
-		OnAmmoChanged.Broadcast(CurrentWeapon->GetAmmoTextForHUD());
+		if (ASanzoGun*Gun = Cast<ASanzoGun>(Weapon))
+		{
+			OnAmmoChanged.Broadcast(Gun->GetAmmoTextForHUD());
+			return;
+		}
 	}
 }
 
@@ -129,6 +129,14 @@ void USanzoEquipmentComponent::HandleWeaponHitEnemy()
 	if (OnAnyWeaponHitEnemy.IsBound())
 	{
 		OnAnyWeaponHitEnemy.Broadcast();
+	}
+}
+
+void USanzoEquipmentComponent::NotifyItemPickedUp(FName InItemType, int32 InAmount)
+{
+	if (OnItemPickedUp.IsBound())
+	{
+		OnItemPickedUp.Broadcast(InItemType, InAmount);
 	}
 }
 
@@ -197,7 +205,7 @@ UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
 			// 교체된 애님인스턴스 가져와서 몽타지 재생
 			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
-				AnimInstance->Montage_Play(NextWeapon->EquipMontage);
+				AnimInstance->Montage_Play(NextWeapon->EquipMontage,2.0f);
 				return NextWeapon->EquipMontage;
 			}
 		}
