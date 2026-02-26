@@ -4,6 +4,7 @@
 #include "Character/SanzoCharacter.h"
 #include "Weapon/SanzoWeaponBase.h"
 #include "Character/Components/SanzoEquipmentComponent.h"
+#include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
 #include "Weapon/SanzoGun.h"
 
 USanzoGameInstance::USanzoGameInstance()
@@ -80,5 +81,11 @@ void USanzoGameInstance::InitSetup()
   CurrentStageIndex = 0;
   CachedAmmo = 1000; // 초기 탄약값 설정
   CachedStatData = FSanzoSaveStatData(); // 초기 스탯값 설정
+
+	if (USanzoUpgradeSubsystem* UpgradeSubsystem = GetSubsystem<USanzoUpgradeSubsystem>())
+	{
+		UpgradeSubsystem->ResetUpgradeData();
+	}
+	
 }
 #pragma endregion 최윤서

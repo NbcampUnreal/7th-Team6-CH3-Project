@@ -139,3 +139,12 @@ FUpgradeOption USanzoUpgradeSubsystem::GetNoneOption()
 	return EmptyOption;
 }
 
+void USanzoUpgradeSubsystem::ResetUpgradeData()
+{
+	UpgradeTotalMap.Empty();
+	SelectedTotalMap.Empty();
+	LimitedUpgradeIDs.Empty();
+	
+	UE_LOG(LogLJR, Warning, TEXT("UpgradeSubsystem: 업그레이드 데이터 초기화 완료"))
+}
+
