@@ -384,6 +384,8 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
     FOnMontageBlendingOutStarted DodgeEndDelegate;
     AnimInstance->Montage_SetBlendingOutDelegate(DodgeEndDelegate, DodgeMontage);
     DodgeEndDelegate.BindUObject(this, &ASanzoCharacter::EndDodge);
+
+    StatComp->ConsumeStaminaForAction(EActionType::Dodge);
   }
   
 }
@@ -414,7 +416,7 @@ void ASanzoCharacter::Parry(const FInputActionValue& Value)
   if (ParryComp->TryParry())
   {
     ParryComp->PlayParryMontage();
-    StatComp->ConsumeStaminaForAction(); //스태미나 소모
+    StatComp->ConsumeStaminaForAction(EActionType::Parry); //스태미나 소모
     StatComp->BeginExhaustionCooldown(); // 지친 상태로 가는 쿨다운 시작
 
     CharacterGameplayTags.AddTag(SanzoTags::Parry);
@@ -609,6 +611,13 @@ float ASanzoCharacter::TakeDamage(
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
 
+  }
+  /*회피*/
+  if (CharacterGameplayTags.HasTag(SanzoTags::IFrame))
+  {
+    CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
+    FinalDamage = 0.f;
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
   }
 
   if (StatComp)

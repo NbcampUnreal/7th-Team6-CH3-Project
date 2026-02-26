@@ -19,8 +19,8 @@ USanzoStatComponent::USanzoStatComponent()
 	MaxStamina = 100.f;
 	StaminaRestoreAmount = 10.f; //초당 Stamina회복량
   SprintStaminaCost = 25.f; //Sprint 초당 소모량
-  ParryStaminaCost = 15.f; //Parry 한번당 소모량
-
+  ParryStaminaCost = 2.5f; //Parry 한번당 소모량
+	DodgeStaminaCost = 20.f; //Dodge 한번당 소모량
   bIsExhausted = false;
 	//테스트 코드
 	CurrentHealth = 100.f;
@@ -101,9 +101,22 @@ void USanzoStatComponent::RequestConsumeStaminaForSprint(bool bShouldConsume)
 	}
 }
 
-void USanzoStatComponent::ConsumeStaminaForAction()
+void USanzoStatComponent::ConsumeStaminaForAction(EActionType Type)
 {
-	ConsumeStamina(ParryStaminaCost); // 예시로 10만큼 소모
+	switch (Type)
+	{
+	case EActionType::Parry:
+		ConsumeStamina(ParryStaminaCost); // 2.5만큼 소모
+		break;
+	case EActionType::Dodge:
+		ConsumeStamina(DodgeStaminaCost);
+		break;
+
+	default:
+		break;
+
+	}
+
 	BroadCastStatUpdate();
 }
 
