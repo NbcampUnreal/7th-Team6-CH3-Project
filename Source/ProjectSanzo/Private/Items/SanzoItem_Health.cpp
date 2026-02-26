@@ -18,6 +18,8 @@ void ASanzoItem_Health::ActivateItem(AActor* Activator)
     if (USanzoStatComponent* StatComp = Activator->FindComponentByClass<USanzoStatComponent>())
     {
       StatComp->RestoreHealth(HealAmount);
+    	//HUD에 Data전달
+    	NotifyItemPickedUp(Activator,HealAmount);
     }
     // TODO: 체력 증가 로직
     UE_LOG(LogCYS, Warning, TEXT("HP 획득 : %d"), HealAmount);

@@ -35,6 +35,8 @@ enum class EActionType :uint8
 //정보 전달 할 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExhaustedChanged, bool, bIsExhausted);
+
 #pragma endregion 이준로
 //추후 태그 추가/제거 델리게이트도 만들 예정 !
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
@@ -130,6 +132,8 @@ public:
 #pragma region UIDataTransfer
 
 	FOnStatChangedDelegate OnStatChanged;
+	
+	FOnExhaustedChanged OnExhaustedChanged;
 
 	void BroadCastStatUpdate();
 
