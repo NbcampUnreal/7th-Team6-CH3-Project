@@ -56,10 +56,12 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
 #pragma region NotifyParried
     if (ACharacter* Character = Cast<ACharacter>(OtherActor))
     {
-      IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character);
-      if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+      if(IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
       {
-        StunComponent->NotifyParried();
+        if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+        {
+          StunComponent->NotifyParried();
+        }
       }
     }
 #pragma endregion 김형백
