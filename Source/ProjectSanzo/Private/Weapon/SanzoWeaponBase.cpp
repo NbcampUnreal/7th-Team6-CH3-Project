@@ -1,4 +1,4 @@
-#include "Weapon/SanzoWeaponBase.h"
+﻿#include "Weapon/SanzoWeaponBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,6 +51,11 @@ void ASanzoWeaponBase::PlayFireEffects()
     if (AnimInstance && CharacterFireMontage)
     {
       AnimInstance->Montage_Play(CharacterFireMontage, 1.0f);
+
+      //김형백
+      
+      AnimInstance->Montage_SetBlendedInDelegate(StartBowAttackDelegate, CharacterFireMontage);
+      
     }
   }
 

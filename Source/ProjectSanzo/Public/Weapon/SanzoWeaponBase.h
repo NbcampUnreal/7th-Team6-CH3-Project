@@ -133,5 +133,8 @@ public:
 	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
 	
 #pragma endregion 이준로
+
+	//김형백 화살몽타주시작 델리게이트
+	FOnMontageBlendedInEnded StartBowAttackDelegate;
 };
 
