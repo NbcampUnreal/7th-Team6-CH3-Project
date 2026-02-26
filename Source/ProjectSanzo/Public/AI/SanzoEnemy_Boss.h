@@ -42,24 +42,19 @@ protected:
   // 트레이스 활성화 여부 플래그
   bool bIsWeaponActive = false;
 
-  // 칼날 시작 부분 소켓 이름
+  // 무기 시작 부분 소켓 이름
   UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
   FName SocketStartName = TEXT("TraceStart");
 
-  // 칼날 끝 부분 소켓 이름
+  // 무기 끝 부분 소켓 이름
   UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
   FName SocketEndName = TEXT("TraceEnd");
 
-  // 칼날 두께
+  // 무기 트레이스 반경
   UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat|Trace")
   float TraceRadius = 15.0f;
 
-  // 이전 프레임의 소켓 위치 저장
-  FVector PrevStartLocation;
-  FVector PrevEndLocation;
-
-  // 이미 맞은 적들을 기억해서 
-  // 한 번 휘두를 때 여러 번 데미지 주는 것 방지
+  // 중복 타격 방지 배열
   UPROPERTY()
   TArray<AActor*> HitActorsToIgnore;
 

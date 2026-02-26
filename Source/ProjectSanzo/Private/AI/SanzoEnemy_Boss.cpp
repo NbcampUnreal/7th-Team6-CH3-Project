@@ -91,13 +91,6 @@ void ASanzoEnemy_Boss::EnableWeaponCollision()
   // 맞은 적 목록 초기화
   HitActorsToIgnore.Empty();
   HitActorsToIgnore.Add(this);
-
-  // 트레이스 시작 전, 현재 소켓 위치를 '이전 위치'로 초기화
-  if (StaticWeaponMesh)
-  {
-    PrevStartLocation = StaticWeaponMesh->GetSocketLocation(SocketStartName);
-    PrevEndLocation = StaticWeaponMesh->GetSocketLocation(SocketEndName);
-  }
 }
 
 // 무기 콜리전 비활성화
@@ -142,6 +135,8 @@ void ASanzoEnemy_Boss::PerformWeaponTrace()
     {
       AActor* HitActor = Hit.GetActor();
       if (!HitActor || HitActorsToIgnore.Contains(HitActor)) continue;
+
+      if (HitActor->IsA<ASanzoEnemyBase>()) continue;
 
       if (HitActor && HitActor != this)
       {

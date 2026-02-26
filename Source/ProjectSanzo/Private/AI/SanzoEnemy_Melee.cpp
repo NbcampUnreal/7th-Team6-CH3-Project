@@ -12,48 +12,86 @@ ASanzoEnemy_Melee::ASanzoEnemy_Melee()
   MaxHP = 120.f;
   AttackRange = 180.f;
   Exp = 30.f;
-  // 근접 공격용 박스 콜리전 생성
-  MeleeCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeCollision"));
-
-  // 무기에 콜리전을 부착
-  MeleeCollision->SetupAttachment(StaticWeaponMesh);
-
-  // 칼을 휘두를 때만 충돌 판정이 활성화되도록 초기에는 비활성화
-  MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-  MeleeCollision->SetCollisionObjectType(ECC_WorldDynamic);
-  MeleeCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
-  MeleeCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
-  // 오버랩 이벤트 연결
-  MeleeCollision->OnComponentBeginOverlap.AddDynamic(this, &ASanzoEnemy_Melee::OnMeleeOverlap);
 }
 
+void ASanzoEnemy_Melee::Tick(float DeltaTime)
+{
+  if (bIsWeaponActive)
+  {
+    PerformWeaponTrace();
+  }
+}
+
+// 무기 콜리전 활성화
 void ASanzoEnemy_Melee::EnableWeaponCollision()
 {
-  // 공격 판정 시작
-  MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+  // 공격 시작
+  bIsWeaponActive = true;
+  // 맞은 적 목록 초기화
+  HitActorsToIgnore.Empty();
+  HitActorsToIgnore.Add(this);
 }
 
+// 무기 콜리전 비활성화
 void ASanzoEnemy_Melee::DisableWeaponCollision()
 {
-  // 공격 판정 종료
-  MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  // 공격 종료
+  bIsWeaponActive = false;
 }
 
-void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ASanzoEnemy_Melee::PerformWeaponTrace()
 {
-  if (OtherActor && OtherActor != this)
-  {
-    UGameplayStatics::ApplyDamage(
-      OtherActor,
-      MeleeDamage,
-      GetController(),
-      this,
-      UDamageType::StaticClass()
-    );
+  if (!StaticWeaponMesh) return;
 
-    // 한 번 때리면 콜리전을 즉시 비활성화 
-    DisableWeaponCollision();
+  // 현재 프레임의 소켓 위치 가져오기
+  FVector CurrentStart = StaticWeaponMesh->GetSocketLocation(SocketStartName);
+  FVector CurrentEnd = StaticWeaponMesh->GetSocketLocation(SocketEndName);
+
+  // 트레이스 설정
+  TArray<FHitResult> OutHits;
+  TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+  ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+  // 스피어 스윕 수행
+  // bTraceComplex=false, ActorsToIgnore=HitActorsToIgnore, DrawDebugType=EDrawDebugTrace::ForDuration (디버그용 표시)
+  bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+    GetWorld(),
+    CurrentStart, CurrentEnd, // 시작점과 끝점 변경!
+    TraceRadius,
+    ObjectTypes,
+    false,
+    HitActorsToIgnore,
+    EDrawDebugTrace::ForDuration, // 테스트 후 None으로 끄기
+    OutHits,
+    true, // IgnoreSelf
+    FLinearColor::Red, FLinearColor::Green, 2.0f
+  );
+
+  // 충돌 결과 처리
+  if (bHit)
+  {
+    for (const FHitResult& Hit : OutHits)
+    {
+      AActor* HitActor = Hit.GetActor();
+      if (!HitActor || HitActorsToIgnore.Contains(HitActor)) continue;
+
+      if (HitActor->IsA<ASanzoEnemyBase>()) continue;
+
+      if (HitActor && HitActor != this)
+      {
+        UGameplayStatics::ApplyDamage(
+          HitActor,
+          MeleeDamage,
+          GetController(),
+          this,
+          UDamageType::StaticClass()
+        );
+        // 한 번 맞은 적은 이번 공격에서 다시 맞지 않도록 목록에 추가
+        HitActorsToIgnore.Add(HitActor);
+        // 한 번 때리면 콜리전을 즉시 비활성화 
+        DisableWeaponCollision();
+      }
+    }
   }
 }
 
@@ -64,7 +102,6 @@ void ASanzoEnemy_Melee::Attack()
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Melee Attack! Drawing Range..."));
   }
   Super::Attack();
-  DrawAttackRange();
 }
 
 bool ASanzoEnemy_Melee::CanAttack(AActor* TargetActor)
@@ -88,49 +125,4 @@ bool ASanzoEnemy_Melee::CanAttack(AActor* TargetActor)
   }
 
   return false;
-}
-
-void ASanzoEnemy_Melee::DrawAttackRange()
-{
-  UWorld* World = GetWorld();
-  if (!World) return;
-
-  FVector Center = GetActorLocation();
-  FVector Forward = GetActorForwardVector();
-
-  float Radius = AttackRange;
-  float AngleHalf = 45.0f; // 좌우 45도 (총 90도)
-
-  int32 Segments = 50;
-
-  // 색상 설정 (내부는 반투명, 외곽선은 진하게)
-  FColor FillColor = FColor(255, 0, 0, 100);
-  FColor OutlineColor = FColor::Red;
-
-  // 왼쪽 가장자리 방향 벡터 계산
-  FVector LeftEdgeDir = Forward.RotateAngleAxis(-AngleHalf, FVector::UpVector);
-  float AngleStep = (AngleHalf * 2.f) / Segments;
-
-  FVector PrevPoint = Center + (LeftEdgeDir * Radius);
-
-  for (int32 i = 0; i <= Segments; i++)
-  {
-    FVector CurrentDir = LeftEdgeDir.RotateAngleAxis(AngleStep * i, FVector::UpVector);
-    FVector CurrentPoint = Center + (CurrentDir * Radius);
-
-    // 내부 채우기
-    DrawDebugLine(World, Center, CurrentPoint, FillColor, false, 1.0f, 0, 8.0f);
-
-    // 바깥쪽 호 외곽선
-    if (i > 0)
-    {
-      DrawDebugLine(World, PrevPoint, CurrentPoint, OutlineColor, false, 1.0f, 0, 3.0f);
-    }
-    PrevPoint = CurrentPoint;
-  }
-
-  // 양옆 직선 외곽선
-  FVector RightEdgeDir = Forward.RotateAngleAxis(AngleHalf, FVector::UpVector);
-  DrawDebugLine(World, Center, Center + (LeftEdgeDir * Radius), OutlineColor, false, 1.0f, 0, 3.0f);
-  DrawDebugLine(World, Center, Center + (RightEdgeDir * Radius), OutlineColor, false, 1.0f, 0, 3.0f);
 }
