@@ -6,6 +6,12 @@
 
 class ASanzoProjectile;
 
+#pragma region DataForHUD
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChargePercentChanged, float, NewPercnetage);
+
+#pragma endregion 이준로
+
 UCLASS()
 class PROJECTSANZO_API ASanzoBow : public ASanzoWeaponBase
 {
@@ -69,7 +75,16 @@ protected:
 #pragma region DataForHUD
 	
 public:
+	
+	virtual void Tick(float DeltaSeconds) override;
+	
+	UPROPERTY()
+	FOnChargePercentChanged OnChargePercentChanged;
+	
 	virtual FText GetAmmoTextForHUD() const override;
+	
+protected:
+	bool bIsCharging = false;
 	
 #pragma endregion 이준로
 };

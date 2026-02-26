@@ -59,6 +59,9 @@ public:
 #pragma region UIDataTransfer
 
 public:
+	UFUNCTION()
+	ASanzoWeaponBase* GetCurrentWeapon() const { return CurrentWeapon; }
+	
   FOnWeaponAmmoChanged OnAmmoChanged;
 	FOnWeaponSwapped OnSwapped;
 
