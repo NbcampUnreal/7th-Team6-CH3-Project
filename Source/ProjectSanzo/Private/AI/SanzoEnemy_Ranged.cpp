@@ -1,4 +1,4 @@
-﻿#include "AI/SanzoEnemy_Ranged.h"
+#include "AI/SanzoEnemy_Ranged.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Particles/ParticleSystem.h"
@@ -19,6 +19,7 @@ ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
   PrimaryActorTick.bCanEverTick = true;
   MaxHP = 80.f;
   AttackRange = 2500.f;
+  Exp = 20.f;
 }
 
 void ASanzoEnemy_Ranged::BeginPlay()
@@ -57,7 +58,15 @@ void ASanzoEnemy_Ranged::FireHitScan()
   }
   if (FireSound)
   {
-    UGameplayStatics::PlaySoundAtLocation(this, FireSound, TraceStart);
+    // 사운드 큐로 변경 - 최윤서
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      FireSound, 
+      TraceStart,
+      1.f,
+      1.f,
+      0.f,
+      EnemyAttenuation);
   }
 
   // 히트스캔 (LineTrace)

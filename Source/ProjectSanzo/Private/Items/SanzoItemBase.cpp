@@ -63,16 +63,6 @@ void ASanzoItemBase::OnItemOverlap(
 void ASanzoItemBase::ActivateItem(AActor* Activator)
 {
 	UParticleSystemComponent* Particle = nullptr;
-	//if (PickupParticle)
-	//{
-	//	Particle = UGameplayStatics::SpawnEmitterAtLocation(
-	//		GetWorld(),
-	//		PickupParticle,
-	//		GetActorLocation(),
-	//		GetActorRotation(),
-	//		true
-	//	);
-	//}
 	if (PickupSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -81,26 +71,6 @@ void ASanzoItemBase::ActivateItem(AActor* Activator)
 			GetActorLocation()
 		);
 	}
-
-	//if (Particle)
-	//{
-	//	FTimerHandle DestroyParticleHandle;
-
-	//	TWeakObjectPtr<UParticleSystemComponent> WeakParticle = Particle;
-
-	//	GetWorld()->GetTimerManager().SetTimer(
-	//		DestroyParticleHandle,
-	//		[WeakParticle]()
-	//		{
-	//			if (WeakParticle.IsValid())
-	//			{
-	//				WeakParticle->DestroyComponent();
-	//			}
-	//		},
-	//		2.0f,
-	//		false
-	//	);
-	//}
 }
 
 void ASanzoItemBase::DestroyItem()

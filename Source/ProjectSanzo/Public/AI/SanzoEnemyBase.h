@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -34,7 +34,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDataChanged, const FEnemyOve
 #pragma endregion 이준로
 
 UCLASS()
-class PROJECTSANZO_API ASanzoEnemyBase : public ACharacter, public ISanzoEnemyInterface
+class PROJECTSANZO_API ASanzoEnemyBase : 
+  public ACharacter, 
+  public ISanzoEnemyInterface
+  
 {
   GENERATED_BODY()
 
@@ -63,6 +66,8 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float AttackRange = 150.f;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+  float Exp = 0;
   // 중복 사망 처리를 막기 위한 플래그
   bool bIsDead = false;
 
@@ -196,5 +201,14 @@ protected:
   UFUNCTION()
   virtual void OnParriedCallback();
 #pragma endregion 김동주
+
+#pragma region Sound
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  TArray<USoundBase*> DeathSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  TArray<USoundBase*> HitSounds;
+  UPROPERTY(EditAnywhere, Category = "Effects|Sound")
+  USoundAttenuation* EnemyAttenuation;
+#pragma endregion 최윤서
 
 };

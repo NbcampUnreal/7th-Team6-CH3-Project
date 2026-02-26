@@ -111,6 +111,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon|Attachment")
 	FName AttachSocketName;
 
+	// 스왑할 때 플레이할 애니메이션 시퀀스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Animation")
+	class UAnimMontage* EquipMontage;
+
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
 	virtual void Fire() {};

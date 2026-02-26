@@ -92,12 +92,12 @@ public:
 	void ConsumeStaminaForAction();
 	bool bIsExhausted;
 
+	void RestoreHealth(float Amount);
+	void AddExperience(float Amount);
+	void LevelUp();
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-
-
-
 
 	float GetStamina() const { return CurrentStamina; }
 

@@ -103,7 +103,18 @@ void USanzoEquipmentComponent::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType 
 	}
 }
 
+void USanzoEquipmentComponent::AddAmmo(int32 Amount)
+{
+	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
+	{
+		Gun->AddAmmo(Amount); //base오버라이드시키고싶지만.. 시간이업다
+	}
+}
+
+
 #pragma region UIDataTransfer
+
+
 
 void USanzoEquipmentComponent::UpdateHUDAmmo()
 {
@@ -124,7 +135,7 @@ void USanzoEquipmentComponent::HandleWeaponHitEnemy()
 #pragma endregion 이준로
 
 #pragma region 무기 스왑 로직 추가
-void USanzoEquipmentComponent::SwapWeapon()
+void USanzoEquipmentComponent::SwapWeapon(bool bUpdateAnimInstance)
 {
 	// 인벤토리에 무기가 2개 이상일 때만 스왑 가능
 	if (Inventory.Num() < 2) return;
@@ -132,10 +143,10 @@ void USanzoEquipmentComponent::SwapWeapon()
 	// 다음 무기 인덱스 계산
 	int32 NextIndex = (CurrentWeaponIndex + 1) % Inventory.Num();
 	// 해당 무기 장착
-	EquipWeaponByIndex(NextIndex);
+	EquipWeaponByIndex(NextIndex, bUpdateAnimInstance);
 }
 
-void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index)
+void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index, bool bUpdateAnimInstance)
 {
 	if (!Inventory.IsValidIndex(Index)) return;
 
@@ -154,12 +165,36 @@ void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index)
 	CurrentWeapon->SetActorHiddenInGame(false);
 
 	// 무기에 따라 다르게 만들어둔 ABP로 교체
-	if (OwnerCharacter && OwnerCharacter->GetMesh())
+	if (bUpdateAnimInstance && CurrentWeapon->WeaponAnimInstanceClass)
 	{
-		if (CurrentWeapon->WeaponAnimInstanceClass)
+		OwnerCharacter->GetMesh()->SetAnimInstanceClass(CurrentWeapon->WeaponAnimInstanceClass);
+	}
+}
+
+UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
+{
+	// 인벤토리에 무기가 2개 이상일 때만 진행
+	if (Inventory.Num() < 2) return nullptr;
+
+	// 다음에 꺼낼 무기 인덱스 계산
+	int32 NextIndex = (CurrentWeaponIndex + 1) % Inventory.Num();
+	ASanzoWeaponBase* NextWeapon = Inventory[NextIndex];
+
+	if (NextWeapon && NextWeapon->EquipMontage)
+	{
+		if (ASanzoCharacter* Character = GetOwnerCharacter())
 		{
-			// 해당 무기에 설정된 ABP로 ABP 파일 교체
-			OwnerCharacter->GetMesh()->SetAnimInstanceClass(CurrentWeapon->WeaponAnimInstanceClass);
+			// 몽타지 틀기 전에 먼저 ABP 파일 교체
+			if (NextWeapon->WeaponAnimInstanceClass)
+			{
+				Character->GetMesh()->SetAnimInstanceClass(NextWeapon->WeaponAnimInstanceClass);
+			}
+			// 교체된 애님인스턴스 가져와서 몽타지 재생
+			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->Montage_Play(NextWeapon->EquipMontage);
+				return NextWeapon->EquipMontage;
+			}
 		}
 	}
 	
@@ -168,6 +203,7 @@ void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index)
 		OnSwapped.Broadcast(CurrentWeaponIndex);
 	}
 	
+	return nullptr;
 }
 #pragma endregion 이용호
 

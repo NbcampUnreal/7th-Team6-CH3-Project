@@ -6,6 +6,7 @@
 #include "TimerManager.h"
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
+#include "Character/SanzoPlayerController.h"
 
 USanzoStatComponent::USanzoStatComponent()
 {
@@ -108,6 +109,40 @@ void USanzoStatComponent::ConsumeStaminaForAction()
 
 
 
+
+void USanzoStatComponent::RestoreHealth(float Amount)
+{
+	CurrentHealth += Amount;
+	if (CurrentHealth > MaxHealth)
+	{
+		CurrentHealth = MaxHealth;
+	}
+}
+
+void USanzoStatComponent::AddExperience(float Amount)
+{
+	CurrentExp += Amount;
+	if (CurrentExp >= 100)
+	{
+		CurrentExp -= 100;
+		LevelUp();
+	}
+	BroadCastStatUpdate();
+}
+
+void USanzoStatComponent::LevelUp()
+{
+	Level++;
+	if (APawn* SanzoPawn = Cast<APawn>(GetOwner()))
+	{
+		if (ASanzoPlayerController* PlayerController = Cast<ASanzoPlayerController>(SanzoPawn->GetController()))
+		{
+			//TODO : 소리 재생
+			PlayerController->ShowPopUp(SanzoTags::UpgradeSelet);
+		}
+	}
+	BroadCastStatUpdate();
+}
 
 void USanzoStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
   FActorComponentTickFunction* ThisTickFunction)

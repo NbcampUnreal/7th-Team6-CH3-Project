@@ -17,6 +17,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnyWeaponHitEnemy);
 
 class ASanzoCharacter;
 
+enum class WeaponName : uint8
+{
+  Gun,
+  Bow
+};
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTSANZO_API USanzoEquipmentComponent : public UActorComponent, public ISanzoUpgradeInterface
 {
@@ -34,12 +40,15 @@ protected:
 public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 #pragma region 스왑 시스템
-  // 무기 교체 함수 추가
+  // 무기 교체 함수
   UFUNCTION(BlueprintCallable, Category = "Equipment|Action")
-  void SwapWeapon();
+  void SwapWeapon(bool bUpdateAnimInstance = true);
 
   // 내부 인덱스에 맞는 무기를 장착시키는 함수
-  void EquipWeaponByIndex(int32 Index);
+  void EquipWeaponByIndex(int32 Index, bool bUpdateAnimInstance = true);
+
+  // 캐릭터가 호출할 스왑 시작 함수
+  UAnimMontage* BeginSwapWeapon();
 
   // 원래 무기 하나 소환했지만 무기를 인덱스로 갖는 배열로 수정
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment|Class")
@@ -56,6 +65,8 @@ public:
 
   // (이용호 추가) 현재 들고 있는 무기의 인덱스 저장용 변수
   int32 CurrentWeaponIndex = 0;
+
+  void AddAmmo(int32 Amount);
 
 #pragma region UIDataTransfer
 
