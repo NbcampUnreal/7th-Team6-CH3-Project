@@ -49,7 +49,7 @@ void ASanzoBow::StartFire()
 	if (WeaponMesh && BowDrawAnim)
 	{
 		// 활을 발사하는 사람 몽타지 중 Draw 섹션의 재생 길이를 가져옴
-		int32 SectionIndex = CharacterFireMontage->GetSectionIndex(FName("Draw"));
+		int32 SectionIndex = CharacterFireMontage->GetSectionIndex(FName("Default"));
 		float CurrentSectionLength = CharacterFireMontage->GetSectionLength(SectionIndex);
 
 		// 활 애니메이션 길이 가져옴
