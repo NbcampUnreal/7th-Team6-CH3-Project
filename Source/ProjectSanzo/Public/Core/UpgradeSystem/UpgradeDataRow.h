@@ -34,7 +34,8 @@ enum class EUpgradeType : uint8
 	MaxStamina,
 	Beauty,
 	Damage,
-	FireRate,
+	FireRate, // 총 공격 속도
+	MaxChargeTime, // 활 공격 속도
 	Exp
 };
 

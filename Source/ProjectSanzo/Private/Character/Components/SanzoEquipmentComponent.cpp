@@ -46,6 +46,9 @@ void USanzoEquipmentComponent::BeginPlay()
 				// 스폰된 무기 전부 안보이게 변경
 				SpawnedWeapon->SetActorHiddenInGame(true);
 				Inventory.Add(SpawnedWeapon);
+				
+				// 적 타격시 HUD 이펙트 재생용 Broadcast - 작업자: 이준로
+				SpawnedWeapon->OnEnemyHit.AddDynamic(this, &USanzoEquipmentComponent::HandleWeaponHitEnemy);
 			}
 		}
 	}
@@ -56,15 +59,11 @@ void USanzoEquipmentComponent::BeginPlay()
 		EquipWeaponByIndex(0);
 	}
 
+	//HUD가 처음 총알 정보 받아오는 부분 - 작업자: 이준로
 	if (ASanzoGun* Gun = Cast<ASanzoGun>(CurrentWeapon))
 	{
 		Gun->OnAmmoChanged.AddDynamic(this, &USanzoEquipmentComponent::UpdateHUDAmmo);
 
-		UpdateHUDAmmo();
-	}
-
-	if (ASanzoBow* Bow = Cast<ASanzoBow>(CurrentWeapon))
-	{
 		UpdateHUDAmmo();
 	}
 #pragma endregion 이용호
@@ -115,9 +114,29 @@ void USanzoEquipmentComponent::AddAmmo(int32 Amount)
 
 void USanzoEquipmentComponent::UpdateHUDAmmo()
 {
-	if (CurrentWeapon)
+	for (ASanzoWeaponBase* Weapon : Inventory)
 	{
-		OnAmmoChanged.Broadcast(CurrentWeapon->GetAmmoTextForHUD());
+		if (ASanzoGun*Gun = Cast<ASanzoGun>(Weapon))
+		{
+			OnAmmoChanged.Broadcast(Gun->GetAmmoTextForHUD());
+			return;
+		}
+	}
+}
+
+void USanzoEquipmentComponent::HandleWeaponHitEnemy()
+{
+	if (OnAnyWeaponHitEnemy.IsBound())
+	{
+		OnAnyWeaponHitEnemy.Broadcast();
+	}
+}
+
+void USanzoEquipmentComponent::NotifyItemPickedUp(FName InItemType, int32 InAmount)
+{
+	if (OnItemPickedUp.IsBound())
+	{
+		OnItemPickedUp.Broadcast(InItemType, InAmount);
 	}
 }
 
@@ -149,6 +168,11 @@ void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index, bool bUpdateAnimI
 	// 다른 무기로 변경
 	CurrentWeaponIndex = Index;
 	CurrentWeapon = Inventory[CurrentWeaponIndex];
+	
+	if (OnSwapped.IsBound())
+	{
+		OnSwapped.Broadcast(CurrentWeaponIndex);
+	}
 
 	// 바꾼 무기 보이도록 변경
 	CurrentWeapon->SetActorHiddenInGame(false);
@@ -181,7 +205,7 @@ UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
 			// 교체된 애님인스턴스 가져와서 몽타지 재생
 			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
-				AnimInstance->Montage_Play(NextWeapon->EquipMontage);
+				AnimInstance->Montage_Play(NextWeapon->EquipMontage,2.0f);
 				return NextWeapon->EquipMontage;
 			}
 		}

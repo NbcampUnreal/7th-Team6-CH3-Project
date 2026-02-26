@@ -25,6 +25,11 @@ public:
 	virtual void StopFire() override;
 
 protected:
+
+	// 총 연사 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun|Stats")
+	float FireRate;
+
 	// 에셋에 있는 트레이스 이펙트 사용위한 변수
 	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
 	UParticleSystem* TracerEffect;
@@ -33,7 +38,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Gun|Debug")
 	bool bShowDebugTrace = false;
 
-
+	// 마지막으로 총을 쏜 시간을 기록할 변수(단발 광클 방지용)
+	float LastFireTime;
 
 	// 실제 발사 로직: 라인트레이스 및 디버그 라인 그리기
 	virtual void Fire() override;
@@ -48,6 +54,9 @@ public:
 #pragma region DataForHUD
 	
 public:
+	
+	void SetCurrentAmmo(int32 Amount);
+	
 	UPROPERTY()
 	FOnAmmoChanged OnAmmoChanged;
 	

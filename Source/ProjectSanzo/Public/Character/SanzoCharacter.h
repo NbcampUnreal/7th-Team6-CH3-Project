@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -162,6 +162,7 @@ protected:
   void StopFire(const FInputActionValue& Value);
 
   void Dodge(const FInputActionValue& Value);
+  void EndDodge(UAnimMontage* Montage, bool bInterrupted);
 
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);
@@ -211,6 +212,7 @@ public:
     AActor* DamageCauser) override;
 #pragma endregion 김동주
 
-
+  // 스테이지 이동 시 GI에서 스탯 복원하는 함수
+  void RestoreFromGI();
 
 };

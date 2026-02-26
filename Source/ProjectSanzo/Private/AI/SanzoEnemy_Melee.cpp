@@ -1,10 +1,11 @@
-﻿#include "AI/SanzoEnemy_Melee.h"
+#include "AI/SanzoEnemy_Melee.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "Common/SanzoGameplayTag.h"
 #include "AI/Components/SanzoEnemyStunComponent.h" 
+#include "GameplayTagAssetInterface.h"
 
 ASanzoEnemy_Melee::ASanzoEnemy_Melee()
 {
@@ -18,4 +19,18 @@ ASanzoEnemy_Melee::ASanzoEnemy_Melee()
 void ASanzoEnemy_Melee::Attack()
 {
   Super::Attack();
+#pragma region Sound
+  if (MeleeAttackSound)
+    {
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      MeleeAttackSound, 
+      GetActorLocation(),
+      1.f,
+      FMath::FRandRange(0.9f, 1.1f), // 피치 변동
+      0.f,
+      EnemyAttenuation
+    );
+  }
+#pragma endregion 최윤서
 }

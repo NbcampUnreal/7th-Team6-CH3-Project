@@ -1,4 +1,6 @@
 #include "Items/SanzoItemBase.h"
+
+#include "Character/Components/SanzoEquipmentComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -63,16 +65,6 @@ void ASanzoItemBase::OnItemOverlap(
 void ASanzoItemBase::ActivateItem(AActor* Activator)
 {
 	UParticleSystemComponent* Particle = nullptr;
-	//if (PickupParticle)
-	//{
-	//	Particle = UGameplayStatics::SpawnEmitterAtLocation(
-	//		GetWorld(),
-	//		PickupParticle,
-	//		GetActorLocation(),
-	//		GetActorRotation(),
-	//		true
-	//	);
-	//}
 	if (PickupSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -81,26 +73,6 @@ void ASanzoItemBase::ActivateItem(AActor* Activator)
 			GetActorLocation()
 		);
 	}
-
-	//if (Particle)
-	//{
-	//	FTimerHandle DestroyParticleHandle;
-
-	//	TWeakObjectPtr<UParticleSystemComponent> WeakParticle = Particle;
-
-	//	GetWorld()->GetTimerManager().SetTimer(
-	//		DestroyParticleHandle,
-	//		[WeakParticle]()
-	//		{
-	//			if (WeakParticle.IsValid())
-	//			{
-	//				WeakParticle->DestroyComponent();
-	//			}
-	//		},
-	//		2.0f,
-	//		false
-	//	);
-	//}
 }
 
 void ASanzoItemBase::DestroyItem()
@@ -108,3 +80,18 @@ void ASanzoItemBase::DestroyItem()
 	Destroy();
 }
 #pragma endregion 최윤서
+
+#pragma region ItemPickedUpNotify
+
+void ASanzoItemBase::NotifyItemPickedUp(AActor* Activator, int32 InAmount)
+{
+	if (Activator)
+	{
+		if (auto* EquipmentComponent = Activator->GetComponentByClass<USanzoEquipmentComponent>())
+		{
+			EquipmentComponent->NotifyItemPickedUp(ItemType, InAmount);
+		}
+	}
+}
+
+#pragma endregion 이준로

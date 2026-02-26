@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemy_MeleeBase.h"
@@ -12,4 +12,10 @@ public:
   ASanzoEnemy_Melee();
 
   virtual void Attack() override;
+
+protected:
+#pragma region Sound
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* MeleeAttackSound;
+#pragma endregion 최윤서
 };

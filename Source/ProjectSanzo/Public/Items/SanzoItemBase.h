@@ -30,7 +30,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Component")
 	UNiagaraComponent* NiagaraComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Effects")
-	//UParticleSystem* PickupParticle;
 	UNiagaraSystem* SpawnEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item|Effects")
 	USoundBase* PickupSound;
@@ -46,4 +45,9 @@ protected:
 	virtual void ActivateItem(AActor* Activator);
 	virtual void DestroyItem();
 #pragma endregion 최윤서
+	
+#pragma region ItemPickedUpNotify
+protected:
+	void NotifyItemPickedUp(AActor* Activator, int32 InAmount);
+#pragma endregion 이준로
 };

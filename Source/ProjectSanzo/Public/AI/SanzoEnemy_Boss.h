@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemy_MeleeBase.h"
@@ -71,4 +71,9 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
   float ShockwaveDamage = 20.0f;
 
+#pragma region Sound
+public:
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  TArray<USoundBase*> AttackSounds;
+#pragma endregion 최윤서
 };
