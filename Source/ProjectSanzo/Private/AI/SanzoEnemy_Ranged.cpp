@@ -138,7 +138,7 @@ void ASanzoEnemy_Ranged::FireHitScan()
       );
 
 #pragma region NotifyParried
-      if (ACharacter* Character = Cast<ACharacter>(HitResult.GetActor()))
+      if (ACharacter* Character = Cast<ACharacter>(ValidHitResult.GetActor()))
       {
         if (IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
         {
