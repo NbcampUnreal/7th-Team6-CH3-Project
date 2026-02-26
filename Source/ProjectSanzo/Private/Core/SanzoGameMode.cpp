@@ -24,8 +24,6 @@ void ASanzoGameMode::BeginPlay()
   InitStageType();
   if(CurrentStageType!=ESanzoStageType::None)
   {
-    // 스탯 복원
-    SanzoGameInstance->RestoreStat(Cast<ASanzoCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)));
     // 스테이지 시작
     StartStage();
   }
