@@ -24,6 +24,7 @@ ASanzoProjectile::ASanzoProjectile()
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);  // 벽, 바닥같이 움직이지 않는 것들
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block); // 움직이는 물체
 	CollisionComp->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Block);  // 적 스켈레탈 메시
+	CollisionComp->SetCollisionResponseToChannel(ECC_Destructible, ECR_Block); // 파괴되는 물체도 블락하도록 추가
 	CollisionComp->OnComponentHit.AddDynamic(this, &ASanzoProjectile::OnHit);
 	RootComponent = CollisionComp;
 
