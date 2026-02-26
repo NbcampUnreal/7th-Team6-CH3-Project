@@ -8,11 +8,13 @@
 
 ASanzoGun::ASanzoGun()
 {
-	BaseDamage = 20.0f;       // 기본 데미지
-	FireRate = 0.1f;          // 0.1초마다 발사 (빠른 연사)
-	MaxRange = 5000.0f;       // 사거리 50미터           
+	BaseDamage = 5.0f;       // 기본 데미지
+	FireRate = 0.15f;          // 0.15초마다 발사 (빠른 연사)         
 	CurrentAmmo = 3000;         // 시작 탄약
 	bInfiniteAmmo = false;
+
+	// 첫 발은 무조건 바로 나가도록 초기화
+	LastFireTime = 0.0f;
 
 	// 라인트레이스 시작 위치 고정
 	if (FireStartLocation)
@@ -34,16 +36,20 @@ void ASanzoGun::StartFire()
 {
 	Super::StartFire();
 
-	if (!bInfiniteAmmo && CurrentAmmo <= 0) return;
+	// 현재 플레이 시간 저장
+	float CurrentTime = GetWorld()->GetTimeSeconds();
 
-	Fire();
+	// 단발 광클을 해서 입력 텀이 FireRate(0.15f) 보다 작은지 계산
+	float FirstDelay = FMath::Max(LastFireTime + FireRate - CurrentTime, 0.0f);
 
-	GetWorld()->GetTimerManager().SetTimer(
+	// FirstDelay 의 값이 양수라면 그 시간만큼 기다렸다가 FireRate 시간 후에 Fire() 작동
+	GetWorldTimerManager().SetTimer(
 		FireTimerHandle,
 		this,
 		&ASanzoGun::Fire,
 		FireRate,
-		true
+		true,
+		FirstDelay
 	);
 
 }
@@ -65,6 +71,9 @@ void ASanzoGun::Fire()
 		return;
 	}
 
+	// 총을 쏜 시점을 LastFireTime 에 저장
+	LastFireTime = GetWorld()->GetTimeSeconds();
+
 	if (!bInfiniteAmmo)
 	{
 		CurrentAmmo--;
@@ -82,9 +91,11 @@ void ASanzoGun::Fire()
 	FVector CameraLocation;
 	FRotator CameraRotation;
 	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+	// 사라진 사거리 대신 사용할 트레이스 끝점 
+	float TraceDistance = 100000.f;
 
 	FVector Start = CameraLocation;
-	FVector End = Start + (CameraRotation.Vector() * MaxRange);
+	FVector End = Start + (CameraRotation.Vector() * TraceDistance);
 
 	// 라인트레이스 시작될 때 쏜 무기와 무기 들고있는 플레이어 판정 제외
 	FHitResult HitResult;
@@ -198,15 +209,12 @@ void ASanzoGun::Fire()
 
 void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 {
-	/*
-	추후 업그레이드 타입이 생기면 수정
+	Super::ApplyWeaponStatUpgrade(Type, Value);
+
 	switch (Type)
 	{
 	case EUpgradeType::FireRate:
 		FireRate += Value;
-		break;
-	case EUpgradeType::Damage:
-		BaseDamage += Value;
 		break;
 
 	default:
@@ -215,7 +223,7 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 
 		
 	}
-	*/
+	
 }
 
 void ASanzoGun::AddAmmo(int32 Amount)

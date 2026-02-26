@@ -39,7 +39,7 @@ protected:
 
 	// 최대 차징 유효 시간(현재는 3초, 수정가능)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
-	float MaxChargeTime = 2.0f;
+	float MaxChargeTime = 1.0f;
 
 	// 계산 후 차징퍼센티지 넣을 변수
 	float ChargePercent;
@@ -51,14 +51,6 @@ protected:
 	// 풀차징했을 때 최대속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
 	float MaxArrowSpeed = 6000.0f;
-
-	// 차징에 따른 최소 데미지
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
-	float MinArrowDamage = 5.0f;
-
-	// 차징에 따른 최대 데미지
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
-	float MaxArrowDamage = 30.0f;
 
 	// 활시위가 당겨지는 애니메이션 시퀀스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Animation")
