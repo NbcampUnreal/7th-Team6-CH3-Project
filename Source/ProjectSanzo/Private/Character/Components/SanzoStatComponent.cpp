@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Character/Components/SanzoStatComponent.h"
@@ -298,3 +298,20 @@ bool USanzoStatComponent::IsDead() const
   return CurrentHealth <= 0.f;
 }
 #pragma endregion 김동주
+#pragma region SaveLoad
+FSanzoSaveStatData USanzoStatComponent::GetSaveData() const
+{
+	FSanzoSaveStatData Data;
+	Data.Level = Level;
+	Data.CurrentExp = CurrentExp;
+
+	return Data;
+}
+void USanzoStatComponent::LoadFromSaveData(const FSanzoSaveStatData& SaveData)
+{
+	Level = SaveData.Level;
+	CurrentExp = SaveData.CurrentExp;
+
+	BroadCastStatUpdate(); // UI 갱신
+}
+#pragma endregion 최윤서
