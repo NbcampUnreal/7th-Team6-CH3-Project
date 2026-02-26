@@ -97,15 +97,12 @@ void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
 
 void USanzoHUDWidget::HandleWeaponSwapped(int32 CurrentWeaponIndex)
 {
-	bool bIsGunMain = true;
-	if (CurrentWeaponIndex)
-	{
-		bIsGunMain = (CurrentWeaponIndex == 0);
-	}
+	bool bIsGunMain = (CurrentWeaponIndex == 0);
+	
 	UCanvasPanelSlot* GunSlot = Cast<UCanvasPanelSlot>(GunInfoOverlay->Slot);
 	UCanvasPanelSlot* BowSlot = Cast<UCanvasPanelSlot>(BowInfoOverlay->Slot);
 	
-	if (BowSlot && BowSlot)
+	if (GunSlot && BowSlot)
 	{
 		if (bIsGunMain)
 		{
@@ -122,6 +119,7 @@ void USanzoHUDWidget::HandleWeaponSwapped(int32 CurrentWeaponIndex)
 			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Forward);
 		}
 	}
+	
 	if (APawn* PlayerCharacter = GetOwningPlayerPawn())
 	{
 		USanzoEquipmentComponent* EquipmentComponent = PlayerCharacter->FindComponentByClass<USanzoEquipmentComponent>();
@@ -139,7 +137,6 @@ void USanzoHUDWidget::HandleWeaponSwapped(int32 CurrentWeaponIndex)
 			}
 		}
 	}
-	
 }
 
 void USanzoHUDWidget::UpdateBowChargingProgress(float NewPercent)

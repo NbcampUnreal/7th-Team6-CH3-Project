@@ -160,6 +160,11 @@ void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index, bool bUpdateAnimI
 	// 다른 무기로 변경
 	CurrentWeaponIndex = Index;
 	CurrentWeapon = Inventory[CurrentWeaponIndex];
+	
+	if (OnSwapped.IsBound())
+	{
+		OnSwapped.Broadcast(CurrentWeaponIndex);
+	}
 
 	// 바꾼 무기 보이도록 변경
 	CurrentWeapon->SetActorHiddenInGame(false);
@@ -197,12 +202,6 @@ UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
 			}
 		}
 	}
-	
-	if (OnSwapped.IsBound())
-	{
-		OnSwapped.Broadcast(CurrentWeaponIndex);
-	}
-	
 	return nullptr;
 }
 #pragma endregion 이용호
