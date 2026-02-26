@@ -409,7 +409,7 @@ void ASanzoEnemyBase::OnStunEnteredCallback()
 
   if (StunSound)
   {
-    // 큐로 변경 - 최윤서
+    // 사운드 큐로 변경 - 최윤서
     UGameplayStatics::PlaySoundAtLocation(
       this, 
       StunSound, 
@@ -417,7 +417,8 @@ void ASanzoEnemyBase::OnStunEnteredCallback()
       1.f,
       1.f,
       0.f,
-      EnemyAttenuation);
+      EnemyAttenuation
+    );
   }
 
   StopAnimMontage();
@@ -461,7 +462,16 @@ void ASanzoEnemyBase::OnParriedCallback()
 
   if (ParriedSound)
   {
-    UGameplayStatics::PlaySoundAtLocation(this, ParriedSound, EffectLocation);
+    // 사운드 큐로 변경  - 최윤서
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      ParriedSound, 
+      GetActorLocation(),
+      1.f,
+      1.f,
+      0.f,
+      EnemyAttenuation
+    );
   }
 
   if (!StunComponent->GetIsStunned() && StaggerMontage)
