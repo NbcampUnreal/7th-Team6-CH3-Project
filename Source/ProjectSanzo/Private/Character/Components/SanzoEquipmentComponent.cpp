@@ -46,6 +46,9 @@ void USanzoEquipmentComponent::BeginPlay()
 				// 스폰된 무기 전부 안보이게 변경
 				SpawnedWeapon->SetActorHiddenInGame(true);
 				Inventory.Add(SpawnedWeapon);
+				
+				// 적 타격시 HUD 이펙트 재생용 Broadcast - 작업자: 이준로
+				SpawnedWeapon->OnEnemyHit.AddDynamic(this, &USanzoEquipmentComponent::HandleWeaponHitEnemy);
 			}
 		}
 	}
@@ -121,6 +124,14 @@ void USanzoEquipmentComponent::UpdateHUDAmmo()
 	}
 }
 
+void USanzoEquipmentComponent::HandleWeaponHitEnemy()
+{
+	if (OnAnyWeaponHitEnemy.IsBound())
+	{
+		OnAnyWeaponHitEnemy.Broadcast();
+	}
+}
+
 #pragma endregion 이준로
 
 #pragma region 무기 스왑 로직 추가
@@ -149,6 +160,11 @@ void USanzoEquipmentComponent::EquipWeaponByIndex(int32 Index, bool bUpdateAnimI
 	// 다른 무기로 변경
 	CurrentWeaponIndex = Index;
 	CurrentWeapon = Inventory[CurrentWeaponIndex];
+	
+	if (OnSwapped.IsBound())
+	{
+		OnSwapped.Broadcast(CurrentWeaponIndex);
+	}
 
 	// 바꾼 무기 보이도록 변경
 	CurrentWeapon->SetActorHiddenInGame(false);

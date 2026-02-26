@@ -1,10 +1,11 @@
-﻿#include "AI/SanzoEnemy_Melee.h"
+#include "AI/SanzoEnemy_Melee.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "Common/SanzoGameplayTag.h"
 #include "AI/Components/SanzoEnemyStunComponent.h" 
+#include "GameplayTagAssetInterface.h"
 
 ASanzoEnemy_Melee::ASanzoEnemy_Melee()
 {
@@ -52,6 +53,38 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
       UDamageType::StaticClass()
     );
 
+#pragma region NotifyParried
+    if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+    {
+      if (IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
+      {
+        if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+        {
+          StunComponent->NotifyParried();
+        }
+        //회피성공
+        if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
+        {
+          GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+          TWeakObjectPtr<ASanzoEnemyBase> WeakThis(this);
+          GetWorld()->GetTimerManager().SetTimer(
+            SlowTimerHandle,
+            [WeakThis]()
+            {
+              if (WeakThis.IsValid())
+                WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+            },
+            0.1f, //0.1초 후 시간 원래대로
+            false);
+          return;
+        }
+      }
+    }
+  
+
+#pragma endregion 김형백
+
+
     // 한 번 때리면 콜리전을 즉시 비활성화 
     DisableWeaponCollision();
   }
@@ -64,6 +97,20 @@ void ASanzoEnemy_Melee::Attack()
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Melee Attack! Drawing Range..."));
   }
   Super::Attack();
+#pragma region Sound
+  if (MeleeAttackSound)
+    {
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      MeleeAttackSound, 
+      GetActorLocation(),
+      1.f,
+      FMath::FRandRange(0.9f, 1.1f), // 피치 변동
+      0.f,
+      EnemyAttenuation
+    );
+  }
+#pragma endregion 최윤서
   DrawAttackRange();
 }
 

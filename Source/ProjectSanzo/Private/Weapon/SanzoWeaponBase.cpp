@@ -141,6 +141,8 @@ void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitIn
   // 맞은 액터가 SanzoEnemyBase가 맞다면 데미지 적용
   if (HitEnemy)
   {
+  	//적 피격 HUD 이펙트 재생용 방송 - 작업자: 이준로 
+  	OnEnemyHit.Broadcast();
 
     if (HitInfo.BoneName == HeadBoneName)
     {

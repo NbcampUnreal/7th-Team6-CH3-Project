@@ -16,14 +16,28 @@ ASanzoBow::ASanzoBow()
 	StringSocketName = TEXT("StringSocket");
 
 	BaseDamage = 40.0f;
+  
+#pragma region DataForHUD
+	//Tick 사용
+	PrimaryActorTick.bCanEverTick = true;
+	//스폰시에는 Tick 끄고 스폰.
+	PrimaryActorTick.bStartWithTickEnabled = false;
+	
+#pragma endregion 이준로
+	
 }
 
 void ASanzoBow::StartFire()
 {
 	Super::StartFire();
 
+	//PercentBar 방송용 Tick 활성화 - 작업자:이준로
+	SetActorTickEnabled(true);
+	
 	// 차징 시작한 현재 시간 기록
 	ChargeStartTime = GetWorld()->GetTimeSeconds();
+	//PercentBar 차오르기 시작 bool 값 변경 - 작업자:이준로
+	bIsCharging = true;
 
 	// 차징 시작하면 더미 화살 보여주기
 	if (DummyArrowMesh)
@@ -56,7 +70,21 @@ void ASanzoBow::StartFire()
 void ASanzoBow::StopFire()
 {
 	Super::StopFire();
-
+	
+#pragma region DataForHUD
+	
+	//PercentBar 방송용 Tick 비활성화
+	SetActorTickEnabled(false);
+	//PercentBar 차오르기 종료 bool 값 변경
+	bIsCharging = false;
+	//PercentBar 초기화
+	if (OnChargePercentChanged.IsBound())
+	{
+		OnChargePercentChanged.Broadcast(0.0f);
+	}
+	
+#pragma endregion 이준로
+	
 	// 화살 발사하면 더미화살 다시 안보이게 변경
 	if (DummyArrowMesh)
 	{
@@ -210,7 +238,23 @@ void ASanzoBow::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 }
 
 #pragma region DataForHUD
+
+void ASanzoBow::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 	
+	if (bIsCharging)
+	{
+		float CurrentDuration = GetWorld()->GetTimeSeconds() - ChargeStartTime;
+		float CurrentPercent = FMath::Clamp(CurrentDuration / MaxChargeTime, 0.0f, 1.0f);
+		
+		if (OnChargePercentChanged.IsBound())
+		{
+			OnChargePercentChanged.Broadcast(CurrentPercent);
+		}
+	}
+}
+
 FText ASanzoBow::GetAmmoTextForHUD() const
 {
 	return FText::FromString(TEXT("무한"));
