@@ -3,6 +3,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
+#include "Common/SanzoGameplayTag.h"
+#include "GameplayTagAssetInterface.h"
+#include "AI/Components/SanzoEnemyStunComponent.h" 
 
 ASanzoEnemy_MeleeBase::ASanzoEnemy_MeleeBase()
 {
@@ -97,6 +100,37 @@ void ASanzoEnemy_MeleeBase::PerformWeaponTrace()
           this,
           UDamageType::StaticClass()
         );
+
+#pragma region NotifyParried
+        if (ACharacter* Character = Cast<ACharacter>(HitActor))
+        {
+          if (IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
+          {
+            if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+            {
+              StunComponent->NotifyParried();
+            }
+
+            //회피성공
+            if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
+            {
+              GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+              TWeakObjectPtr<ASanzoEnemyBase> WeakThis(this);
+              GetWorld()->GetTimerManager().SetTimer(
+                SlowTimerHandle,
+                [WeakThis]()
+                {
+                  if (WeakThis.IsValid())
+                    WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+                },
+                0.1f, //0.1초 후 시간 원래대로
+                false);
+              return;
+            }
+          }
+        }
+
+#pragma endregion 김형백
 
         HitActorsToIgnore.Add(HitActor);
         DisableWeaponCollision();
