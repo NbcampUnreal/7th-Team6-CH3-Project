@@ -74,6 +74,10 @@ protected:
   // 조준 고정된 각도
   FRotator LockedAimRotation;
 
+  // 상하 에임 각도
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat|Aim")
+  float AimPitch = 0.f;
+
   virtual void BeginPlay() override;
 
   // 플레이어 정보를 기억해둘 캐싱 변수
