@@ -65,11 +65,6 @@ void USanzoEquipmentComponent::BeginPlay()
 
 		UpdateHUDAmmo();
 	}
-
-	if (ASanzoBow* Bow = Cast<ASanzoBow>(CurrentWeapon))
-	{
-		UpdateHUDAmmo();
-	}
 #pragma endregion 이용호
 }
 
@@ -118,9 +113,13 @@ void USanzoEquipmentComponent::AddAmmo(int32 Amount)
 
 void USanzoEquipmentComponent::UpdateHUDAmmo()
 {
-	if (CurrentWeapon)
+	for (ASanzoWeaponBase* Weapon : Inventory)
 	{
-		OnAmmoChanged.Broadcast(CurrentWeapon->GetAmmoTextForHUD());
+		if (ASanzoGun*Gun = Cast<ASanzoGun>(Weapon))
+		{
+			OnAmmoChanged.Broadcast(Gun->GetAmmoTextForHUD());
+			return;
+		}
 	}
 }
 
