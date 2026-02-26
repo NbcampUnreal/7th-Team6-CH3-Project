@@ -117,9 +117,12 @@ public:
   void PlayAimTimeLine();
 #pragma endregion 김형백
   
+#pragma region Asset
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
   UAnimMontage* DodgeMontage;
+  USoundBase* DodgeSuccessSound;
 
+#pragma endregion 김형백
 public:
   ASanzoCharacter();
 
@@ -171,6 +174,9 @@ protected:
 
   void AimStop(const FInputActionValue& Value);
 
+  void ZoomBow(UAnimMontage* Montage);
+  void ZoomOutBow();
+
   virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma endregion 김형백
 
@@ -181,10 +187,14 @@ protected:
   virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 #pragma endregion 김형백
 
+  //현재 FOV
+  float CurrentFOV;
+
   //타이머 핸들러 선언
   FTimerHandle SprintStaminaTimerHandle;
   FTimerHandle ParryPenaltyTimerHandle;
   FTimerHandle SlowTimerHandle;
+  FTimerHandle BowDrawTimerHandle;
   void PrintGameplayTags();
 
 public:

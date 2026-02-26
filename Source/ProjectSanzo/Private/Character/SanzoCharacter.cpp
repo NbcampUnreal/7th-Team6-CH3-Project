@@ -17,7 +17,7 @@
 #include "Character/Components/SanzoNavigationArrowComponent.h"
 #include "Character/Components/SanzoUpgradeComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
-#include "Weapon/SanzoGun.h"
+//#include "Weapon/SanzoGun.h" //제거필요
 #include "Curves/CurveFloat.h"
 
 #include "Common/SanzoGameplayTag.h"
@@ -94,6 +94,8 @@ ASanzoCharacter::ASanzoCharacter()
   NavArrow->SetHiddenInGame(true);
 #pragma endregion 이준로
 
+
+  CurrentFOV = FollowCamera->FieldOfView;
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
 }
@@ -112,6 +114,9 @@ void ASanzoCharacter::PostInitializeComponents()
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
   }
+
+ 
+  
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -139,6 +144,17 @@ void ASanzoCharacter::BeginPlay()
     //타임라인과 커브 연결
     AimTimeline.AddInterpFloat(AimCurve, TimelineCallback);
     AimTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
+
+  }
+
+  //화살 장전 몽타주 시작 델리게이 바인딩
+  if (EquipmentComp)
+  {
+    ASanzoWeaponBase* BowWeapon = EquipmentComp->Inventory[1];
+    if (BowWeapon)
+    {
+      BowWeapon->StartBowAttackDelegate.BindUObject(this, &ASanzoCharacter::ZoomBow);
+    }
 
   }
 }
@@ -295,8 +311,6 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
   }
 }
 
-
-
 void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 {
   if(GetCharacterMovement())
@@ -346,6 +360,12 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
     {
       GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
       Weapon->StartFire();
+
+      if (Weapon == EquipmentComp->Inventory[static_cast<uint8>(EWeaponType::Bow)])
+      {
+
+      }
+
       //AI가 들을수 있는 Noise재생
 #pragma region MakeNoise
       MakeNoise(1.0f, this, GetActorLocation());
@@ -366,6 +386,7 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
     CharacterGameplayTags.RemoveTag(SanzoTags::Attack);
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
+      //끼고있는 무기가 활 일때 공격불가
       if (Weapon == EquipmentComp->Inventory[1] && CharacterGameplayTags.HasTag(SanzoTags::Swap))
       {
         return;
@@ -374,6 +395,8 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
       Weapon->StopFire();
     }
   }
+  GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
+  ZoomOutBow();
 }
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
@@ -413,7 +436,7 @@ void ASanzoCharacter::EndDodge(UAnimMontage* Montage, bool bInterrupted)
 void ASanzoCharacter::SuccessDodge()
 {
   CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
-
+  UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
   GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
   TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
   GetWorld()->GetTimerManager().SetTimer(
@@ -495,6 +518,69 @@ void ASanzoCharacter::AimStop(const FInputActionValue& Value)
   PlayAimTimeLine();
   CharacterGameplayTags.RemoveTag(SanzoTags::Aiming);
 }
+
+void ASanzoCharacter::ZoomBow(UAnimMontage* Montage)
+{
+  //float CurrentFOV = FollowCamera->FieldOfView;
+  //float DesiredFOV = 45.f;
+  // 활을 발사하는 사람 몽타지 중 Draw 섹션의 재생 길이를 가져옴
+  int32 SectionIndex = Montage->GetSectionIndex(FName("Default"));
+  float CurrentSectionLength = Montage->GetSectionLength(SectionIndex);
+
+  float InterpSpeed = 1 / (CurrentSectionLength * 10) * 5;
+
+  GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
+  TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
+  GetWorldTimerManager().SetTimer(
+    BowDrawTimerHandle,
+    [WeakThis, InterpSpeed]()
+    {
+      float DesiredFOV = 75.f;
+      if (WeakThis.IsValid())
+      {
+        WeakThis->CurrentFOV = WeakThis->FollowCamera->FieldOfView;
+        float NewFOV = FMath::FInterpTo(WeakThis->CurrentFOV, DesiredFOV, WeakThis->GetWorld()->GetDeltaSeconds(), InterpSpeed);
+        WeakThis->FollowCamera->SetFieldOfView(NewFOV);
+      }
+    },
+    0.01f,
+    true
+  );
+}
+
+void ASanzoCharacter::ZoomOutBow()
+{
+  GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
+  TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
+  float ZoomAlpha = 0;
+  GetWorldTimerManager().SetTimer(
+    BowDrawTimerHandle,
+    [WeakThis, ZoomAlpha]() mutable
+    {
+      float DesiredFOV = 90.f;
+      if (WeakThis.IsValid())
+      {
+        
+        ZoomAlpha = FMath::Clamp(ZoomAlpha, 0, 1) + 0.05;
+        WeakThis->CurrentFOV = WeakThis->FollowCamera->FieldOfView;
+        float NewFOV = FMath::Lerp(WeakThis->CurrentFOV, 90.f, ZoomAlpha);
+        WeakThis->FollowCamera->SetFieldOfView(NewFOV);
+
+        if (ZoomAlpha >= 1.0f)
+        {
+          WeakThis->GetWorldTimerManager().ClearTimer(WeakThis->BowDrawTimerHandle);
+        }
+      }
+    },
+    0.01f,
+    true
+  );
+
+
+}
+
+
+
 
 void ASanzoCharacter::TimelineUpdateCallBack(float Value)
 {
