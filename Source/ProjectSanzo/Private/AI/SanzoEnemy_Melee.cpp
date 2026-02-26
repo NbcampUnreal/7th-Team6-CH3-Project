@@ -54,17 +54,32 @@ void ASanzoEnemy_Melee::OnMeleeOverlap(UPrimitiveComponent* OverlappedComp, AAct
     );
 
 #pragma region NotifyParried
-    if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+    if (ACharacter* Character = Cast<ACharacter>(HitResult.GetActor()))
     {
-      if(IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
+      if (IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
       {
         if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
         {
           StunComponent->NotifyParried();
         }
+        if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
+        {
+          TWeakObjectPtr<ASanzoEnemyBase> WeakThis;
+          GetWorld()->GetTimerManager().SetTimer(
+            SlowTimerHandle,
+            [WeakThis]()
+            {
+              WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+            },
+            0.1f, //0.1초 후 시간 원래대로
+            false);
+          return;
+        }
       }
     }
+
 #pragma endregion 김형백
+
 
     // 한 번 때리면 콜리전을 즉시 비활성화 
     DisableWeaponCollision();
