@@ -32,17 +32,9 @@ protected:
 	// 플레이어 활, AI 적 원거리 무기 = true, 플레이어 총 = false
 	bool bInfiniteAmmo;
 
-	// 기본 사거리
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
-	float MaxRange;
-
 	// 기본 공격력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float BaseDamage;
-
-	// 연사 속도
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
-	float FireRate;
 
 	// 헤드샷 데미지 배율
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
@@ -74,7 +66,7 @@ protected:
 
 	// 총알 자국 사이즈 조절용 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Effects")
-	float DecalSize = 9.0f;
+	float DecalSize = 8.0f;
 
 public:
 	// 마우스 좌클릭 눌렀을 때 작동, 활이면 차징 시작, 총(연사)면 발사~, 총(단발)이면 Fire() 1번 호출 
