@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickedUp,FName, ItemType, in
 
 class ASanzoCharacter;
 
-enum class WeaponName : uint8
+enum class EWeaponType : uint8
 {
   Gun,
   Bow

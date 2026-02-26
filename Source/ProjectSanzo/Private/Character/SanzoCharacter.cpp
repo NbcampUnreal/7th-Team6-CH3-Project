@@ -17,7 +17,7 @@
 #include "Character/Components/SanzoNavigationArrowComponent.h"
 #include "Character/Components/SanzoUpgradeComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
-#include "Weapon/SanzoGun.h"
+//#include "Weapon/SanzoGun.h" //제거필요
 #include "Curves/CurveFloat.h"
 
 #include "Common/SanzoGameplayTag.h"
@@ -96,6 +96,8 @@ ASanzoCharacter::ASanzoCharacter()
   NavArrow->SetHiddenInGame(true);
 #pragma endregion 이준로
 
+
+  CurrentFOV = FollowCamera->FieldOfView;
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
 }
@@ -113,7 +115,7 @@ void ASanzoCharacter::PostInitializeComponents()
   if(ParryComp)
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
-  }
+  } 
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -141,9 +143,19 @@ void ASanzoCharacter::BeginPlay()
     //타임라인과 커브 연결
     AimTimeline.AddInterpFloat(AimCurve, TimelineCallback);
     AimTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
-
   }
-  // 스탯 복원
+
+  //화살 장전 몽타주 시작 델리게이 바인딩
+  if (EquipmentComp)
+  {
+    ASanzoWeaponBase* BowWeapon = EquipmentComp->Inventory[1];
+    if (BowWeapon)
+    {
+      BowWeapon->StartBowAttackDelegate.BindUObject(this, &ASanzoCharacter::ZoomBow);
+    }
+  }
+  
+  // 스탯 복원 최
   RestoreFromGI();
 }
 
@@ -223,6 +235,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ASanzoCharacter::AimStart);
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
     EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ASanzoCharacter::Parry);
+    EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ASanzoCharacter::Pause);
     // 이용호 추가
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
   }
@@ -299,8 +312,6 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
   }
 }
 
-
-
 void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
 {
   if(GetCharacterMovement())
@@ -350,6 +361,12 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
     {
       GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
       Weapon->StartFire();
+
+      if (Weapon == EquipmentComp->Inventory[static_cast<uint8>(EWeaponType::Bow)])
+      {
+
+      }
+
       //AI가 들을수 있는 Noise재생
 #pragma region MakeNoise
       MakeNoise(1.0f, this, GetActorLocation());
@@ -370,6 +387,7 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
     CharacterGameplayTags.RemoveTag(SanzoTags::Attack);
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
+      //끼고있는 무기가 활 일때 공격불가
       if (Weapon == EquipmentComp->Inventory[1] && CharacterGameplayTags.HasTag(SanzoTags::Swap))
       {
         return;
@@ -378,6 +396,17 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
       Weapon->StopFire();
     }
   }
+  GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
+  ZoomOutBow();
+}
+
+void ASanzoCharacter::Pause(const FInputActionValue& Value)
+{
+  if (ASanzoPlayerController* PlayerController = Cast<ASanzoPlayerController>(GetController()))
+  {
+    PlayerController->ShowPopUp(SanzoTags::Pause);
+  }
+
 }
 
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
@@ -412,6 +441,23 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 void ASanzoCharacter::EndDodge(UAnimMontage* Montage, bool bInterrupted)
 {
   CharacterGameplayTags.RemoveTag(SanzoTags::Dodge);
+}
+
+void ASanzoCharacter::SuccessDodge()
+{
+  CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
+  UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
+  GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+  TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
+  GetWorld()->GetTimerManager().SetTimer(
+    SlowTimerHandle,
+    [WeakThis]()
+    {
+      if (WeakThis.IsValid())
+        WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+    },
+    0.1f, //0.1초 후 시간 원래대로
+    false);
 }
 
 
@@ -482,6 +528,69 @@ void ASanzoCharacter::AimStop(const FInputActionValue& Value)
   PlayAimTimeLine();
   CharacterGameplayTags.RemoveTag(SanzoTags::Aiming);
 }
+
+void ASanzoCharacter::ZoomBow(UAnimMontage* Montage)
+{
+  //float CurrentFOV = FollowCamera->FieldOfView;
+  //float DesiredFOV = 45.f;
+  // 활을 발사하는 사람 몽타지 중 Draw 섹션의 재생 길이를 가져옴
+  int32 SectionIndex = Montage->GetSectionIndex(FName("Default"));
+  float CurrentSectionLength = Montage->GetSectionLength(SectionIndex);
+
+  float InterpSpeed = 1 / (CurrentSectionLength * 3);
+
+  GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
+  TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
+  GetWorldTimerManager().SetTimer(
+    BowDrawTimerHandle,
+    [WeakThis, InterpSpeed]()
+    {
+      float DesiredFOV = 75.f;
+      if (WeakThis.IsValid())
+      {
+        WeakThis->CurrentFOV = WeakThis->FollowCamera->FieldOfView;
+        float NewFOV = FMath::FInterpTo(WeakThis->CurrentFOV, DesiredFOV, WeakThis->GetWorld()->GetDeltaSeconds(), InterpSpeed);
+        WeakThis->FollowCamera->SetFieldOfView(NewFOV);
+      }
+    },
+    0.01f,
+    true
+  );
+}
+
+void ASanzoCharacter::ZoomOutBow()
+{
+  GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
+  TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
+  float ZoomAlpha = 0;
+  GetWorldTimerManager().SetTimer(
+    BowDrawTimerHandle,
+    [WeakThis, ZoomAlpha]() mutable
+    {
+      float DesiredFOV = 90.f;
+      if (WeakThis.IsValid())
+      {
+        
+        ZoomAlpha = FMath::Clamp(ZoomAlpha, 0, 1) + 0.05;
+        WeakThis->CurrentFOV = WeakThis->FollowCamera->FieldOfView;
+        float NewFOV = FMath::Lerp(WeakThis->CurrentFOV, 90.f, ZoomAlpha);
+        WeakThis->FollowCamera->SetFieldOfView(NewFOV);
+
+        if (ZoomAlpha >= 1.0f)
+        {
+          WeakThis->GetWorldTimerManager().ClearTimer(WeakThis->BowDrawTimerHandle);
+        }
+      }
+    },
+    0.01f,
+    true
+  );
+
+
+}
+
+
+
 
 void ASanzoCharacter::TimelineUpdateCallBack(float Value)
 {
@@ -562,6 +671,7 @@ bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
   return CharacterGameplayTags.HasTag(TagsToCheck);
   
 }
+
 #pragma region InterfaceFunction
 void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
@@ -601,10 +711,9 @@ void ASanzoCharacter::ApplyExpeReward(float Amount)
     StatComp->AddExperience(Amount);
   }
 }
-
-
 #pragma endregion 김형백
 
+#pragma region TakeDamage
 float ASanzoCharacter::TakeDamage(
   float DamageAmount,
   FDamageEvent const& DamageEvent,
@@ -631,10 +740,10 @@ float ASanzoCharacter::TakeDamage(
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
 
   }
-  /*회피*/
+  /*회피성공*/
   if (CharacterGameplayTags.HasTag(SanzoTags::IFrame))
   {
-    CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
+    SuccessDodge();
     FinalDamage = 0.f;
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
   }
@@ -658,8 +767,9 @@ float ASanzoCharacter::TakeDamage(
 
   return FinalDamage;
 }
+#pragma endregion 김형백
 
-// 자가 복원
+// 자가 복원 최윤서
 void ASanzoCharacter::RestoreFromGI()
 {
   if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
