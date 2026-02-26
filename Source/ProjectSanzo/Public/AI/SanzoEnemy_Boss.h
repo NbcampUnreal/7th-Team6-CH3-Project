@@ -34,4 +34,41 @@ protected:
 
   // 페이즈 2 진입 처리
   void EnterPhase2();
+
+public:
+  // 돌진 실행 함수
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void ExecuteDash();
+
+  UPROPERTY(BlueprintReadOnly, Category = "Boss|Combat")
+  bool bIsHeavyAttack = false;
+
+  // 강공격 준비
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void BeginHeavySmash();
+
+  // 강공격 종료
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void EndHeavySmash();
+
+  // 강공격 충격파 실행
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void ExecuteSmashShockwave();
+
+protected:
+  // 돌진 속도
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  float DashSpeed = 4000.f;
+
+  // 원래 데미지를 기억해 둘 변수
+  float OriginalDamage;
+
+  // 충격파 반경 (3m = 300.0f)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  float ShockwaveRadius = 300.0f;
+
+  // 충격파 데미지
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  float ShockwaveDamage = 20.0f;
+
 };

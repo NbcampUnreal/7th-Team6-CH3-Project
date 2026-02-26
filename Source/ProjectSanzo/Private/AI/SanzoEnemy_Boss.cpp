@@ -6,6 +6,8 @@
 #include "Common/SanzoLog.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "DrawDebugHelpers.h"
 
 ASanzoEnemy_Boss::ASanzoEnemy_Boss()
 {
@@ -22,6 +24,7 @@ void ASanzoEnemy_Boss::BeginPlay()
 {
   Super::BeginPlay();
   bIsPhase2 = false;
+  OriginalDamage = MeleeDamage;
 }
 
 float ASanzoEnemy_Boss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -74,4 +77,80 @@ void ASanzoEnemy_Boss::BroadcastAttackWarning(FName PatternName)
   UE_LOG(LogKDJ, Warning, TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
   
   OnBossAttackWarning.Broadcast(PatternName);
+}
+
+// 돌진 패턴 실행 함수
+void ASanzoEnemy_Boss::ExecuteDash()
+{
+  ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+  if (!Player || IsDead()) return;
+
+  // 플레이어를 향한 방향 벡터 계산
+  FVector StartLoc = GetActorLocation();
+  FVector TargetLoc = Player->GetActorLocation();
+  FVector Direction = (TargetLoc - StartLoc).GetSafeNormal2D();
+
+  // 돌진하기 직전, 플레이어 쪽으로 몸을 회전
+  SetActorRotation(Direction.Rotation());
+
+  if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+  {
+    MoveComp->SetMovementMode(MOVE_Falling);
+
+    FVector FinalVelocity = Direction * DashSpeed;
+    FinalVelocity.Z = 200.f;
+
+    MoveComp->Velocity = FinalVelocity;
+  }
+}
+
+void ASanzoEnemy_Boss::BeginHeavySmash()
+{
+  bIsHeavyAttack = true;
+
+  // 내려찍기 시 기본 데미지의 2배
+  MeleeDamage = OriginalDamage * 2.f;
+}
+
+void ASanzoEnemy_Boss::EndHeavySmash()
+{
+  bIsHeavyAttack = false;
+  MeleeDamage = OriginalDamage;
+}
+
+void ASanzoEnemy_Boss::ExecuteSmashShockwave()
+{
+  // 충격파가 터질 중심점 계산
+  FVector ImpactLocation;
+  if (StaticWeaponMesh)
+  {
+    ImpactLocation = StaticWeaponMesh->GetSocketLocation(SocketEndName);
+  }
+  else
+  {
+    ImpactLocation = GetActorLocation() + (GetActorForwardVector() * 100.0f);
+  }
+
+  // 팀킬 방지
+  TArray<AActor*> IgnoredActors;
+  IgnoredActors.Add(this);
+
+  // 반경 3m(300.f) 내의 모든 액터에게 광역 데미지
+  UGameplayStatics::ApplyRadialDamage(
+    GetWorld(),
+    ShockwaveDamage,
+    ImpactLocation,
+    ShockwaveRadius,
+    UDamageType::StaticClass(),
+    IgnoredActors,
+    this,
+    GetController(),
+    true
+  );
+
+  // [디버그용] 빨간색 원(공격 범위) 그리기
+  if (GetWorld())
+  {
+    DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
+  }
 }
