@@ -24,7 +24,7 @@
 #include "Common/SanzoLog.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
-//#include "AI/Components/SanzoEnemyStunComponent.h" //제거필요
+
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -328,8 +328,14 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   //} 이제 달릴때 쏘면 멈추고, 쏩니다
   if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed))
   {
+    StopFire(Value);
     return;
   }
+  if (CharacterGameplayTags.HasTag(SanzoTags::Swap))
+  {
+    return;
+  }
+
 
   if(EquipmentComp)
   {
@@ -354,11 +360,17 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
 
 void ASanzoCharacter::StopFire(const FInputActionValue& Value)
 {
+
   if (EquipmentComp)
   {
     CharacterGameplayTags.RemoveTag(SanzoTags::Attack);
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
+      if (Weapon == EquipmentComp->Inventory[1] && CharacterGameplayTags.HasTag(SanzoTags::Swap))
+      {
+        return;
+      }
+
       Weapon->StopFire();
     }
   }
@@ -376,12 +388,20 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
+
   if (bIsExhausted)
   {
     EndParry(nullptr, false);
     return;
   }
-  
+  if (CharacterGameplayTags.HasTag(SanzoTags::Action) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Aiming) &&
+    !CharacterGameplayTags.HasTag(SanzoTags::Parry))
+  {
+    EndParry(nullptr, false);
+    return;
+  }
+
   if (ParryComp->TryParry())
   {
     ParryComp->PlayParryMontage();
@@ -461,8 +481,7 @@ void ASanzoCharacter::SwapWeaponAction(const FInputActionValue& Value)
 {
   // 고정 액션, 공격, 조준, 스왑 중이면 안켜짐
   if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed) ||
-    CharacterGameplayTags.HasTag(SanzoTags::Attack) ||
-    CharacterGameplayTags.HasTag(SanzoTags::Aiming) ||
+    CharacterGameplayTags.HasTag(SanzoTags::Attack)||
     CharacterGameplayTags.HasTag(SanzoTags::Swap))
   {
     return;
@@ -611,29 +630,3 @@ float ASanzoCharacter::TakeDamage(
   return FinalDamage;
 }
 
-/*
-#pragma region PlayerTakeDamage
-float ASanzoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-  float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-  if (StatComp)
-  {
-    StatComp->ApplyDamage(FinalDamage);
-    if (GEngine)
-    {
-      FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
-      GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
-    }
-
-    if (StatComp->IsDead())
-    {
-      UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      // TO-DO: 플레이어 래그돌, 게임 오버 UI 호출, 조작 불가 등 처리
-    }
-  }
-
-  return FinalDamage;
-}
-#pragma endregion 김동주
-*/
