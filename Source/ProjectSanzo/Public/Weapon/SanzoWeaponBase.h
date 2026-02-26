@@ -95,7 +95,7 @@ public:
 
 	// 총알 Setter - 최윤서
 	UFUNCTION(Category = "Weapon|Ammo")
-	void SetCurrentAmmo(int32 Ammo) { CurrentAmmo = Ammo; }
+	virtual void SetCurrentAmmo(int32 Ammo) { CurrentAmmo = Ammo; }
 
 	//업그레이드 적용 함수
 	virtual void ApplyWeaponStatUpgrade(EUpgradeType Type, float Value);

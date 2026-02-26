@@ -54,6 +54,9 @@ public:
 #pragma region DataForHUD
 	
 public:
+	
+	void SetCurrentAmmo(int32 Amount);
+	
 	UPROPERTY()
 	FOnAmmoChanged OnAmmoChanged;
 	

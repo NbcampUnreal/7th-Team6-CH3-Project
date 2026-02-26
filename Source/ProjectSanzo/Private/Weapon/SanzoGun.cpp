@@ -233,6 +233,13 @@ void ASanzoGun::AddAmmo(int32 Amount)
 	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %d"), CurrentAmmo);
 }
 
+void ASanzoGun::SetCurrentAmmo(int32 Amount)
+{
+	Super::SetCurrentAmmo(Amount);
+	
+	OnAmmoChanged.Broadcast();
+}
+
 #pragma region DataForHUD
 
 FText ASanzoGun::GetAmmoTextForHUD() const

@@ -4,6 +4,7 @@
 #include "Character/SanzoCharacter.h"
 #include "Weapon/SanzoWeaponBase.h"
 #include "Character/Components/SanzoEquipmentComponent.h"
+#include "Weapon/SanzoGun.h"
 
 USanzoGameInstance::USanzoGameInstance()
 {
@@ -63,9 +64,12 @@ void USanzoGameInstance::RestoreStat(ASanzoCharacter* Player)
   {
     if (EquipComp->Inventory.IsValidIndex(0))
     {
-      ASanzoWeaponBase* Gun = EquipComp->Inventory[0];
-      Gun->SetCurrentAmmo(CachedAmmo);
-      UE_LOG(LogCYS, Warning, TEXT("GI: 복원 후 탄약: %d"), Gun->GetCurrentAmmo());
+      ASanzoWeaponBase* SanzoWeaponBase = EquipComp->Inventory[0];
+    	if (ASanzoGun* Gun = Cast<ASanzoGun>(SanzoWeaponBase))
+    	{
+    		Gun->SetCurrentAmmo(CachedAmmo);
+    		UE_LOG(LogCYS, Warning, TEXT("GI: 복원 후 탄약: %d"), Gun->GetCurrentAmmo());
+    	}
     }
   }
 }
