@@ -8,9 +8,8 @@
 
 ASanzoGun::ASanzoGun()
 {
-	BaseDamage = 20.0f;       // 기본 데미지
-	FireRate = 0.1f;          // 0.1초마다 발사 (빠른 연사)
-	MaxRange = 5000.0f;       // 사거리 50미터           
+	BaseDamage = 5.0f;       // 기본 데미지
+	FireRate = 0.15f;          // 0.15초마다 발사 (빠른 연사)         
 	CurrentAmmo = 3000;         // 시작 탄약
 	bInfiniteAmmo = false;
 
@@ -82,9 +81,11 @@ void ASanzoGun::Fire()
 	FVector CameraLocation;
 	FRotator CameraRotation;
 	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+	// 사라진 사거리 대신 사용할 트레이스 끝점 
+	float TraceDistance = 100000.f;
 
 	FVector Start = CameraLocation;
-	FVector End = Start + (CameraRotation.Vector() * MaxRange);
+	FVector End = Start + (CameraRotation.Vector() * TraceDistance);
 
 	// 라인트레이스 시작될 때 쏜 무기와 무기 들고있는 플레이어 판정 제외
 	FHitResult HitResult;
@@ -198,15 +199,12 @@ void ASanzoGun::Fire()
 
 void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 {
-	/*
-	추후 업그레이드 타입이 생기면 수정
+	Super::ApplyWeaponStatUpgrade(Type, Value);
+
 	switch (Type)
 	{
 	case EUpgradeType::FireRate:
 		FireRate += Value;
-		break;
-	case EUpgradeType::Damage:
-		BaseDamage += Value;
 		break;
 
 	default:
@@ -215,7 +213,7 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 
 		
 	}
-	*/
+	
 }
 
 void ASanzoGun::AddAmmo(int32 Amount)

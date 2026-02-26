@@ -25,6 +25,11 @@ public:
 	virtual void StopFire() override;
 
 protected:
+
+	// 총 연사 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun|Stats")
+	float FireRate;
+
 	// 에셋에 있는 트레이스 이펙트 사용위한 변수
 	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
 	UParticleSystem* TracerEffect;
