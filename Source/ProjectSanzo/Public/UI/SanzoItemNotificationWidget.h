@@ -1,10 +1,25 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "SanzoItemNotificationWidget.generated.h"
+
+USTRUCT(BlueprintType)
+struct FNotifyTextInfo
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditDefaultsOnly)
+	FText DisplayInfo;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FLinearColor DisplayColor;
+	
+	FNotifyTextInfo() 
+	:	DisplayInfo(FText::GetEmpty()), DisplayColor(FLinearColor::White) {}
+	
+};
+
 
 UCLASS()
 class PROJECTSANZO_API USanzoItemNotificationWidget : public UUserWidget
@@ -25,5 +40,8 @@ protected:
 	
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* ItemNotifyAnim;
+	
+	UPROPERTY(EditDefaultsOnly, Category="UI|Settings")
+	TMap<FName,FNotifyTextInfo> ItemNameTable;
 	
 };

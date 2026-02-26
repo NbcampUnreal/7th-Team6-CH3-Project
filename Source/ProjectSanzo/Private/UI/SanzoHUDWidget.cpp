@@ -37,6 +37,7 @@ void USanzoHUDWidget::NativeConstruct()
 			EquipmentComponent->OnAmmoChanged.AddDynamic(this, &USanzoHUDWidget::HandleAmmoChanged);
 			EquipmentComponent->OnSwapped.AddDynamic(this, &USanzoHUDWidget::HandleWeaponSwapped);
 			EquipmentComponent->OnAnyWeaponHitEnemy.AddDynamic(this, &USanzoHUDWidget::HandleEnemyHitAnim);
+			EquipmentComponent->OnItemPickedUp.AddDynamic(this, &USanzoHUDWidget::HandleItemNotification);
 		}
 		
 		if (BowAimProgressBar)
@@ -223,7 +224,7 @@ void USanzoHUDWidget::HandleEnemyHitAnim()
 }
 #pragma region ItemNotification
 
-void USanzoHUDWidget::ShowItemNotification(FName ItemType, int32 Amount)
+void USanzoHUDWidget::HandleItemNotification(FName ItemType, int32 Amount)
 {
 	if (!ItemNotificationClass || !NotificationContainer) return;
 	

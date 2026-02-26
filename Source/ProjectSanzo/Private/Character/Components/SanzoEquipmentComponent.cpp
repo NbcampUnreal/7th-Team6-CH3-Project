@@ -132,6 +132,14 @@ void USanzoEquipmentComponent::HandleWeaponHitEnemy()
 	}
 }
 
+void USanzoEquipmentComponent::NotifyItemPickedUp(FName InItemType, int32 InAmount)
+{
+	if (OnItemPickedUp.IsBound())
+	{
+		OnItemPickedUp.Broadcast(InItemType, InAmount);
+	}
+}
+
 #pragma endregion 이준로
 
 #pragma region 무기 스왑 로직 추가

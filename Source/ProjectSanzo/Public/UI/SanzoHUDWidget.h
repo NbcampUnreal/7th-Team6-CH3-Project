@@ -105,7 +105,8 @@ protected:
 #pragma region ItemNotification
 	
 public:
-	void ShowItemNotification(FName ItemType, int32 Amount);
+	UFUNCTION()
+	void HandleItemNotification(FName ItemType, int32 Amount);
 	
 protected:
 	UPROPERTY(EditAnywhere, Category= "UI")
