@@ -235,6 +235,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ASanzoCharacter::AimStart);
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
     EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ASanzoCharacter::Parry);
+    EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ASanzoCharacter::Pause);
     // 이용호 추가
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
   }
@@ -399,6 +400,15 @@ void ASanzoCharacter::StopFire(const FInputActionValue& Value)
   ZoomOutBow();
 }
 
+void ASanzoCharacter::Pause(const FInputActionValue& Value)
+{
+  if (ASanzoPlayerController* PlayerController = Cast<ASanzoPlayerController>(GetController()))
+  {
+    PlayerController->ShowPopUp(SanzoTags::Pause);
+  }
+
+}
+
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
@@ -527,7 +537,7 @@ void ASanzoCharacter::ZoomBow(UAnimMontage* Montage)
   int32 SectionIndex = Montage->GetSectionIndex(FName("Default"));
   float CurrentSectionLength = Montage->GetSectionLength(SectionIndex);
 
-  float InterpSpeed = 1 / (CurrentSectionLength * 10) * 5;
+  float InterpSpeed = 1 / (CurrentSectionLength * 3);
 
   GetWorldTimerManager().ClearTimer(BowDrawTimerHandle);
   TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
