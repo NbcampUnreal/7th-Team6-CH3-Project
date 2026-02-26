@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemyBase.h"
@@ -43,4 +43,9 @@ protected:
   // 근접 공격 데미지
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
   float MeleeDamage = 30.0f;
+
+#pragma region Sound
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* MeleeAttackSound;
+#pragma endregion 최윤서
 };

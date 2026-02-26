@@ -196,7 +196,25 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
       Reward->ApplyExpeReward(Exp);
     }
   }
-
+#pragma region Sound
+  else 
+  {
+    // 데미지 입었을 때 사운드 재생
+    if(HitSounds.Num() > 0)
+    {
+      int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
+      UGameplayStatics::PlaySoundAtLocation(
+        this, 
+        HitSounds[RandomIndex], 
+        GetActorLocation(),
+        1.f,
+        1.f,
+        0.f,
+        EnemyAttenuation
+      );
+    }
+  }
+#pragma endregion 최윤서
   return ActualDamage;
 }
 
@@ -208,7 +226,23 @@ void ASanzoEnemyBase::Die()
   bIsDead = true;
   UE_LOG(LogKDJ, Error, TEXT("Enemy Died! Engaging Ragdoll."));
 
-  // TO-DO: Room에 사망 알림
+#pragma region Sound
+  // 사망 사운드 재생
+  if(DeathSounds.Num() > 0)
+  {
+    int32 RandomIndex = FMath::RandRange(0, DeathSounds.Num() - 1);
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      DeathSounds[RandomIndex], 
+      GetActorLocation(),
+      1.f,
+      1.f,
+      0.f,
+      EnemyAttenuation
+    );
+  }
+#pragma endregion 최윤서
+
 #pragma region Call RoomBase
   // 사망 SanzoRoomBase::OnEnemyKilled() 호출
   if (CurrentRoom)
@@ -384,7 +418,16 @@ void ASanzoEnemyBase::OnStunEnteredCallback()
 
   if (StunSound)
   {
-    UGameplayStatics::PlaySoundAtLocation(this, StunSound, GetActorLocation());
+    // 사운드 큐로 변경 - 최윤서
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      StunSound, 
+      GetActorLocation(),
+      1.f,
+      1.f,
+      0.f,
+      EnemyAttenuation
+    );
   }
 
   StopAnimMontage();
@@ -428,7 +471,16 @@ void ASanzoEnemyBase::OnParriedCallback()
 
   if (ParriedSound)
   {
-    UGameplayStatics::PlaySoundAtLocation(this, ParriedSound, EffectLocation);
+    // 사운드 큐로 변경  - 최윤서
+    UGameplayStatics::PlaySoundAtLocation(
+      this, 
+      ParriedSound, 
+      GetActorLocation(),
+      1.f,
+      1.f,
+      0.f,
+      EnemyAttenuation
+    );
   }
 
   if (!StunComponent->GetIsStunned() && StaggerMontage)

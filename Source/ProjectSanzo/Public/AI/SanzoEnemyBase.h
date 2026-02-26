@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -201,5 +201,14 @@ protected:
   UFUNCTION()
   virtual void OnParriedCallback();
 #pragma endregion 김동주
+
+#pragma region Sound
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  TArray<USoundBase*> DeathSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  TArray<USoundBase*> HitSounds;
+  UPROPERTY(EditAnywhere, Category = "Effects|Sound")
+  USoundAttenuation* EnemyAttenuation;
+#pragma endregion 최윤서
 
 };
