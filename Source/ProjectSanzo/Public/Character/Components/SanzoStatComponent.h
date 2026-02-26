@@ -26,6 +26,12 @@ struct FSanzoStatData
 	int32 CurrentLevel = 1;
 };
 
+enum class EActionType :uint8
+{
+	Parry,
+	Dodge
+};
+
 //정보 전달 할 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzoStatData&, StatData);
 
@@ -58,9 +64,13 @@ protected:
   float SprintStaminaCost;
 	UPROPERTY(EditAnywhere, Category = "Stamina|Cost")
   float ParryStaminaCost;
+	UPROPERTY(EditAnywhere, Category = "Stamina|Cost")
+	float DodgeStaminaCost;
 	//스태미나 지속회복 핸들
 	FTimerHandle StaminaRestoreHandle;
   FTimerHandle SprintStaminaCostHandle;
+
+	FTimerHandle LevelUpLateHandle;
 	//Health 관련 변수
 	float CurrentHealth;
 	float MaxHealth;
@@ -89,7 +99,7 @@ public:
 	FOnTagCheckDelegate TagCheckDelegate;
 	//캐릭터에서 사용할 질문함수
 	void RequestConsumeStaminaForSprint(bool bShouldConsume);
-	void ConsumeStaminaForAction();
+	void ConsumeStaminaForAction(EActionType Type);
 	bool bIsExhausted;
 
 	void RestoreHealth(float Amount);

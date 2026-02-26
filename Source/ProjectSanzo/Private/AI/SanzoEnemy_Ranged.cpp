@@ -13,6 +13,7 @@
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
 #include "AI/Components/SanzoEnemyStunComponent.h" 
+#include "GameplayTagAssetInterface.h"
 
 ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
 {
@@ -110,11 +111,45 @@ void ASanzoEnemy_Ranged::FireHitScan()
         UDamageType::StaticClass()
       );
 
+#pragma region NotifyParried
+      if (ACharacter* Character = Cast<ACharacter>(HitResult.GetActor()))
+      {
+        if (IGameplayTagAssetInterface* TagCheck = Cast<IGameplayTagAssetInterface>(Character))
+        {
+          if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
+          {
+            StunComponent->NotifyParried();
+          }
+
+          //회피성공
+          if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
+          {
+            GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+            TWeakObjectPtr<ASanzoEnemyBase> WeakThis(this);
+            GetWorld()->GetTimerManager().SetTimer(
+              SlowTimerHandle,
+              [WeakThis]()
+              {
+                if(WeakThis.IsValid())
+                WeakThis->GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f); //시간 정상화
+              },
+              0.1f, //0.1초 후 시간 원래대로
+              false);
+            return;
+          }
+        }
+      }
+      
+#pragma endregion 김형백
+
       // 피격 위치에 이펙트 생성
       if (HitEffect)
       {
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
       }
+
+
+
     }
 
     // [디버그용] 명중 시 초록색 선 출력

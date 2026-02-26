@@ -202,6 +202,9 @@ protected:
   virtual void OnParriedCallback();
 #pragma endregion 김동주
 
+  //슬로우효과 - 김형백
+  FTimerHandle SlowTimerHandle;
+  
 #pragma region Sound
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> DeathSounds;
