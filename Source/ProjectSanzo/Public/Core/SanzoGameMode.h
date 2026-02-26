@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Core/SanzoStageTypes.h"
+#include "Core/SanzoGameInstance.h" 
 #include "SanzoGameMode.generated.h"
 
 UCLASS()
@@ -18,7 +19,7 @@ public:
 #pragma region Stage Management
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
   ESanzoStageType CurrentStageType;
-
+  USanzoGameInstance* SanzoGameInstance;
   void InitStageType();
 
   // 스테이지 흐름

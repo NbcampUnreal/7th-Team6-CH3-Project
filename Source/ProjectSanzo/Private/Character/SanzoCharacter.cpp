@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
@@ -25,6 +25,8 @@
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
+#include "Core/SanzoGameInstance.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -141,6 +143,8 @@ void ASanzoCharacter::BeginPlay()
     AimTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
 
   }
+  // 스탯 복원
+  RestoreFromGI();
 }
 
 void ASanzoCharacter::Tick(float DeltaTime)
@@ -655,3 +659,11 @@ float ASanzoCharacter::TakeDamage(
   return FinalDamage;
 }
 
+// 자가 복원
+void ASanzoCharacter::RestoreFromGI()
+{
+  if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
+  {
+    GI->RestoreStat(this);
+  }
+}

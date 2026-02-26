@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -39,6 +39,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzo
 //추후 태그 추가/제거 델리게이트도 만들 예정 !
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
 
+#pragma region SaveData
+USTRUCT(BlueprintType)
+struct FSanzoSaveStatData
+{
+	GENERATED_BODY()
+	UPROPERTY()
+	int32 Level = 1;
+	UPROPERTY()
+	float CurrentExp = 0.f;
+};
+#pragma endregion 최윤서
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTSANZO_API USanzoStatComponent :
   public UActorComponent,
@@ -130,4 +141,9 @@ public:
   void ApplyDamage(float DamageAmount);
   bool IsDead() const;
 #pragma endregion 김동주
+
+#pragma region SaveLoad
+	FSanzoSaveStatData GetSaveData() const;
+	void LoadFromSaveData(const FSanzoSaveStatData& SaveData);
+#pragma endregion 최윤서
 };

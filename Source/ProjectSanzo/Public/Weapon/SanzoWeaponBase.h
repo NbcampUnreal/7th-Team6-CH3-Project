@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -92,6 +92,10 @@ public:
 	// UI에서 사용할 현재 총알 값 가져오는 함수
 	UFUNCTION(BlueprintPure, Category = "Weapon|Ammo")
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+
+	// 총알 Setter - 최윤서
+	UFUNCTION(Category = "Weapon|Ammo")
+	void SetCurrentAmmo(int32 Ammo) { CurrentAmmo = Ammo; }
 
 	//업그레이드 적용 함수
 	virtual void ApplyWeaponStatUpgrade(EUpgradeType Type, float Value);
