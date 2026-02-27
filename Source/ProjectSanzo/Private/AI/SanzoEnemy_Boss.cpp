@@ -8,6 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
+#include "AI/SanzoEnemy_Boss_SwordAura.h"
 
 ASanzoEnemy_Boss::ASanzoEnemy_Boss()
 {
@@ -75,7 +76,7 @@ void ASanzoEnemy_Boss::BroadcastAttackWarning(FName PatternName)
   }
 
   UE_LOG(LogKDJ, Warning, TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
-  
+
   OnBossAttackWarning.Broadcast(PatternName);
 }
 
@@ -152,5 +153,42 @@ void ASanzoEnemy_Boss::ExecuteSmashShockwave()
   if (GetWorld())
   {
     DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
+  }
+}
+
+void ASanzoEnemy_Boss::FireSwordAura()
+{
+  // 검기 클래스가 등록되어 있지 않으면 취소
+  if (!SwordAuraClass) return;
+
+  ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+  if (!Player) return;
+
+  // 발사 위치
+  FVector SpawnLocation = StaticWeaponMesh ? StaticWeaponMesh->GetSocketLocation(SocketEndName) : GetActorLocation() + GetActorForwardVector() * 100.f;
+
+  // 발사 방향
+  FVector DirectionToPlayer = (Player->GetActorLocation() - SpawnLocation).GetSafeNormal();
+  FRotator BaseRotation = DirectionToPlayer.Rotation();
+
+  // 스폰 파라미터
+  FActorSpawnParameters SpawnParams;
+  SpawnParams.Owner = this;
+  SpawnParams.Instigator = this;
+
+  TArray<float> SpreadAngles = { -40.f, -20.f, 0.f, 20.f, 40.f };
+
+  for (float Angle : SpreadAngles)
+  {
+    FRotator SpawnRotation = BaseRotation;
+    SpawnRotation.Yaw += Angle;
+
+    // 검기 생성
+    GetWorld()->SpawnActor<ASanzoEnemy_Boss_SwordAura>(
+      SwordAuraClass,
+      SpawnLocation,
+      SpawnRotation,
+      SpawnParams
+    );
   }
 }

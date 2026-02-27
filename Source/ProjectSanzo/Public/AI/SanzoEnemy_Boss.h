@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemy_MeleeBase.h"
@@ -55,6 +55,10 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
   void ExecuteSmashShockwave();
 
+  // 검기 방출
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void FireSwordAura();
+
 protected:
   // 돌진 속도
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
@@ -70,6 +74,10 @@ protected:
   // 충격파 데미지
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
   float ShockwaveDamage = 20.0f;
+
+  // 검기 투사체 클래스
+  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat")
+  TSubclassOf<class ASanzoEnemy_Boss_SwordAura> SwordAuraClass;
 
 #pragma region Sound
 public:
