@@ -232,4 +232,9 @@ public:
   // 스테이지 이동 시 GI에서 스탯 복원하는 함수
   void RestoreFromGI();
 
+#pragma region Death
+  void HandleDeath();
+  void PlayDeathSequence();
+#pragma endregion 최윤서
+
 };
