@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -124,7 +124,10 @@ public:
 #pragma region Asset
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
   UAnimMontage* DodgeMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Dodge")
   USoundBase* DodgeSuccessSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
+  UAnimMontage* HitMontage;
 
 #pragma endregion 김형백
 public:
@@ -172,7 +175,12 @@ protected:
 
   void Dodge(const FInputActionValue& Value);
   void EndDodge(UAnimMontage* Montage, bool bInterrupted);
+  bool TryDodge();
   void SuccessDodge();
+  uint8 DodgeIndex = 0;
+  float LastDodgeTime = 0;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Dodge")
+  float DodgeCooldownTime;
 
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);
@@ -202,7 +210,13 @@ protected:
   FTimerHandle ParryPenaltyTimerHandle;
   FTimerHandle SlowTimerHandle;
   FTimerHandle BowDrawTimerHandle;
+  
+  //디버그용
   void PrintGameplayTags();
+
+  void ApplyHitEffect();
+  void EndHitEffect(UAnimMontage* Montage, bool bInterrupted);
+
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
