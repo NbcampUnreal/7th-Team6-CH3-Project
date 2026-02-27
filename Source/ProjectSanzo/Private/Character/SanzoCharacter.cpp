@@ -253,7 +253,10 @@ void ASanzoCharacter::Move(const FInputActionValue& Value)
   {
     return;
   }
-
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    return;
+  }
   FVector2D MovementVector = Value.Get<FVector2D>();
 
   if (Controller != nullptr)//움직임 로직
@@ -289,8 +292,10 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
   bool bHasAttackTag = CharacterGameplayTags.HasTag(SanzoTags::Attack);
   bool bHasAimingTag = CharacterGameplayTags.HasTag(SanzoTags::Aiming);
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
-
-  if (bHasAimingTag || bHasAttackTag || !bShouldMove || bIsExhausted)
+  bool bIsHit = CharacterGameplayTags.HasTag(SanzoTags::HitReaction);
+  
+  
+  if (bHasAimingTag || bHasAttackTag || !bShouldMove || bIsExhausted||bIsHit)
   {
     StopSprint(Value);
     return;
@@ -343,6 +348,11 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   //  StopFire(Value);
   //  return;
   //} 이제 달릴때 쏘면 멈추고, 쏩니다
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    StopFire(Value);
+    return;
+  }
   if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed))
   {
     StopFire(Value);
@@ -415,7 +425,11 @@ void ASanzoCharacter::Pause(const FInputActionValue& Value)
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
-  
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    return;
+  }
+
   CharacterGameplayTags.AddTag(SanzoTags::Dodge);
   //실행불가
   if (bIsExhausted)
@@ -515,6 +529,10 @@ void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
 
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    return;
+  }
   if (bIsExhausted)
   {
     EndParry(nullptr, false);
@@ -567,6 +585,7 @@ void ASanzoCharacter::AimStart(const FInputActionValue& Value)
   {
     return;
   }
+
   GetCharacterMovement()->MaxWalkSpeed = AimingSpeed;
   PlayAimTimeLine();
   CharacterGameplayTags.AddTag(SanzoTags::Aiming);
