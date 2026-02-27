@@ -55,15 +55,17 @@ void ASanzoEnemy_Boss::EnterPhase2()
 
   UE_LOG(LogKDJ, Error, TEXT("Boss Phase 2 Started!"));
 
-  if (AAIController* AICon = Cast<AAIController>(GetController()))
+  AAIController* AICon = Cast<AAIController>(GetController());
+  if (AICon && AICon->GetBlackboardComponent())
   {
-    if (UBlackboardComponent* BBComp = AICon->GetBlackboardComponent())
-    {
-      BBComp->SetValueAsBool(TEXT("IsPhase2"), true);
-    }
+    AICon->GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPhase2"), true);
   }
 
-  // TO-DO: 포효 애니메이션 재생, 붉은 오라 이펙트 켜기 등 연출 추가
+  // (선택) 여기서 2페이즈 돌입 포효 몽타주 재생, 무기 파티클 변경 등 연출 추가
+  if (Phase2RoarMontage)
+  {
+    PlayAnimMontage(Phase2RoarMontage);
+  }
 }
 
 // 패턴 알림
@@ -207,4 +209,13 @@ void ASanzoEnemy_Boss::EndUltimateFlurry()
   bIsUltimateFlurry = false;
   bIsEnraged = false;
   MeleeDamage = OriginalDamage;
+}
+
+void ASanzoEnemy_Boss::OnParriedCallback()
+{
+  // 데미지를 즉시 기본값으로 복구
+  bIsHeavyAttack = false;
+  MeleeDamage = OriginalDamage;
+  DisableWeaponCollision();
+  Super::OnParriedCallback();
 }

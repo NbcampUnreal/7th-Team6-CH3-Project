@@ -96,4 +96,10 @@ public:
   // 궁극기 종료 (원상 복구)
   UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
   void EndUltimateFlurry();
+
+  // 2페이즈 진입 몽타주
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  TObjectPtr<UAnimMontage> Phase2RoarMontage;
+
+  virtual void OnParriedCallback() override;
 };
