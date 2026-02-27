@@ -5,7 +5,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
-
+#include "GameplayTagAssetInterface.h"
+#include "Common/SanzoGameplayTag.h"
 ASanzoBow::ASanzoBow()
 {
 	// 시위에 보일 가짜화살 생성
@@ -87,6 +88,16 @@ void ASanzoBow::StopFire()
 {
 	Super::StopFire();
 	
+	if (IGameplayTagAssetInterface* TagCheak = Cast<IGameplayTagAssetInterface>(GetOwner()))
+	{
+		if(TagCheak->HasMatchingGameplayTag(SanzoTags::HitReaction)||
+		TagCheak->HasMatchingGameplayTag(SanzoTags::Swap)
+			)
+		{
+			return;
+		}
+	}
+
 #pragma region DataForHUD
 	
 	//PercentBar 방송용 Tick 비활성화
