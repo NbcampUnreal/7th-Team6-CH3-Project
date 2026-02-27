@@ -111,7 +111,11 @@ void ASanzoEnemy_MeleeBase::PerformWeaponTrace()
           {
             if (TagCheck->HasMatchingGameplayTag(SanzoTags::ParryWindow))
             {
-              StunComponent->NotifyParried();
+              // 작성자: 김동주
+              // 특정 패턴 패리 시 스턴 게이지 2칸
+              // 그 외 패리 시 1칸 증가하도록 구현
+              int32 StunAmount = GetStunGaugeOnParried();
+              StunComponent->NotifyParried(StunAmount);
             }
 
             //회피성공

@@ -60,7 +60,7 @@ public:
 
   // '패링 당함' 알림 함수
   UFUNCTION(BlueprintCallable, Category = "Stun")
-  void NotifyParried();
+  void NotifyParried(int32 StunAmount = 1);
 
   // 스턴 게이지 추가 함수
   UFUNCTION(BlueprintCallable, Category = "Stun")

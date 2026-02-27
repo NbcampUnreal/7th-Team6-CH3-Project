@@ -102,4 +102,6 @@ public:
   TObjectPtr<UAnimMontage> Phase2RoarMontage;
 
   virtual void OnParriedCallback() override;
+
+  virtual int32 GetStunGaugeOnParried() const override;
 };

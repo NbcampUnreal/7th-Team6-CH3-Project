@@ -5,10 +5,10 @@ USanzoEnemyStunComponent::USanzoEnemyStunComponent()
   PrimaryComponentTick.bCanEverTick = false;
 }
 
-void USanzoEnemyStunComponent::NotifyParried()
+void USanzoEnemyStunComponent::NotifyParried(int32 StunAmount)
 {
   OnParried.Broadcast();
-  AddStunGauge(1);
+  AddStunGauge(StunAmount);
 }
 
 void USanzoEnemyStunComponent::AddStunGauge(int32 Amount)
@@ -43,7 +43,10 @@ void USanzoEnemyStunComponent::EnterStunState()
   OnStunStateEntered.Broadcast();
 
   // 타이머 설정하여 스턴 해제 예약
-  GetWorld()->GetTimerManager().SetTimer(StunTimerHandle, this, &USanzoEnemyStunComponent::RecoverFromStun, StunDuration, false);
+  if (UWorld* World = GetWorld())
+  {
+    GetWorld()->GetTimerManager().SetTimer(StunTimerHandle, this, &USanzoEnemyStunComponent::RecoverFromStun, StunDuration, false);
+  }
 }
 
 void USanzoEnemyStunComponent::RecoverFromStun()
