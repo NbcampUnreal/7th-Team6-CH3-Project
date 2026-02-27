@@ -116,4 +116,12 @@ protected:
 	class UVerticalBox* NotificationContainer;
 	
 #pragma endregion 이준로
+	
+#pragma region StageInfo
+	
+protected:	
+	UPROPERTY(meta = (BindWidget))
+	class USanzoStageInfoWidget* StageInfoWidget;
+	
+#pragma endregion 이준로
 };
