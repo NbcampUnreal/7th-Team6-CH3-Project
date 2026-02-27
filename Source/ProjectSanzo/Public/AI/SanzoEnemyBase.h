@@ -212,4 +212,7 @@ protected:
   USoundAttenuation* EnemyAttenuation;
 #pragma endregion 최윤서
 
+  // 분노 상태 플래그
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+  bool bIsEnraged = false;
 };

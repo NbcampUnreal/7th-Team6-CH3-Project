@@ -45,6 +45,9 @@ protected:
   UPROPERTY(EditDefaultsOnly, Category = "Combat|Trace")
   float TraceRadius = 10.0f;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+  float TraceZOffset = -40.0f;
+
   // 중복 타격 방지 배열
   UPROPERTY()
   TArray<AActor*> HitActorsToIgnore;

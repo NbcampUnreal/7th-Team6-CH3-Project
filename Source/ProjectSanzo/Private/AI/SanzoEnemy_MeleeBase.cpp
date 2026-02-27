@@ -61,8 +61,11 @@ void ASanzoEnemy_MeleeBase::PerformWeaponTrace()
 {
   if (!StaticWeaponMesh) return;
 
-  FVector CurrentStart = StaticWeaponMesh->GetSocketLocation(SocketStartName);
-  FVector OutputEnd = StaticWeaponMesh->GetSocketLocation(SocketEndName);
+  FVector SocketStart = StaticWeaponMesh->GetSocketLocation(SocketStartName);
+  FVector SocketEnd = StaticWeaponMesh->GetSocketLocation(SocketEndName);
+
+  FVector CurrentStart = SocketStart + FVector(0.f, 0.f, TraceZOffset);
+  FVector OutputEnd = SocketEnd + FVector(0.f, 0.f, TraceZOffset);
 
   TArray<FHitResult> OutHits;
   TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;

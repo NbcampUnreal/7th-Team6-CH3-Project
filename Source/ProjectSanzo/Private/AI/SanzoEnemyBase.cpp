@@ -484,7 +484,7 @@ void ASanzoEnemyBase::OnParriedCallback()
     );
   }
 
-  if (!StunComponent->GetIsStunned() && StaggerMontage)
+  if (!StunComponent->GetIsStunned() && StaggerMontage && !bIsEnraged)
   {
   	//Stun상태 방송
   	BroadCastAllData();

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemy_MeleeBase.h"
@@ -55,6 +55,10 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
   void ExecuteSmashShockwave();
 
+  // 검기 방출
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void FireSwordAura();
+
 protected:
   // 돌진 속도
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
@@ -71,9 +75,31 @@ protected:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
   float ShockwaveDamage = 20.0f;
 
+  // 검기 투사체 클래스
+  UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat")
+  TSubclassOf<class ASanzoEnemy_Boss_SwordAura> SwordAuraClass;
+
 #pragma region Sound
 public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> AttackSounds;
 #pragma endregion 최윤서
+
+  // 궁극기 패턴 플래그
+  UPROPERTY(BlueprintReadOnly, Category = "Boss|Combat")
+  bool bIsUltimateFlurry = false;
+
+  // 궁극기 시작 (데미지 세팅)
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void BeginUltimateFlurry();
+
+  // 궁극기 종료 (원상 복구)
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void EndUltimateFlurry();
+
+  // 2페이즈 진입 몽타주
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Combat")
+  TObjectPtr<UAnimMontage> Phase2RoarMontage;
+
+  virtual void OnParriedCallback() override;
 };

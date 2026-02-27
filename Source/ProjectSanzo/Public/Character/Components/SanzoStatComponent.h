@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -150,4 +150,8 @@ public:
 	FSanzoSaveStatData GetSaveData() const;
 	void LoadFromSaveData(const FSanzoSaveStatData& SaveData);
 #pragma endregion 최윤서
+
+  // 작성자: 김동주
+  // 최대 체력 반환 함수
+  float GetMaxHealth() const { return MaxHealth; }
 };

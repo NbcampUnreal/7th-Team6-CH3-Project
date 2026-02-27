@@ -36,13 +36,13 @@ void ASanzoEnemy_Ranged::Attack()
 
 void ASanzoEnemy_Ranged::FireHitScan()
 {
-  if (IsDead() || !WeaponMesh) return;
+  if (IsDead() || !StaticWeaponMesh) return;
 
   FVector TraceStart = GetActorLocation();
 
-  if (WeaponMesh->DoesSocketExist(TEXT("MuzzleFlash")))
+  if (StaticWeaponMesh->DoesSocketExist(TEXT("MuzzleFlash")))
   {
-    TraceStart = WeaponMesh->GetSocketLocation(TEXT("MuzzleFlash"));
+    TraceStart = StaticWeaponMesh->GetSocketLocation(TEXT("MuzzleFlash"));
   }
   else
   {
@@ -187,7 +187,7 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
 
-  if (bIsAiming && !IsDead() && WeaponMesh && CachedPlayer)
+  if (bIsAiming && !IsDead() && StaticWeaponMesh && CachedPlayer)
   {
     if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
     {
@@ -207,9 +207,9 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
     static const FName HeadSocketName = TEXT("head");
 
     FVector TraceStart = GetActorLocation();
-    if (WeaponMesh->DoesSocketExist(MuzzleSocketName))
+    if (StaticWeaponMesh->DoesSocketExist(MuzzleSocketName))
     {
-      TraceStart = WeaponMesh->GetSocketLocation(MuzzleSocketName);
+      TraceStart = StaticWeaponMesh->GetSocketLocation(MuzzleSocketName);
     }
 
     // 플레이어 위치 계산

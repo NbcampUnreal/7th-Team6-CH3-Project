@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "Character/SanzoCharacter.h"
+﻿#include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -28,6 +26,8 @@
 #include "Components/AudioComponent.h"
 #include "Sound/AmbientSound.h"
 #include "Core/SanzoGameInstance.h"
+#include "Common/SanzoDamageType_Percent.h"
+#include "Engine/DamageEvents.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -831,6 +831,15 @@ float ASanzoCharacter::TakeDamage(
 {
   float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+#pragma region DamageTypePercent
+  if (DamageEvent.DamageTypeClass == USanzoDamageType_Percent::StaticClass())
+  {
+    if (StatComp)
+    {
+      FinalDamage = StatComp->GetMaxHealth() * FinalDamage;
+    }
+  }
+#pragma endregion 김동주
 
   /*패리 성공*/
   //패리태그가 있거나 성공섹션일때 패리 성공

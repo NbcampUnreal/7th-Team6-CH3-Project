@@ -8,6 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DrawDebugHelpers.h"
+#include "AI/SanzoEnemy_Boss_SwordAura.h"
 
 ASanzoEnemy_Boss::ASanzoEnemy_Boss()
 {
@@ -15,7 +16,7 @@ ASanzoEnemy_Boss::ASanzoEnemy_Boss()
 
   // 보스 기본 스탯
   MaxHP = 1000.f;
-  AttackRange = 300.f;
+  AttackRange = 500.f;
   MeleeDamage = 40.f;
   Exp = 500.f; // 레벨업 5번, 외모 업글 찍으라고 협박
 }
@@ -54,15 +55,17 @@ void ASanzoEnemy_Boss::EnterPhase2()
 
   UE_LOG(LogKDJ, Error, TEXT("Boss Phase 2 Started!"));
 
-  if (AAIController* AICon = Cast<AAIController>(GetController()))
+  AAIController* AICon = Cast<AAIController>(GetController());
+  if (AICon && AICon->GetBlackboardComponent())
   {
-    if (UBlackboardComponent* BBComp = AICon->GetBlackboardComponent())
-    {
-      BBComp->SetValueAsBool(TEXT("IsPhase2"), true);
-    }
+    AICon->GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPhase2"), true);
   }
 
-  // TO-DO: 포효 애니메이션 재생, 붉은 오라 이펙트 켜기 등 연출 추가
+  // (선택) 여기서 2페이즈 돌입 포효 몽타주 재생, 무기 파티클 변경 등 연출 추가
+  if (Phase2RoarMontage)
+  {
+    PlayAnimMontage(Phase2RoarMontage);
+  }
 }
 
 // 패턴 알림
@@ -75,7 +78,7 @@ void ASanzoEnemy_Boss::BroadcastAttackWarning(FName PatternName)
   }
 
   UE_LOG(LogKDJ, Warning, TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
-  
+
   OnBossAttackWarning.Broadcast(PatternName);
 }
 
@@ -153,4 +156,66 @@ void ASanzoEnemy_Boss::ExecuteSmashShockwave()
   {
     DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
   }
+}
+
+void ASanzoEnemy_Boss::FireSwordAura()
+{
+  // 검기 클래스가 등록되어 있지 않으면 취소
+  if (!SwordAuraClass) return;
+
+  ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+  if (!Player) return;
+
+  // 발사 위치
+  FVector SpawnLocation = StaticWeaponMesh ? StaticWeaponMesh->GetSocketLocation(SocketEndName) : GetActorLocation() + GetActorForwardVector() * 100.f;
+
+  // 발사 방향
+  FVector DirectionToPlayer = (Player->GetActorLocation() - SpawnLocation).GetSafeNormal();
+  FRotator BaseRotation = DirectionToPlayer.Rotation();
+
+  // 스폰 파라미터
+  FActorSpawnParameters SpawnParams;
+  SpawnParams.Owner = this;
+  SpawnParams.Instigator = this;
+
+  TArray<float> SpreadAngles = { -40.f, -20.f, 0.f, 20.f, 40.f };
+
+  for (float Angle : SpreadAngles)
+  {
+    FRotator SpawnRotation = BaseRotation;
+    SpawnRotation.Yaw += Angle;
+
+    // 검기 생성
+    GetWorld()->SpawnActor<ASanzoEnemy_Boss_SwordAura>(
+      SwordAuraClass,
+      SpawnLocation,
+      SpawnRotation,
+      SpawnParams
+    );
+  }
+}
+
+// 궁극기 시작 - 데미지 50% 증가, 분노 상태
+void ASanzoEnemy_Boss::BeginUltimateFlurry()
+{
+  bIsUltimateFlurry = true;
+  bIsEnraged = true;
+  MeleeDamage = OriginalDamage * 1.5f;
+}
+
+// 궁극기 종료 - 데미지 원상 복구, 분노 상태 해제
+void ASanzoEnemy_Boss::EndUltimateFlurry()
+{
+  bIsUltimateFlurry = false;
+  bIsEnraged = false;
+  MeleeDamage = OriginalDamage;
+}
+
+void ASanzoEnemy_Boss::OnParriedCallback()
+{
+  // 데미지를 즉시 기본값으로 복구
+  bIsHeavyAttack = false;
+  MeleeDamage = OriginalDamage;
+  DisableWeaponCollision();
+  Super::OnParriedCallback();
 }
