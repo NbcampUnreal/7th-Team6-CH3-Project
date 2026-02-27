@@ -84,4 +84,16 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> AttackSounds;
 #pragma endregion 최윤서
+
+  // 궁극기 패턴 플래그
+  UPROPERTY(BlueprintReadOnly, Category = "Boss|Combat")
+  bool bIsUltimateFlurry = false;
+
+  // 궁극기 시작 (데미지 세팅)
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void BeginUltimateFlurry();
+
+  // 궁극기 종료 (원상 복구)
+  UFUNCTION(BlueprintCallable, Category = "Boss|Combat")
+  void EndUltimateFlurry();
 };

@@ -468,7 +468,7 @@ void ASanzoEnemyBase::OnParriedCallback()
     );
   }
 
-  if (!StunComponent->GetIsStunned() && StaggerMontage)
+  if (!StunComponent->GetIsStunned() && StaggerMontage && !bIsEnraged)
   {
     PlayAnimMontage(StaggerMontage);
   }
