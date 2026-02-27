@@ -50,8 +50,6 @@ void USanzoHUDWidget::NativeConstruct()
 				BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"),0.0f);
 			}
 		}
-		
-		
 	}
 
 	if (ASanzoGameState* GameState = GetWorld()->GetGameState<ASanzoGameState>())
@@ -127,15 +125,6 @@ void USanzoHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 }
 
-
-
-void USanzoHUDWidget::HandleStageProgressChanged(float percent)
-{
-	if (StageProgressBar)
-	{
-		StageProgressBar->SetPercent(percent);
-	}
-}
 
 void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
 {
