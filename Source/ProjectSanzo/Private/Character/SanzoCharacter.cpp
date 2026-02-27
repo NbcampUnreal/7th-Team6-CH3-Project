@@ -988,28 +988,13 @@ void ASanzoCharacter::PlayDeathSequence()
   GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
   GetMesh()->SetSimulatePhysics(true);
   GetMesh()->WakeAllRigidBodies();
-
-  FTimerHandle TimerHandle;
-  GetWorld()->GetTimerManager().SetTimer(
-    TimerHandle,
-    FTimerDelegate::CreateWeakLambda(this, [this]()
-      {
-        if (!IsValid(this)) return;
-
-        if (UWorld* World = GetWorld())
-        {
-          World->GetWorldSettings()->SetTimeDilation(1.0f);
-        }
-
-        UE_LOG(LogCYS, Error, TEXT("Game Over!"));
-
-        if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
-        {
-          GI->Restart();
-        }
-      }),
-    1.f,
-    false
-  );
+	
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
+		{
+			SanzoPlayerController->ShowMainUI(FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")));
+		}
+	}
 }
 #pragma endregion 최윤서

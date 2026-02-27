@@ -21,6 +21,8 @@ public:
 	
 	virtual void NativeConstruct() override;
 	
+	virtual void NativeDestruct() override;
+	
 	UFUNCTION()
 	void SetMainUI(FGameplayTag State, float ClearTime, int32 KillScore);
 	
@@ -86,6 +88,22 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	FGameplayTag ReturnMainMenuTag;
+	
+#pragma endregion 이준로
+	
+#pragma region GameOverUI
+protected:
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* GameOverAnim;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
+	USoundBase* GameOverSound;
+	
+	UPROPERTY()
+	UAudioComponent* PlayingAudio;
+	
+	UFUNCTION()
+	void PlayGameOverSound();
 	
 #pragma endregion 이준로
 };
