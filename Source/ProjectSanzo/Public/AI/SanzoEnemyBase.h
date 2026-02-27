@@ -26,6 +26,9 @@ struct FEnemyOverHeadData
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
   bool bIsSighted = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+	bool bIsStunned = false;
 
 };
 

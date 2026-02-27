@@ -24,25 +24,25 @@ public:
 	void UpdateStunGage(int32 CurrentStunCount);
 	
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void UpdatePerceptionMark(bool bIsSight);
-	
-	UFUNCTION(BlueprintCallable, Category = "UI")
 	void UpdateHealthBar(float HealthPercent);
 	
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void UpdateStateImage(bool bIsStunned, bool bIsSighted);
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
 	class UBorder* HealthBorder;
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthBar;
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* PerceptionMark;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* StunGageBox;
 	
 	UPROPERTY()
-	TArray<UImage*> StunImages;
+	TArray<UImage*> StunGageImages;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UImage* StateImage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Resources")
 	class UTexture2D* FullTexture;
@@ -50,9 +50,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Resources")
 	class UTexture2D* EmptyTexture;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Resources")
+	class UTexture2D* FindTexture;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Resources")
+	class UTexture2D* MissingTexture;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Resources")
+	class UTexture2D* StunTexture;
+	
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
-	class UWidgetAnimation* PerceptionMarkStartAnim;
+	class UWidgetAnimation* FindStateAnim;
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
-	class UWidgetAnimation* PerceptionMarkBlinkAnim;
+	class UWidgetAnimation* MissingStateAnim;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* StunStateAnim;
 	
 };

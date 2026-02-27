@@ -13,6 +13,7 @@
 #include "Components/VerticalBox.h"
 #include "Core/SanzoGameState.h"
 #include "UI/SanzoItemNotificationWidget.h"
+#include "UI/SanzoStageInfoWidget.h"
 #include "Weapon/SanzoBow.h"
 
 void USanzoHUDWidget::NativeConstruct()
@@ -49,20 +50,16 @@ void USanzoHUDWidget::NativeConstruct()
 				BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"),0.0f);
 			}
 		}
-		
-		
 	}
 
 	if (ASanzoGameState* GameState = GetWorld()->GetGameState<ASanzoGameState>())
 	{
-		if (StageText)
+		ESanzoStageType CurrentStageType = GameState->CurrentStageType;
+		
+		if (StageInfoWidget)
 		{
-			int32 StageInfo = GameState->CurrentStageIndex;
-			StageText->SetText(FText::FromString(FString::Printf(TEXT("스테이지: %d"), StageInfo)));
+			StageInfoWidget->SetStageInfo(CurrentStageType);
 		}
-		//Delegate 등록
-		//this : 대상 객체, &USanzoHUDWidget::HandleStageProgressChanged: 실행할 함수
-		GameState->OnStageProgressChanged.AddDynamic(this, &USanzoHUDWidget::HandleStageProgressChanged);
 	}
 }
 
@@ -128,15 +125,6 @@ void USanzoHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 }
 
-
-
-void USanzoHUDWidget::HandleStageProgressChanged(float percent)
-{
-	if (StageProgressBar)
-	{
-		StageProgressBar->SetPercent(percent);
-	}
-}
 
 void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
 {

@@ -17,6 +17,8 @@ void ASanzoItem_Exp::ActivateItem(AActor* Activator)
     if (USanzoStatComponent* StatComp = Activator->FindComponentByClass<USanzoStatComponent>())
     {
       StatComp->AddExperience(ExpAmount);
+    	//HUD에 데이터 전달
+    	NotifyItemPickedUp(Activator,ExpAmount);
     }
     UE_LOG(LogCYS, Warning, TEXT("EXP 획득 : %d"), ExpAmount);
     DestroyItem();

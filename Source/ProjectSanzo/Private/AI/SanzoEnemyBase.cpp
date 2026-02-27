@@ -20,6 +20,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "AI/Components/SanzoEnemyStunComponent.h"
 #include "Character/Interface/SanzoRewardReceiverInterface.h"
+#include "UI/SanzoBossOverheadWidget.h"
 
 ASanzoEnemyBase::ASanzoEnemyBase()
 {
@@ -109,6 +110,16 @@ void ASanzoEnemyBase::BeginPlay()
 
       BroadCastAllData();
     }
+  	
+  	//보스전용 Delegate
+  	USanzoBossOverheadWidget* BossOverheadWidget = Cast<USanzoBossOverheadWidget>(OverHeadWidgetInstance);
+  	
+  	if (BossOverheadWidget)
+  	{
+  		OnEnemyDataChanged.AddDynamic(BossOverheadWidget, &USanzoBossOverheadWidget::UpdateOverHeadWidget);
+  		
+  		BroadCastAllData();
+  	}
   }
 
   GetWorldTimerManager().SetTimer(
@@ -322,11 +333,12 @@ FEnemyOverHeadData ASanzoEnemyBase::MakeUpdateOverHeadData() const
   FEnemyOverHeadData NewData;
   if (MaxHP > 0.f)
   {
-
     NewData.HealthPercent = CurrentHP / MaxHP;
-    UE_LOG(LogLJR, Warning, TEXT("적 체력 퍼센트 : %f"), NewData.HealthPercent);
   }
   NewData.CurrentStunCount = StunComponent ? StunComponent->GetCurrentStunCount() : 0;
+	
+	NewData.bIsStunned = StunComponent? StunComponent->GetIsStunned() : 0;
+	
   NewData.bIsSighted = bIsSighted;
 
   return NewData;
@@ -354,7 +366,7 @@ void ASanzoEnemyBase::MakeOverHeadWidget3D()
 void ASanzoEnemyBase::ShowAlertWidget(bool bIsSight)
 {
   bIsSighted = bIsSight;
-  UE_LOG(LogLJR, Warning, TEXT("봤는가? %s"), bIsSighted ? TEXT("true") : TEXT("false"));
+  
   BroadCastAllData();
 }
 
@@ -438,6 +450,10 @@ void ASanzoEnemyBase::OnStunRecoveredCallback()
   {
     if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetBrainComponent()))
     {
+    	//Stun해제 방송
+    	UE_LOG(LogLJR, Warning, TEXT("EnemyBase: 스턴 회복됨"));
+    	BroadCastAllData();
+    	
       BTComp->RestartTree();
     }
   }
@@ -470,6 +486,9 @@ void ASanzoEnemyBase::OnParriedCallback()
 
   if (!StunComponent->GetIsStunned() && StaggerMontage)
   {
+  	//Stun상태 방송
+  	BroadCastAllData();
+  	
     PlayAnimMontage(StaggerMontage);
   }
 }

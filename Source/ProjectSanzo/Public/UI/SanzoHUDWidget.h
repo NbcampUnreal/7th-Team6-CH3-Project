@@ -20,9 +20,6 @@ public:
 
 	UFUNCTION()
 	void HandleStatChanged(const FSanzoStatData& Data);
-
-	UFUNCTION()
-	void HandleStageProgressChanged(float percent);
 	
 	UFUNCTION()
 	void HandleAmmoChanged(FText NewAmmoText);
@@ -72,13 +69,6 @@ protected:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* HitEffectAnim;
 
-	//Game State로 부터 받아올 정보 위젯 연결
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* StageText;
-
-	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* StageProgressBar;
-
 #pragma endregion 이준로
 	
 #pragma region StaminaBarDynamic
@@ -115,5 +105,13 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* NotificationContainer;
 	
+#pragma endregion 이준로
+	
+#pragma region StageInfo
+	
+public:	
+	UPROPERTY(meta = (BindWidget))
+	class USanzoStageInfoWidget* StageInfoWidget;
+
 #pragma endregion 이준로
 };
