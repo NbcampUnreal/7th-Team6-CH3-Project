@@ -103,7 +103,7 @@ void USanzoEquipmentComponent::AddAmmo(int32 Amount)
 {
 	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
 	{
-		Gun->AddAmmo(Amount); //base오버라이드시키고싶지만.. 시간이업다
+		Gun->AddAmmo(Amount); //weaponbase오버라이드시키고싶지만.. 시간이업다
 	}
 }
 
