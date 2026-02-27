@@ -90,10 +90,16 @@ void ASanzoBow::StopFire()
 	
 	if (IGameplayTagAssetInterface* TagCheak = Cast<IGameplayTagAssetInterface>(GetOwner()))
 	{
-		if(TagCheak->HasMatchingGameplayTag(SanzoTags::HitReaction)||
-		TagCheak->HasMatchingGameplayTag(SanzoTags::Swap)
+		if (TagCheak->HasMatchingGameplayTag(SanzoTags::HitReaction) ||
+			TagCheak->HasMatchingGameplayTag(SanzoTags::Swap)
 			)
 		{
+			ChargeStartTime = GetWorld()->GetTimeSeconds();
+			ChargePercent = 0;
+			if (OnChargePercentChanged.IsBound())
+			{
+				OnChargePercentChanged.Broadcast(0.0f);
+			}
 			return;
 		}
 	}
@@ -111,6 +117,9 @@ void ASanzoBow::StopFire()
 	}
 	
 #pragma endregion 이준로
+
+
+
 	// 치지가 끝나기 전에 발사가 호출되면 차지 사운드 예약한 타이머 끄기
 	GetWorldTimerManager().ClearTimer(SwitchSoundTimer);
 	// 재생되던 드로우 사운드 끄고 혹시 있을 차지 사운드도 끄기
@@ -170,6 +179,8 @@ void ASanzoBow::StopFire()
 
 		return;
 	}
+
+
 
 	Fire();
 }

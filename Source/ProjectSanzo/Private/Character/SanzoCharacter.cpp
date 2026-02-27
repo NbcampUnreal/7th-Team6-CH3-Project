@@ -855,11 +855,12 @@ void ASanzoCharacter::ApplyHitEffect()
   {
     AnimInstance->Montage_Play(HitMontage); //여러개 작동 하게 나중에
 
-    FOnMontageBlendingOutStarted HitEndDelegate;
+    FOnMontageEnded HitEndDelegate;
+    /*FOnMontageBlendingOutStarted HitEndDelegate;*/
     HitEndDelegate.BindUObject(this, &ASanzoCharacter::EndHitEffect);
 
     // 반드시 Bind 후에 Set해야 함
-    AnimInstance->Montage_SetBlendingOutDelegate(HitEndDelegate, HitMontage);
+    AnimInstance->Montage_SetEndDelegate(HitEndDelegate, HitMontage);
 
     //공격중지
     StopFire(0);
