@@ -17,18 +17,20 @@ void USanzoBossOverheadWidget::UpdateStunImage(bool bIsStunned)
 	{
 		if (bIsStunned)
 		{
-			if (StunStateAnim)
+			if (!IsAnimationPlaying(StunStateAnim))
 			{
 				UE_LOG(LogLJR, Warning, TEXT("보스 스턴! 애니메이션 재생!"));
+				StateImage->SetOpacity(1.0f);
 				PlayAnimation(StunStateAnim, 0, 0);
 			}
 		}
-		
-		else if (!bIsStunned)
+		else
 		{
-			//UE_LOG(LogLJR, Warning, TEXT("보스 스턴끝 애니메이션 끄기!"));
-			StopAnimation(StunStateAnim);
-			StateImage->SetOpacity(0.0f);
+			if (IsAnimationPlaying(StunStateAnim))
+			{
+				StopAnimation(StunStateAnim);
+				StateImage->SetOpacity(0.0f);
+			}
 		}
 	}
 }
