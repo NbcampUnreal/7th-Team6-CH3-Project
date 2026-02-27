@@ -63,7 +63,33 @@ protected:
 	// 가짜 화살이 부착될 활 시위 쪽의 소켓
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bow|Attachment")
 	FName StringSocketName;
-	
+
+	// 활 발사 시작했을 때 소리 넣을 사운드베이스
+	UPROPERTY(EditDefaultsOnly, Category = "Bow|Sound")
+	USoundBase* DrawStartSound;
+	// 활 차징 계속 당기고 있을 때 소리 넣을 사운드베이스
+	UPROPERTY(EditDefaultsOnly, Category = "Bow|Sound")
+	USoundBase* DrawLoopSound;
+	// 활 발사했을 때 소리 넣을 사운드베이스
+	UPROPERTY(EditDefaultsOnly, Category = "Bow|Sound")
+	USoundBase* FireSound;
+
+	// 사운드들 제어할 오디오 컴포넌트
+	UPROPERTY()
+	UAudioComponent* DrawStartAudioComp;
+
+	UPROPERTY()
+	UAudioComponent* DrawLoopAudioComp;
+
+	UPROPERTY()
+	UAudioComponent* FireAudioComp;
+
+	// 차징 완료 시간에 맞춰 소리를 넘겨줄 타이머
+	FTimerHandle SwitchSoundTimer;
+
+	// 타이머가 실행할 함수
+	void SwitchToLoopSound();
+
 #pragma region DataForHUD
 	
 public:
