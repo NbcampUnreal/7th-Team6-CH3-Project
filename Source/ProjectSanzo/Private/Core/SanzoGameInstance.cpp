@@ -22,12 +22,20 @@ void USanzoGameInstance::MoveToNextStage()
   CurrentStageIndex++;
   if (CurrentStageIndex >= StageLevels.Num())
   {
-    UE_LOG(LogCYS, Warning, TEXT("GI: 처음으로 돌아감"));
-    InitSetup();
+    Restart();
   }
 
   UE_LOG(LogCYS, Warning, TEXT("GI: 다음 스테이지로 이동, 인덱스: %d"), CurrentStageIndex);
 
+  UGameplayStatics::OpenLevel(
+    this,
+    FName(*StageLevels[CurrentStageIndex].GetAssetName())
+  );
+}
+void USanzoGameInstance::Restart()
+{
+  UE_LOG(LogCYS, Warning, TEXT("GI: 처음으로 돌아감"));
+  InitSetup();
   UGameplayStatics::OpenLevel(
     this,
     FName(*StageLevels[CurrentStageIndex].GetAssetName())

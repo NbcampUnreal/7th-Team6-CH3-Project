@@ -23,7 +23,7 @@ class USanzoStatComponent;
 class USanzoParryComponent;
 class USanzoEquipmentComponent;
 class USanzoNavigationArrowComponent;
-
+class AAmbientSound;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -246,4 +246,17 @@ public:
   // 스테이지 이동 시 GI에서 스탯 복원하는 함수
   void RestoreFromGI();
 
+#pragma region Death
+  void HandleDeath();
+  void PlayDeathSequence();
+#pragma endregion 최윤서
+
+#pragma region Sounds
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  USoundBase* DeathSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  TArray<USoundBase*> HitSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+  AAmbientSound* BGMActor;
+#pragma endregion 최윤서
 };
