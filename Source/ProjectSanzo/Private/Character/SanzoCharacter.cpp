@@ -23,7 +23,8 @@
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-
+#include "Components/AudioComponent.h"
+#include "Sound/AmbientSound.h"
 #include "Core/SanzoGameInstance.h"
 #include "Common/SanzoDamageType_Percent.h"
 #include "Engine/DamageEvents.h"
@@ -31,7 +32,7 @@
 DEFINE_LOG_CATEGORY(LogSanzo);
 
 
-
+#pragma region LifeCycle
 ASanzoCharacter::ASanzoCharacter()
 {
   
@@ -96,7 +97,7 @@ ASanzoCharacter::ASanzoCharacter()
   NavArrow->SetHiddenInGame(true);
 #pragma endregion 이준로
 
-
+  DodgeCooldownTime = 0.3;
   CurrentFOV = FollowCamera->FieldOfView;
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
@@ -157,6 +158,19 @@ void ASanzoCharacter::BeginPlay()
   
   // 스탯 복원 최
   RestoreFromGI();
+
+  // BGM 액터 찾기
+  TArray<AActor*> FoundActors;
+  UGameplayStatics::GetAllActorsOfClass(
+    GetWorld(),
+    AAmbientSound::StaticClass(),
+    FoundActors
+  );
+
+  if (FoundActors.Num() > 0)
+  {
+    BGMActor = Cast<AAmbientSound>(FoundActors[0]);
+  }
 }
 
 void ASanzoCharacter::Tick(float DeltaTime)
@@ -187,7 +201,7 @@ void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 }
 
-
+#pragma endregion 김형백
 
 void ASanzoCharacter::PrintGameplayTags()
 {
@@ -218,6 +232,8 @@ void ASanzoCharacter::PrintGameplayTags()
     GEngine->AddOnScreenDebugMessage(Key, 0.0f, FColor::Magenta, Message);
   }
 }
+
+
 
 #pragma region InputFunction
 
@@ -251,7 +267,10 @@ void ASanzoCharacter::Move(const FInputActionValue& Value)
   {
     return;
   }
-
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    return;
+  }
   FVector2D MovementVector = Value.Get<FVector2D>();
 
   if (Controller != nullptr)//움직임 로직
@@ -287,8 +306,10 @@ void ASanzoCharacter::SprintStart(const FInputActionValue& Value)
   bool bHasAttackTag = CharacterGameplayTags.HasTag(SanzoTags::Attack);
   bool bHasAimingTag = CharacterGameplayTags.HasTag(SanzoTags::Aiming);
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
-
-  if (bHasAimingTag || bHasAttackTag || !bShouldMove || bIsExhausted)
+  bool bIsHit = CharacterGameplayTags.HasTag(SanzoTags::HitReaction);
+  
+  
+  if (bHasAimingTag || bHasAttackTag || !bShouldMove || bIsExhausted||bIsHit)
   {
     StopSprint(Value);
     return;
@@ -341,6 +362,11 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   //  StopFire(Value);
   //  return;
   //} 이제 달릴때 쏘면 멈추고, 쏩니다
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    StopFire(Value);
+    return;
+  }
   if (CharacterGameplayTags.HasTag(SanzoTags::Action_Fixed))
   {
     StopFire(Value);
@@ -350,7 +376,11 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   {
     return;
   }
-
+  // dead 상태에서는 공격불가 - 최윤서
+  if(CharacterGameplayTags.HasTag(SanzoTags::Dead))
+  {
+    return;
+  }
 
   if(EquipmentComp)
   {
@@ -408,32 +438,67 @@ void ASanzoCharacter::Pause(const FInputActionValue& Value)
   }
 
 }
-
+//회피
+#pragma region Dodge
 void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 {
+  // dead 상태에서는 회피불가 - 최윤서
+  if (CharacterGameplayTags.HasTag(SanzoTags::Dead))
+  {
+    return;
+  }
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    return;
+  }
 
+  CharacterGameplayTags.AddTag(SanzoTags::Dodge);
+  //실행불가
   if (bIsExhausted)
   {
     EndDodge(nullptr, false);
     return;
   }
-  if (CharacterGameplayTags.HasTag(SanzoTags::Action) &&
-    !CharacterGameplayTags.HasTag(SanzoTags::Aiming) &&
-    !CharacterGameplayTags.HasTag(SanzoTags::Dodge))
+
+  if (CharacterGameplayTags.HasTag(SanzoTags::Parry))
+  {
+    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("뭔가이상함"));
+    EndDodge(nullptr, false);
+    return;
+  }
+  if (!TryDodge())
   {
     EndDodge(nullptr, false);
     return;
   }
+  //총쏠때 회피누르면 정지
+  if (CharacterGameplayTags.HasTag(SanzoTags::Attack))
+  {
+    StopFire(Value);
+  }
 
+  //회피실행
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
     AnimInstance->Montage_Play(DodgeMontage);
+    switch (DodgeIndex)
+    {
+    case 0:
+      DodgeIndex++;
+      break;
+    case 1:
+      AnimInstance->Montage_JumpToSection(FName("Dodge1"), DodgeMontage);
+      DodgeIndex = 0;
+      break;
+    }
+    
     FOnMontageBlendingOutStarted DodgeEndDelegate;
-    AnimInstance->Montage_SetBlendingOutDelegate(DodgeEndDelegate, DodgeMontage);
     DodgeEndDelegate.BindUObject(this, &ASanzoCharacter::EndDodge);
+    AnimInstance->Montage_SetBlendingOutDelegate(DodgeEndDelegate, DodgeMontage);
 
     StatComp->ConsumeStaminaForAction(EActionType::Dodge);
+
   }
   
 }
@@ -443,11 +508,31 @@ void ASanzoCharacter::EndDodge(UAnimMontage* Montage, bool bInterrupted)
   CharacterGameplayTags.RemoveTag(SanzoTags::Dodge);
 }
 
+bool ASanzoCharacter::TryDodge()
+{
+  if (GetWorld())
+  {
+    float CurrentTime = GetWorld()->GetTimeSeconds(); //회피 시도한 시간 기록
+    float TimeSinceLastDodge = CurrentTime - LastDodgeTime;
+
+    if (TimeSinceLastDodge < DodgeCooldownTime)
+    {
+      return false; //회피 쿨타임이 아직 남아있으면 패리 재생안함
+    }
+    LastDodgeTime = CurrentTime;
+  }
+  else
+  {
+    return false; //월드가 없으면 회피 시도 실패
+  }
+  return true; //회피 성공
+}
+
 void ASanzoCharacter::SuccessDodge()
 {
   CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
   UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
-  GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+  GetWorld()->GetWorldSettings()->SetTimeDilation(0.3f); //성공시 시간 느리게
   TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
   GetWorld()->GetTimerManager().SetTimer(
     SlowTimerHandle,
@@ -459,12 +544,23 @@ void ASanzoCharacter::SuccessDodge()
     0.1f, //0.1초 후 시간 원래대로
     false);
 }
+#pragma endregion 김형백
 
-
+//패리
+#pragma region Parry
 void ASanzoCharacter::Parry(const FInputActionValue& Value)
 {
+  // dead 상태에서는 패링불가 - 최윤서
+  if (CharacterGameplayTags.HasTag(SanzoTags::Dead))
+  {
+    return;
+  }
   bool bIsExhausted = CharacterGameplayTags.HasTag(SanzoTags::Exhausted);
 
+  if (CharacterGameplayTags.HasTag(SanzoTags::HitReaction))
+  {
+    return;
+  }
   if (bIsExhausted)
   {
     EndParry(nullptr, false);
@@ -507,12 +603,18 @@ void ASanzoCharacter::EndParry(UAnimMontage* Montage, bool bInterrupted)
     CharacterGameplayTags.RemoveTag(SanzoTags::ParryWindow);
     
 }
+#pragma endregion 김형백
 
 #pragma region AimingFunction
 void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 {
-  
   if(CharacterGameplayTags.HasTag(SanzoTags::Aiming))
+  {
+    return;
+  }
+
+  // dead 상태에서는 에임불가 - 최윤서
+  if (CharacterGameplayTags.HasTag(SanzoTags::Dead))
   {
     return;
   }
@@ -531,6 +633,11 @@ void ASanzoCharacter::AimStop(const FInputActionValue& Value)
 
 void ASanzoCharacter::ZoomBow(UAnimMontage* Montage)
 {
+  // dead 상태에서는 줌불가 - 최윤서
+  if (CharacterGameplayTags.HasTag(SanzoTags::Dead))
+  {
+    return;
+  }
   //float CurrentFOV = FollowCamera->FieldOfView;
   //float DesiredFOV = 45.f;
   // 활을 발사하는 사람 몽타지 중 Draw 섹션의 재생 길이를 가져옴
@@ -713,6 +820,8 @@ void ASanzoCharacter::ApplyExpeReward(float Amount)
 }
 #pragma endregion 김형백
 
+
+
 #pragma region TakeDamage
 float ASanzoCharacter::TakeDamage(
   float DamageAmount,
@@ -741,6 +850,7 @@ float ASanzoCharacter::TakeDamage(
     ParryComp->SuccessParry();
     CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
     FinalDamage = 0.f;
+    
     //50%확률로 딜 반사 딜 반사 
     if (FMath::RandBool()) 
     {
@@ -748,15 +858,18 @@ float ASanzoCharacter::TakeDamage(
     }
 
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
-
+    return FinalDamage;
   }
+
   /*회피성공*/
   if (CharacterGameplayTags.HasTag(SanzoTags::IFrame))
   {
     SuccessDodge();
     FinalDamage = 0.f;
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
+    return FinalDamage;
   }
+
 
   if (StatComp)
   {
@@ -765,17 +878,51 @@ float ASanzoCharacter::TakeDamage(
     {
       FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
       GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
+      // Hit Sound - 최윤서
+      if (HitSounds.Num() > 0)
+      {
+        int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
+        UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSounds[RandomIndex], GetActorLocation());
+      }
     }
-
     if (StatComp->IsDead())
     {
       UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      // TO-DO: 플레이어 래그돌, 게임 오버 UI 호출, 조작 불가 등 처리
+      HandleDeath();
     }
   }
-
+  ApplyHitEffect();
 
   return FinalDamage;
+}
+
+void ASanzoCharacter::ApplyHitEffect()
+{
+  if (CharacterGameplayTags.HasTag(SanzoTags::Parry))
+  {
+    return;
+  }
+
+  CharacterGameplayTags.AddTag(SanzoTags::HitReaction);
+  if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+  {
+    AnimInstance->Montage_Play(HitMontage); //여러개 작동 하게 나중에
+
+    FOnMontageEnded HitEndDelegate;
+    /*FOnMontageBlendingOutStarted HitEndDelegate;*/
+    HitEndDelegate.BindUObject(this, &ASanzoCharacter::EndHitEffect);
+
+    // 반드시 Bind 후에 Set해야 함
+    AnimInstance->Montage_SetEndDelegate(HitEndDelegate, HitMontage);
+
+    //공격중지
+    StopFire(0);
+  }
+}
+
+void ASanzoCharacter::EndHitEffect(UAnimMontage* Montage, bool bInterrupted)
+{
+  CharacterGameplayTags.RemoveTag(SanzoTags::HitReaction);
 }
 #pragma endregion 김형백
 
@@ -787,3 +934,82 @@ void ASanzoCharacter::RestoreFromGI()
     GI->RestoreStat(this);
   }
 }
+#pragma region Death
+
+void ASanzoCharacter::HandleDeath()
+{
+  // 중복 실행 방지
+  if (CharacterGameplayTags.HasTag(SanzoTags::Dead))
+  {
+    return;
+  }
+
+  CharacterGameplayTags.AddTag(SanzoTags::Dead);
+
+  // 이동 완전 정지
+  GetCharacterMovement()->DisableMovement();
+
+  // Capsule 비활성화
+  GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+  // 공격/행동 태그 제거
+  CharacterGameplayTags.RemoveTag(SanzoTags::Attack);
+  CharacterGameplayTags.RemoveTag(SanzoTags::Sprint);
+  CharacterGameplayTags.RemoveTag(SanzoTags::Aiming);
+  CharacterGameplayTags.RemoveTag(SanzoTags::Dodge);
+  CharacterGameplayTags.RemoveTag(SanzoTags::Parry);
+
+  // 입력 비활성화
+  GetController()->SetIgnoreMoveInput(true);
+  GetController()->SetIgnoreLookInput(true);
+  PlayDeathSequence();
+}
+
+void ASanzoCharacter::PlayDeathSequence()
+{
+  // 죽음 시퀀스 재생
+  // BGM 정지
+   if (BGMActor)
+  {
+    if (UAudioComponent* AudioComp = BGMActor->GetAudioComponent())
+    {
+      AudioComp->Stop();
+    }
+  }
+  // Death Sound
+  if(DeathSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
+  }
+  // 슬로모션
+  GetWorld()->GetWorldSettings()->SetTimeDilation(0.2f);
+
+  // 레그돌
+  GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+  GetMesh()->SetSimulatePhysics(true);
+  GetMesh()->WakeAllRigidBodies();
+
+  FTimerHandle TimerHandle;
+  GetWorld()->GetTimerManager().SetTimer(
+    TimerHandle,
+    FTimerDelegate::CreateWeakLambda(this, [this]()
+      {
+        if (!IsValid(this)) return;
+
+        if (UWorld* World = GetWorld())
+        {
+          World->GetWorldSettings()->SetTimeDilation(1.0f);
+        }
+
+        UE_LOG(LogCYS, Error, TEXT("Game Over!"));
+
+        if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
+        {
+          GI->Restart();
+        }
+      }),
+    1.f,
+    false
+  );
+}
+#pragma endregion 최윤서

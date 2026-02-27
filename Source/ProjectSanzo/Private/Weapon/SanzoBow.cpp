@@ -3,7 +3,10 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "GameplayTagAssetInterface.h"
+#include "Common/SanzoGameplayTag.h"
 ASanzoBow::ASanzoBow()
 {
 	// 시위에 보일 가짜화살 생성
@@ -65,12 +68,42 @@ void ASanzoBow::StartFire()
 		WeaponMesh->PlayAnimation(BowDrawAnim, false);
 		WeaponMesh->SetPlayRate(SyncPlayRate);
 	}
+	
+	// 활 당기는 사운드 재생
+	if (DrawStartSound)
+	{
+		DrawStartAudioComp = UGameplayStatics::SpawnSoundAttached(DrawStartSound, WeaponMesh, StringSocketName);
+	}
+	// 최대 차지 시간 끝나면 사운드 바꾸는 함수 실행하도록 예약
+	GetWorldTimerManager().SetTimer(
+		SwitchSoundTimer,
+		this,
+		&ASanzoBow::SwitchToLoopSound,
+		MaxChargeTime,
+		false
+	);
 }
 
 void ASanzoBow::StopFire()
 {
 	Super::StopFire();
 	
+	if (IGameplayTagAssetInterface* TagCheak = Cast<IGameplayTagAssetInterface>(GetOwner()))
+	{
+		if (TagCheak->HasMatchingGameplayTag(SanzoTags::HitReaction) ||
+			TagCheak->HasMatchingGameplayTag(SanzoTags::Swap)
+			)
+		{
+			ChargeStartTime = GetWorld()->GetTimeSeconds();
+			ChargePercent = 0;
+			if (OnChargePercentChanged.IsBound())
+			{
+				OnChargePercentChanged.Broadcast(0.0f);
+			}
+			return;
+		}
+	}
+
 #pragma region DataForHUD
 	
 	//PercentBar 방송용 Tick 비활성화
@@ -84,6 +117,19 @@ void ASanzoBow::StopFire()
 	}
 	
 #pragma endregion 이준로
+
+
+
+	// 치지가 끝나기 전에 발사가 호출되면 차지 사운드 예약한 타이머 끄기
+	GetWorldTimerManager().ClearTimer(SwitchSoundTimer);
+	// 재생되던 드로우 사운드 끄고 혹시 있을 차지 사운드도 끄기
+	if (DrawStartAudioComp && DrawStartAudioComp->IsPlaying()) DrawStartAudioComp->Stop();
+	if (DrawLoopAudioComp && DrawLoopAudioComp->IsPlaying()) DrawLoopAudioComp->Stop();
+	// 다 하고 발사 사운드 재생
+	if (FireSound)
+	{
+		FireAudioComp = UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, StringSocketName);
+	}
 	
 	// 화살 발사하면 더미화살 다시 안보이게 변경
 	if (DummyArrowMesh)
@@ -133,6 +179,8 @@ void ASanzoBow::StopFire()
 
 		return;
 	}
+
+
 
 	Fire();
 }
@@ -261,3 +309,18 @@ FText ASanzoBow::GetAmmoTextForHUD() const
 }
 	
 #pragma endregion 이준로
+
+void ASanzoBow::SwitchToLoopSound()
+{
+	// 차징 사운드 재생되기 전 원래 나오던 드로우 사운드 재생 끝냄
+	if (DrawStartAudioComp && DrawStartAudioComp->IsPlaying())
+	{
+		DrawStartAudioComp->Stop();
+	}
+
+	// 차지 했을 때 나와야할 사운드 재생
+	if (DrawLoopSound)
+	{
+		DrawLoopAudioComp = UGameplayStatics::SpawnSoundAttached(DrawLoopSound, WeaponMesh, StringSocketName);
+	}
+}

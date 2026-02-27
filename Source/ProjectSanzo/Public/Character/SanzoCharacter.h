@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -23,7 +23,7 @@ class USanzoStatComponent;
 class USanzoParryComponent;
 class USanzoEquipmentComponent;
 class USanzoNavigationArrowComponent;
-
+class AAmbientSound;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -124,7 +124,10 @@ public:
 #pragma region Asset
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
   UAnimMontage* DodgeMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Dodge")
   USoundBase* DodgeSuccessSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
+  UAnimMontage* HitMontage;
 
 #pragma endregion 김형백
 public:
@@ -172,7 +175,12 @@ protected:
 
   void Dodge(const FInputActionValue& Value);
   void EndDodge(UAnimMontage* Montage, bool bInterrupted);
+  bool TryDodge();
   void SuccessDodge();
+  uint8 DodgeIndex = 0;
+  float LastDodgeTime = 0;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Dodge")
+  float DodgeCooldownTime;
 
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);
@@ -202,7 +210,13 @@ protected:
   FTimerHandle ParryPenaltyTimerHandle;
   FTimerHandle SlowTimerHandle;
   FTimerHandle BowDrawTimerHandle;
+  
+  //디버그용
   void PrintGameplayTags();
+
+  void ApplyHitEffect();
+  void EndHitEffect(UAnimMontage* Montage, bool bInterrupted);
+
 
 public:
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -232,4 +246,17 @@ public:
   // 스테이지 이동 시 GI에서 스탯 복원하는 함수
   void RestoreFromGI();
 
+#pragma region Death
+  void HandleDeath();
+  void PlayDeathSequence();
+#pragma endregion 최윤서
+
+#pragma region Sounds
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  USoundBase* DeathSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  TArray<USoundBase*> HitSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+  AAmbientSound* BGMActor;
+#pragma endregion 최윤서
 };

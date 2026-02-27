@@ -42,7 +42,7 @@ void USanzoParryComponent::ApplyParrySpamPenalty()
     }
   }
 
-  //게임패널티 타이머 제거 // 나중에 패리컴포넌트로 옮길 수 있는지..
+  
   GetWorld()->GetTimerManager().SetTimer(
     ParryPenaltyTimerHandle,
     this,
