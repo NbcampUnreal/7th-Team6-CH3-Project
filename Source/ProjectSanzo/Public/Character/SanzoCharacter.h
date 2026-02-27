@@ -242,8 +242,6 @@ public:
   USoundBase* DeathSound;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
   TArray<USoundBase*> HitSounds;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
-  USoundBase* DodgeSound;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
   AAmbientSound* BGMActor;
 #pragma endregion 최윤서

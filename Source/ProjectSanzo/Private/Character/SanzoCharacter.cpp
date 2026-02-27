@@ -784,12 +784,6 @@ float ASanzoCharacter::TakeDamage(
     SuccessDodge();
     FinalDamage = 0.f;
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
-    // 회피 성공 Sound - 최윤서
-    if(DodgeSuccessSound)
-    {
-      UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
-    }
-
   }
 
   if (StatComp)
