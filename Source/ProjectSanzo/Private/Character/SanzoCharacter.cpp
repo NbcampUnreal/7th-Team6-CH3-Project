@@ -849,6 +849,7 @@ void ASanzoCharacter::ApplyHitEffect()
   {
     return;
   }
+
   CharacterGameplayTags.AddTag(SanzoTags::HitReaction);
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
@@ -859,8 +860,12 @@ void ASanzoCharacter::ApplyHitEffect()
 
     // 반드시 Bind 후에 Set해야 함
     AnimInstance->Montage_SetBlendingOutDelegate(HitEndDelegate, HitMontage);
+
+    //공격중지
+    StopFire(0);
   }
 }
+
 void ASanzoCharacter::EndHitEffect(UAnimMontage* Montage, bool bInterrupted)
 {
   CharacterGameplayTags.RemoveTag(SanzoTags::HitReaction);
