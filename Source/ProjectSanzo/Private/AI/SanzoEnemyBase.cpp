@@ -327,6 +327,9 @@ FEnemyOverHeadData ASanzoEnemyBase::MakeUpdateOverHeadData() const
     UE_LOG(LogLJR, Warning, TEXT("적 체력 퍼센트 : %f"), NewData.HealthPercent);
   }
   NewData.CurrentStunCount = StunComponent ? StunComponent->GetCurrentStunCount() : 0;
+	
+	NewData.bIsStunned = StunComponent? StunComponent->GetIsStunned() : 0;
+	
   NewData.bIsSighted = bIsSighted;
 
   return NewData;
@@ -438,6 +441,9 @@ void ASanzoEnemyBase::OnStunRecoveredCallback()
   {
     if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetBrainComponent()))
     {
+    	//Stun해제 방송
+    	BroadCastAllData();
+    	
       BTComp->RestartTree();
     }
   }
@@ -470,6 +476,9 @@ void ASanzoEnemyBase::OnParriedCallback()
 
   if (!StunComponent->GetIsStunned() && StaggerMontage)
   {
+  	//Stun상태 방송
+  	BroadCastAllData();
+  	
     PlayAnimMontage(StaggerMontage);
   }
 }

@@ -20,20 +20,16 @@ void USanzoEnemyOverHeadWidget::NativeConstruct()
 	{
 		HealthBorder->SetVisibility(ESlateVisibility::Collapsed);
 	}
-	if (PerceptionMark)
-	{
-		PerceptionMark->SetRenderOpacity(0.f);
-	}
 	
 	if (StunGageBox)
 	{
-		StunImages.Empty();
+		StunGageImages.Empty();
 		
 		for (int i = 0; i < StunGageBox->GetChildrenCount(); i++)
 		{
 			if (UImage* ChildImage = Cast<UImage>(StunGageBox->GetChildAt(i)))
 			{
-				StunImages.Add(ChildImage);
+				StunGageImages.Add(ChildImage);
 			}
 		}
 	}
@@ -42,11 +38,10 @@ void USanzoEnemyOverHeadWidget::NativeConstruct()
 
 void USanzoEnemyOverHeadWidget::UpdateOverHeadWidget(const FEnemyOverHeadData& OverHeadData)
 {
-	UE_LOG(LogLJR, Warning, TEXT("위젯 수신 완료: bIsSighted = %s"), OverHeadData.bIsSighted ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogLJR, Warning, TEXT("위젯 수신 완료: CurrentStunCount = %d"), OverHeadData.CurrentStunCount);
 	UpdateHealthBar(OverHeadData.HealthPercent);
 	UpdateStunGage(OverHeadData.CurrentStunCount);
-	UpdatePerceptionMark(OverHeadData.bIsSighted);
+	UpdateStateImage(OverHeadData.bIsStunned, OverHeadData.bIsSighted);
+	//UpdatePerceptionMark(OverHeadData.bIsSighted);
 }
 
 void USanzoEnemyOverHeadWidget::UpdateStunGage(int32 CurrentStunCount)
@@ -59,44 +54,14 @@ void USanzoEnemyOverHeadWidget::UpdateStunGage(int32 CurrentStunCount)
 			HealthBorder->SetVisibility(ESlateVisibility::Visible);
 		}
 		
-		for (int i = 0; i < StunImages.Num(); i++)
+		for (int i = 0; i < StunGageImages.Num(); i++)
 		{
-			if (StunImages[i])
+			if (StunGageImages[i])
 			{
 				UTexture2D* TargetTexture = (i < CurrentStunCount) ? EmptyTexture : FullTexture;
 				
-				StunImages[i]->SetBrushFromTexture(TargetTexture);
-				StunImages[i]->SetDesiredSizeOverride(FVector2D(50.0f, 50.0f));
-			}
-		}
-	}
-}
-
-void USanzoEnemyOverHeadWidget::UpdatePerceptionMark(bool bIsSight)
-{
-	StopAnimation(PerceptionMarkStartAnim);
-	StopAnimation(PerceptionMarkBlinkAnim);
-	
-	if (PerceptionMark)
-	{
-		if (bIsSight)
-		{
-			if (PerceptionMarkStartAnim)
-			{
-				UE_LOG(LogLJR, Warning, TEXT("느낌표 표시 실행"));
-				PerceptionMark->SetText(FText::FromString(FString::Printf(TEXT("!"))));
-				PerceptionMark->SetColorAndOpacity(FLinearColor::Red);
-				PlayAnimation(PerceptionMarkStartAnim);
-			}
-		}
-		else
-		{
-			if (PerceptionMarkBlinkAnim)
-			{
-				UE_LOG(LogLJR, Warning, TEXT("물음표 표시 실행"));
-				PerceptionMark->SetText(FText::FromString(FString::Printf(TEXT("?"))));
-				PerceptionMark->SetColorAndOpacity(FLinearColor::Yellow);
-				PlayAnimation(PerceptionMarkBlinkAnim);
+				StunGageImages[i]->SetBrushFromTexture(TargetTexture);
+				StunGageImages[i]->SetDesiredSizeOverride(FVector2D(50.0f, 50.0f));
 			}
 		}
 	}
@@ -120,5 +85,46 @@ void USanzoEnemyOverHeadWidget::UpdateHealthBar(float HealthPercent)
 		}
 		UE_LOG(LogLJR,Warning,TEXT("HealthBarUpdate"));
 		HealthBar->SetPercent(HealthPercent);
+	}
+}
+
+void USanzoEnemyOverHeadWidget::UpdateStateImage(bool bIsStunned, bool bIsSight)
+{
+	StopAnimation(FindStateAnim);
+	StopAnimation(MissingStateAnim);
+	
+	if (bIsStunned)
+	{
+		if (StateImage)
+		{
+			StateImage-> SetBrushFromTexture(StunTexture);
+			StateImage->SetColorAndOpacity(FLinearColor::Gray);
+			PlayAnimation(StunStateAnim,0,0);
+		}
+	}
+	else
+	{
+		StopAnimation(StunStateAnim);
+		if (StateImage)
+		{
+			if (bIsSight)
+			{
+				StateImage->SetBrushFromTexture(FindTexture);
+				StateImage->SetColorAndOpacity(FLinearColor::Red);
+				if (FindStateAnim)
+				{
+					PlayAnimation(FindStateAnim);
+				}
+			}
+			else
+			{
+				StateImage->SetBrushFromTexture(MissingTexture);
+				StateImage->SetColorAndOpacity(FLinearColor::Yellow);
+				if (MissingStateAnim)
+				{
+					PlayAnimation(MissingStateAnim);
+				}
+			}
+		}
 	}
 }
