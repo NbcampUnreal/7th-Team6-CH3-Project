@@ -27,6 +27,7 @@ public:
   // 스테이지 이동 함수
   UFUNCTION(BlueprintCallable, Category = "Stage")
 	void MoveToNextStage();
+  void Restart();
 
 	// 스탯 정보
 	UPROPERTY()
