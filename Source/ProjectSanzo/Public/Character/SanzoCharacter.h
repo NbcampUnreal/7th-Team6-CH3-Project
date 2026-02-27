@@ -23,7 +23,7 @@ class USanzoStatComponent;
 class USanzoParryComponent;
 class USanzoEquipmentComponent;
 class USanzoNavigationArrowComponent;
-
+class AAmbientSound;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -237,4 +237,14 @@ public:
   void PlayDeathSequence();
 #pragma endregion 최윤서
 
+#pragma region Sounds
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  USoundBase* DeathSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  TArray<USoundBase*> HitSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Sounds")
+  USoundBase* DodgeSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+  AAmbientSound* BGMActor;
+#pragma endregion 최윤서
 };

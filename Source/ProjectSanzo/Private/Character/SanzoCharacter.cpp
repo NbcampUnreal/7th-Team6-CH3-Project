@@ -25,7 +25,8 @@
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-
+#include "Components/AudioComponent.h"
+#include "Sound/AmbientSound.h"
 #include "Core/SanzoGameInstance.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
@@ -157,6 +158,19 @@ void ASanzoCharacter::BeginPlay()
   
   // 스탯 복원 최
   RestoreFromGI();
+
+  // BGM 액터 찾기
+  TArray<AActor*> FoundActors;
+  UGameplayStatics::GetAllActorsOfClass(
+    GetWorld(),
+    AAmbientSound::StaticClass(),
+    FoundActors
+  );
+
+  if (FoundActors.Num() > 0)
+  {
+    BGMActor = Cast<AAmbientSound>(FoundActors[0]);
+  }
 }
 
 void ASanzoCharacter::Tick(float DeltaTime)
@@ -754,7 +768,6 @@ float ASanzoCharacter::TakeDamage(
     ParryComp->SuccessParry();
     CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
     FinalDamage = 0.f;
-    // 패리 성공 Sound - 최윤서
     
     //50%확률로 딜 반사 딜 반사 
     if (FMath::RandBool()) 
@@ -772,6 +785,10 @@ float ASanzoCharacter::TakeDamage(
     FinalDamage = 0.f;
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
     // 회피 성공 Sound - 최윤서
+    if(DodgeSuccessSound)
+    {
+      UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
+    }
 
   }
 
@@ -783,12 +800,16 @@ float ASanzoCharacter::TakeDamage(
       FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
       GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
       // Hit Sound - 최윤서
+      if (HitSounds.Num() > 0)
+      {
+        int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
+        UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSounds[RandomIndex], GetActorLocation());
+      }
     }
 
     if (StatComp->IsDead())
     {
       UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      // TO-DO: 플레이어 래그돌, 게임 오버 UI 호출, 조작 불가 등 처리
       HandleDeath();
     }
   }
@@ -840,8 +861,19 @@ void ASanzoCharacter::HandleDeath()
 void ASanzoCharacter::PlayDeathSequence()
 {
   // 죽음 시퀀스 재생
+  // BGM 정지
+   if (BGMActor)
+  {
+    if (UAudioComponent* AudioComp = BGMActor->GetAudioComponent())
+    {
+      AudioComp->Stop();
+    }
+  }
   // Death Sound
-  
+  if(DeathSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
+  }
   // 슬로모션
   GetWorld()->GetWorldSettings()->SetTimeDilation(0.2f);
 
