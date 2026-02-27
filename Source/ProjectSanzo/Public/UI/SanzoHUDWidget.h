@@ -109,9 +109,9 @@ protected:
 	
 #pragma region StageInfo
 	
-protected:	
+public:	
 	UPROPERTY(meta = (BindWidget))
 	class USanzoStageInfoWidget* StageInfoWidget;
-	
+
 #pragma endregion 이준로
 };

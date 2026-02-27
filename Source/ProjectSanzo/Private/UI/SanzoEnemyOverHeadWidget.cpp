@@ -2,15 +2,11 @@
 
 
 #include "UI/SanzoEnemyOverHeadWidget.h"
-
-#include "EditorDirectories.h"
 #include "AI/SanzoEnemyBase.h"
-#include "Common/SanzoLog.h"
 #include "Components/Border.h"
 #include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
-#include "Components/TextBlock.h"
 
 void USanzoEnemyOverHeadWidget::NativeConstruct()
 {
@@ -41,7 +37,6 @@ void USanzoEnemyOverHeadWidget::UpdateOverHeadWidget(const FEnemyOverHeadData& O
 	UpdateHealthBar(OverHeadData.HealthPercent);
 	UpdateStunGage(OverHeadData.CurrentStunCount);
 	UpdateStateImage(OverHeadData.bIsStunned, OverHeadData.bIsSighted);
-	//UpdatePerceptionMark(OverHeadData.bIsSighted);
 }
 
 void USanzoEnemyOverHeadWidget::UpdateStunGage(int32 CurrentStunCount)
@@ -83,7 +78,6 @@ void USanzoEnemyOverHeadWidget::UpdateHealthBar(float HealthPercent)
 				StunGageBox->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
-		UE_LOG(LogLJR,Warning,TEXT("HealthBarUpdate"));
 		HealthBar->SetPercent(HealthPercent);
 	}
 }

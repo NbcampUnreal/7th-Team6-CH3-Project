@@ -3,12 +3,16 @@
 
 #include "UI/SanzoStageInfoWidget.h"
 
+#include "AI/SanzoEnemyBase.h"
+#include "AI/SanzoEnemy_Boss.h"
+#include "Common/SanzoLog.h"
 #include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Core/SanzoGameState.h"
+#include "Kismet/GameplayStatics.h"
 
 void USanzoStageInfoWidget::SetStageInfo(ESanzoStageType StageType)
 {
@@ -39,6 +43,8 @@ void USanzoStageInfoWidget::SetDefaultStageInfo()
 
 void USanzoStageInfoWidget::SetBossStageInfo()
 {
+	FindStageBoss();
+	
 	if (StageInfoText)
 	{
 		FSlateFontInfo NewFontInfo = StageInfoText->GetFont();
@@ -55,27 +61,68 @@ void USanzoStageInfoWidget::SetBossStageInfo()
 		StageProgressBarSizeBox->SetHeightOverride(30);
 	}
 	
+	if (StageProgressBar)
+	{
+		StageProgressBar->SetFillColorAndOpacity(FLinearColor::Red);
+	}
+	
 	if (StunGageBox)
 	{
-		StunImages.Empty();
+		StunGageImages.Empty();
 		
 		for (int i = 0; i < StunGageBox->GetChildrenCount(); i++)
 		{
 			if (UImage* ChildImage = Cast<UImage>(StunGageBox->GetChildAt(i)))
 			{
-				StunImages.Add(ChildImage);
+				StunGageImages.Add(ChildImage);
 			}
 		}
 		
 		StunGageBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
-	
-	//보스 연결 필요
 }
 
 void USanzoStageInfoWidget::HandleStageProgressChanged(float Percent)
 {
 	StageProgressBar->SetPercent(Percent);
+}
+
+void USanzoStageInfoWidget::FindStageBoss()
+{
+	TArray<AActor*> FoundBosses;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASanzoEnemy_Boss::StaticClass(), FoundBosses);
+    
+	if (FoundBosses.Num() > 0)
+	{
+		ASanzoEnemy_Boss* Boss = Cast<ASanzoEnemy_Boss>(FoundBosses[0]);
+		if (Boss)
+		{
+			Boss->OnEnemyDataChanged.AddDynamic(this, &USanzoStageInfoWidget::HandleBossInfo);
+			Boss->BroadCastAllData();
+		}
+	}
+}
+
+void USanzoStageInfoWidget::HandleBossStunGage(int32 CurrentStunCount)
+{
+	if (StunGageBox)
+	{
+		for (int i = 0; i < StunGageImages.Num(); i++)
+		{
+			if (StunGageImages[i])
+			{
+				UTexture2D* TargetTexture = (i < CurrentStunCount) ? EmptyTexture : FullTexture;
+
+				StunGageImages[i]->SetBrushFromTexture(TargetTexture);
+			}
+		}
+	}
+}
+
+void USanzoStageInfoWidget::HandleBossInfo(const FEnemyOverHeadData& UpdateData)
+{
+	HandleBossStunGage(UpdateData.CurrentStunCount);
+	HandleBossHealthChanged(UpdateData.HealthPercent);
 }
 
 void USanzoStageInfoWidget::HandleBossHealthChanged(float Percent)

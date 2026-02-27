@@ -17,6 +17,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetStageInfo(ESanzoStageType StageType);
 	
+	UFUNCTION()
+	void HandleBossInfo(const FEnemyOverHeadData& UpdateData);
+	
 protected:
 	UFUNCTION()
 	void SetDefaultStageInfo();
@@ -28,7 +31,15 @@ protected:
 	void HandleStageProgressChanged(float Percent);
 	
 	UFUNCTION()
+	void FindStageBoss();
+	
+	UFUNCTION()
+	void HandleBossStunGage(int32 CurrentStunCount);
+	
+	UFUNCTION()
 	void HandleBossHealthChanged(float Percent);
+	
+	
 	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StageInfoText;
@@ -42,7 +53,7 @@ protected:
 	class UHorizontalBox* StunGageBox;
 	
 	UPROPERTY()
-	TArray<UImage*> StunImages;
+	TArray<UImage*> StunGageImages;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Resources")
 	class UTexture2D* FullTexture;
