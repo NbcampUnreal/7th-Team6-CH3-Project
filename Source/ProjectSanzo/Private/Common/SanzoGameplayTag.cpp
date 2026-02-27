@@ -14,12 +14,14 @@ UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Action, "Character.Action");
 
 
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Exhausted, "Character.Status.Exhausted");
+
+UE_DEFINE_GAMEPLAY_TAG(SanzoTags::HitReaction, "Character.State.HitReaction");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Dead, "Character.Status.Dead");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::ParryWindow, "Character.State.ParryWindow");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::IFrame, "Character.State.IFrame");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::ParryPenaltyActive, "Character.State.ParryPenaltyActive");
-UE_DEFINE_GAMEPLAY_TAG(SanzoTags::UpgradeSelet, "Game.State.UpgradeSelecting");
 
+UE_DEFINE_GAMEPLAY_TAG(SanzoTags::UpgradeSelet, "Game.State.UpgradeSelecting");
 UE_DEFINE_GAMEPLAY_TAG(SanzoTags::Pause, "Game.State.Paused");
 
 SanzoGameplayTag::SanzoGameplayTag()
