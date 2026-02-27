@@ -509,7 +509,7 @@ void ASanzoCharacter::SuccessDodge()
 {
   CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
   UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
-  GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f); //성공시 시간 느리게
+  GetWorld()->GetWorldSettings()->SetTimeDilation(0.3f); //성공시 시간 느리게
   TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
   GetWorld()->GetTimerManager().SetTimer(
     SlowTimerHandle,
