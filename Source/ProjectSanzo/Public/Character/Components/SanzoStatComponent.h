@@ -123,6 +123,8 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	float GetStamina() const { return CurrentStamina; }
+	//UI출력용 GetMaxStamina() - 작업자: 이준로
+	float GetMaxStamina() const { return MaxStamina; }
 
 	bool bCanSprint();
 	//태그확인용 델리게이

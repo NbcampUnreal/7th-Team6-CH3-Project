@@ -128,6 +128,8 @@ public:
 	
 	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
 	
+	float GetBaseDamage() const { return BaseDamage; }
+	
 #pragma endregion 이준로
 
 	//김형백 화살몽타주시작 델리게이트

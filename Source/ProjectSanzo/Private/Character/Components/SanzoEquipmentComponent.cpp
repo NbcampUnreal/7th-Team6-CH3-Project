@@ -140,6 +140,42 @@ void USanzoEquipmentComponent::NotifyItemPickedUp(FName InItemType, int32 InAmou
 	}
 }
 
+float USanzoEquipmentComponent::GetGunDamage()
+{
+	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
+	{
+		return Gun->GetBaseDamage();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetGunFireRate()
+{
+	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
+	{
+		return Gun->GetFireRate();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetBowDamage()
+{
+	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
+	{
+		return Bow->GetBaseDamage();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetBowChargeTime()
+{
+	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
+	{
+		return Bow->GetMaxChargeTime();
+	}
+	return 0;
+}
+
 #pragma endregion 이준로
 
 #pragma region 무기 스왑 로직 추가

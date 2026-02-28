@@ -15,19 +15,16 @@
 #include "Character/Components/SanzoNavigationArrowComponent.h"
 #include "Character/Components/SanzoUpgradeComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
-//#include "Weapon/SanzoGun.h" //제거필요
 #include "Curves/CurveFloat.h"
-
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
-#include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "Components/AudioComponent.h"
 #include "Sound/AmbientSound.h"
 #include "Core/SanzoGameInstance.h"
 #include "Common/SanzoDamageType_Percent.h"
 #include "Engine/DamageEvents.h"
+#include "Core/SanzoBaseValue.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -46,12 +43,12 @@ ASanzoCharacter::ASanzoCharacter()
   GetCharacterMovement()->JumpZVelocity = 700.f;
   GetCharacterMovement()->AirControl = 0.35f;
 
-  NomalSpeed = 500.f;
+  NormalSpeed = 500.f;
   SprintSpeedMultiplier = 1.8f;
   AimingSpeedMultiplier = 0.7f;
-  SprintSpeed = NomalSpeed * SprintSpeedMultiplier; 
-  AimingSpeed = NomalSpeed * AimingSpeedMultiplier;
-  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+  SprintSpeed = NormalSpeed * SprintSpeedMultiplier; 
+  AimingSpeed = NormalSpeed * AimingSpeedMultiplier;
+  GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
   //게임패드 아날로그 스틱 최소이동속도
   GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 
@@ -339,7 +336,7 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
   {
     GetCharacterMovement()->bOrientRotationToMovement = false;
     bUseControllerRotationYaw = true;
-    GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+    GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 
     if (CharacterGameplayTags.HasTag(SanzoTags::Aiming))
     {
@@ -626,7 +623,7 @@ void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 void ASanzoCharacter::AimStop(const FInputActionValue& Value)
 {
   
-  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+  GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
   PlayAimTimeLine();
   CharacterGameplayTags.RemoveTag(SanzoTags::Aiming);
 }
@@ -997,4 +994,80 @@ void ASanzoCharacter::PlayDeathSequence()
 		}
 	}
 }
+
+
 #pragma endregion 최윤서
+
+#pragma region StatusDisplayData
+TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
+{
+	TArray<FStatusDisplayData> DisplayData;
+	
+//캐릭터
+	DisplayData.Add(FStatusDisplayData(
+			EUpgradeTarget::Character,
+			FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxHealth),
+			FText::FromString(TEXT("최대 체력")),
+			FCharacterBaseValues::MaxHealth,
+			StatComp->GetMaxHealth()
+		)
+	);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Character,
+		FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxStamina),
+		FText::FromString(TEXT("최대 스태미나")),
+		FCharacterBaseValues::MaxStamina,
+		StatComp->GetMaxStamina()
+	)
+);
+	
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Character,
+		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Speed),
+		FText::FromString(TEXT("이동 속도")),
+		FCharacterBaseValues::DefaultMoveSpeed,
+		NormalSpeed
+	)
+);
+//외모관련 수치 필요 (동기화 단계)
+	
+	//총
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Gun,
+		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::Damage),
+		FText::FromString(TEXT("공격력")),
+		FGunBaseValues::BaseDamage,
+		EquipmentComp->GetGunDamage()
+	)
+);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Gun,
+		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::FireRate),
+		FText::FromString(TEXT("발사 속도")),
+		FGunBaseValues::BaseFireRate,
+		EquipmentComp->GetGunFireRate()
+	)
+);
+	
+	//활
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Bow,
+		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::Damage),
+		FText::FromString(TEXT("공격력")),
+		FBowBaseValues::BaseDamage,
+		EquipmentComp->GetBowDamage()
+	)
+);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Bow,
+		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::MaxChargeTime),
+		FText::FromString(TEXT("차징 시간")),
+		FBowBaseValues::BaseMaxChargeTime,
+		EquipmentComp->GetBowChargeTime()
+	)
+);
+	
+	
+	return DisplayData;
+}
+#pragma endregion 이준로
