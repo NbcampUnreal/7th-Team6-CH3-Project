@@ -3,6 +3,7 @@
 
 #include "UI/SanzoPopUpWidget.h"
 
+#include "Character/SanzoCharacter.h"
 #include "Common/SanzoLog.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
@@ -10,6 +11,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
+#include "UI/SanzoStatInfoWidget.h"
 #include "UI/SanzoUpgradeButtonWidget.h"
 #include "UI/SanzoUpgradeInfo.h"
 
@@ -69,9 +71,9 @@ void USanzoPopUpWidget::SetPauseUI()
 	{
 		PopUpText->SetText(FText::FromString(TEXT("일시 정지")));
 	}
-	if (StatusText)
+	if (StatInfoWidget)
 	{
-		SetStatusText();
+		SetStatInfo();
 	}
 	if (MainMenuButton)
 	{
@@ -106,9 +108,9 @@ void USanzoPopUpWidget::SetUpgradeUI()
 	{
 		PopUpText->SetText(FText::FromString(TEXT("레벨 업")));
 	}
-	if (StatusText)
+	if (StatInfoWidget)
 	{
-		SetStatusText();
+		SetStatInfo();
 	}
 	if (MainMenuButton)
 	{
@@ -161,6 +163,25 @@ void USanzoPopUpWidget::HandleMenuButtonClicked()
 void USanzoPopUpWidget::HandleResumeButtonClicked()
 {
 	OnButtonClicked.Broadcast(GamePlayingTag);
+}
+
+void USanzoPopUpWidget::SetStatInfo()
+{
+	if (StatInfoWidget)
+	{
+		ASanzoCharacter* SanzoCharacter = Cast<ASanzoCharacter>(GetOwningPlayerPawn());
+		if (SanzoCharacter)
+		{
+			TArray<FStatusDisplayData> DisplayData = SanzoCharacter->GetStatusDisplayData();
+			
+			USanzoUpgradeSubsystem* Subsystem = GetGameInstance()->GetSubsystem<USanzoUpgradeSubsystem>();
+			{
+				TMap<FUpgradeStatKey, float> UpgradeTotalMap = Subsystem->GetUpgradeTotalMap();
+				
+				StatInfoWidget->SetStatInfo(DisplayData,UpgradeTotalMap);
+			}
+		}
+	}
 }
 
 void USanzoPopUpWidget::SetStatusText()

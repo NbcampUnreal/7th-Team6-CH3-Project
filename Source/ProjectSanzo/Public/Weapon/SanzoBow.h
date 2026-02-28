@@ -101,6 +101,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
 	float MaxChargeTime = 1.0f;
 	
+	float GetMaxChargeTime() const { return MaxChargeTime; }
+	
 protected:
 	bool bIsCharging = false;
 	

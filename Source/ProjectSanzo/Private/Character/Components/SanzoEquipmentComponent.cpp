@@ -123,7 +123,7 @@ void USanzoEquipmentComponent::AddAmmo(int32 Amount)
 {
 	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
 	{
-		Gun->AddAmmo(Amount); //base오버라이드시키고싶지만.. 시간이업다
+		Gun->AddAmmo(Amount); //weaponbase오버라이드시키고싶지만.. 시간이업다
 	}
 }
 
@@ -158,6 +158,42 @@ void USanzoEquipmentComponent::NotifyItemPickedUp(FName InItemType, int32 InAmou
 	{
 		OnItemPickedUp.Broadcast(InItemType, InAmount);
 	}
+}
+
+float USanzoEquipmentComponent::GetGunDamage()
+{
+	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
+	{
+		return Gun->GetBaseDamage();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetGunFireRate()
+{
+	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
+	{
+		return Gun->GetFireRate();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetBowDamage()
+{
+	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
+	{
+		return Bow->GetBaseDamage();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetBowChargeTime()
+{
+	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
+	{
+		return Bow->GetMaxChargeTime();
+	}
+	return 0;
 }
 
 #pragma endregion 이준로

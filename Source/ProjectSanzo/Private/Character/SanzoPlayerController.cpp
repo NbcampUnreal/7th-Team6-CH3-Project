@@ -172,8 +172,10 @@ void ASanzoPlayerController::ShowMainUI(FGameplayTag State, float ClearTime, int
 		{
 			MenuWidgetInstance->OnButtonClicked.AddDynamic(this, &ThisClass::OnMainClosed);
 			MenuWidgetInstance->AddToViewport();
-			
-			SetPause(true);
+			if (State != GameOverTag)
+			{
+				SetPause(true);
+			}
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}

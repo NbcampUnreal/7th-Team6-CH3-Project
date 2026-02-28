@@ -38,8 +38,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, const FSanzo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExhaustedChanged, bool, bIsExhausted);
 
 #pragma endregion 이준로
-//추후 태그 추가/제거 델리게이트도 만들 예정 !
+
+//추후 태그 추가/제거 델리게이트도 만들 예정 ! - 인터페이스 만들어서 안 만들 예정!
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnTagCheckDelegate, const FGameplayTag&);
+
 
 #pragma region SaveData
 USTRUCT(BlueprintType)
@@ -110,6 +112,11 @@ protected:
 public:
 	void BeginExhaustionCooldown(); //타이머함수
 	FOnTagCheckDelegate TagCheckDelegate;
+
+
+
+
+
 	//캐릭터에서 사용할 질문함수
 	void RequestConsumeStaminaForSprint(bool bShouldConsume);
 	void ConsumeStaminaForAction(EActionType Type);
@@ -123,6 +130,8 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	float GetStamina() const { return CurrentStamina; }
+	//UI출력용 GetMaxStamina() - 작업자: 이준로
+	float GetMaxStamina() const { return MaxStamina; }
 
 	bool bCanSprint();
 	//태그확인용 델리게이

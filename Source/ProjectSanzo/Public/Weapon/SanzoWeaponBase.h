@@ -110,6 +110,10 @@ public:
 	// 기본 공격력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float BaseDamage;
+  
+	//다른곳에서 매시 부르기 -김형백
+	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
+
 
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
@@ -127,6 +131,8 @@ public:
 	FOnEnemyHit OnEnemyHit;
 	
 	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
+	
+	float GetBaseDamage() const { return BaseDamage; }
 	
 #pragma endregion 이준로
 

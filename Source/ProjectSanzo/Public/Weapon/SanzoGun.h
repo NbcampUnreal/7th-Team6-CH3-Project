@@ -51,6 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun|Stats")
 	float FireRate;
 	
+  float GetFireRate() const { return FireRate; }
 #pragma region DataForHUD
 	
 public:

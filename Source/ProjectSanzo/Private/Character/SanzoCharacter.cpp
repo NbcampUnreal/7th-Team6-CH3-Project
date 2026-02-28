@@ -15,24 +15,22 @@
 #include "Character/Components/SanzoNavigationArrowComponent.h"
 #include "Character/Components/SanzoUpgradeComponent.h"
 #include "Weapon/SanzoWeaponBase.h"
-//#include "Weapon/SanzoGun.h" //제거필요
 #include "Curves/CurveFloat.h"
-
 #include "Common/SanzoGameplayTag.h"
 #include "Common/SanzoLog.h"
-#include "Components/PawnNoiseEmitterComponent.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "Components/AudioComponent.h"
 #include "Sound/AmbientSound.h"
 #include "Core/SanzoGameInstance.h"
 #include "Common/SanzoDamageType_Percent.h"
 #include "Engine/DamageEvents.h"
+#include "Core/SanzoBaseValue.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
 
 #pragma region LifeCycle
+
 ASanzoCharacter::ASanzoCharacter()
 {
   
@@ -46,12 +44,12 @@ ASanzoCharacter::ASanzoCharacter()
   GetCharacterMovement()->JumpZVelocity = 700.f;
   GetCharacterMovement()->AirControl = 0.35f;
 
-  NomalSpeed = 500.f;
+  NormalSpeed = 500.f;
   SprintSpeedMultiplier = 1.8f;
   AimingSpeedMultiplier = 0.7f;
-  SprintSpeed = NomalSpeed * SprintSpeedMultiplier; 
-  AimingSpeed = NomalSpeed * AimingSpeedMultiplier;
-  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+  SprintSpeed = NormalSpeed * SprintSpeedMultiplier; 
+  AimingSpeed = NormalSpeed * AimingSpeedMultiplier;
+  GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
   //게임패드 아날로그 스틱 최소이동속도
   GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 
@@ -67,12 +65,21 @@ ASanzoCharacter::ASanzoCharacter()
   CameraBoom->TargetArmLength = 400.0f;
   CameraBoom->bUsePawnControlRotation = true;
 
+  if(GetMesh())
+  {
+    GetMesh()->SetHiddenInGame(true);
+    GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+  }
+
   TargetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TargetMesh"));
   TargetMesh->SetupAttachment(GetMesh());
 
   FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
+
+  CameraSocketOffSet = FVector(0, 55, 68);
+  CameraBoom->SocketOffset = CameraSocketOffSet;
 
   EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
   StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
@@ -106,17 +113,19 @@ ASanzoCharacter::ASanzoCharacter()
 void ASanzoCharacter::PostInitializeComponents()
 {
   Super::PostInitializeComponents();
-  //태그확인용 델리게이 바인딩
+  //스탯 컴포넌트 델리게이 바인딩
   if (StatComp)
   {
     StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
+    
   }
-
   //패리 몽타주 끝날때 델리게이트 바인딩
   if(ParryComp)
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
   } 
+
+
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -252,6 +261,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
     EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ASanzoCharacter::Parry);
     EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ASanzoCharacter::Pause);
+    EnhancedInputComponent->BindAction(CheatKey, ETriggerEvent::Started, this, &ASanzoCharacter::Cheat);
     // 이용호 추가
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
   }
@@ -339,7 +349,7 @@ void ASanzoCharacter::StopSprint(const FInputActionValue& Value)
   {
     GetCharacterMovement()->bOrientRotationToMovement = false;
     bUseControllerRotationYaw = true;
-    GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+    GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 
     if (CharacterGameplayTags.HasTag(SanzoTags::Aiming))
     {
@@ -626,7 +636,7 @@ void ASanzoCharacter::AimStart(const FInputActionValue& Value)
 void ASanzoCharacter::AimStop(const FInputActionValue& Value)
 {
   
-  GetCharacterMovement()->MaxWalkSpeed = NomalSpeed;
+  GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
   PlayAimTimeLine();
   CharacterGameplayTags.RemoveTag(SanzoTags::Aiming);
 }
@@ -695,6 +705,8 @@ void ASanzoCharacter::ZoomOutBow()
 
 
 }
+
+
 
 
 
@@ -780,6 +792,7 @@ bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
 }
 
 #pragma region InterfaceFunction
+
 void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
   TagContainer = CharacterGameplayTags;
@@ -802,6 +815,7 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
     switch(Type)
     {
     case EUpgradeType::Beauty:
+      ChangeModeling(Value);
       break;
     default:
       GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
@@ -820,6 +834,63 @@ void ASanzoCharacter::ApplyExpeReward(float Amount)
 }
 #pragma endregion 김형백
 
+#pragma region ChangeModeling
+void ASanzoCharacter::ChangeModeling(float Value)
+{
+  FaceLevel += static_cast<uint8>(FMath::RoundToFloat(Value));
+
+  switch (FaceLevel)
+  {
+  case 1: //로우폴리
+    TargetMesh->SetSkeletalMeshAsset(LowPoly);
+    TargetMesh->SetAnimInstanceClass(LowPolyABP);
+    for( ASanzoWeaponBase* Weapon: EquipmentComp->Inventory)
+    {
+      Weapon->AttachToComponent(
+        TargetMesh,
+        FAttachmentTransformRules::SnapToTargetIncludingScale,
+        Weapon->AttachSocketName
+      );
+    }
+    //TODO :카메라 셋팅
+    CameraSocketOffSet = FVector(0, 42, 53);
+    CameraBoom->SocketOffset = CameraSocketOffSet;
+    break;
+  case 2: //아리사
+    TargetMesh->SetSkeletalMeshAsset(Arisa);
+    TargetMesh->SetAnimInstanceClass(ArisaABP);
+    for (ASanzoWeaponBase* Weapon : EquipmentComp->Inventory)
+    {
+      Weapon->AttachToComponent(
+        TargetMesh,
+        FAttachmentTransformRules::SnapToTargetIncludingScale,
+        Weapon->AttachSocketName
+      );
+      CameraSocketOffSet = FVector(0, 32, 41);
+      CameraBoom->SocketOffset = CameraSocketOffSet;
+    }
+    break;
+    //TODO :카메라 셋팅
+  case 3: //래드돌
+    TargetMesh->SetSkeletalMeshAsset(RadDoll);
+    TargetMesh->SetAnimInstanceClass(RadDollABP);
+    TargetMesh->SetRelativeScale3D(FVector(1.2, 1.2, 1.2));
+    for (ASanzoWeaponBase* Weapon : EquipmentComp->Inventory)
+    {
+      Weapon->AttachToComponent(
+        TargetMesh,
+        FAttachmentTransformRules::SnapToTargetIncludingScale,
+        Weapon->AttachSocketName
+      );
+      Weapon->GetWeaponMesh()->SetRelativeScale3D(FVector(0.7, 0.7, 0.7));
+     // Weapon->GetWeaponMesh()->SetWorldScale3D
+    }
+    break;
+    //TODO :카메라 셋팅
+  }
+
+}
+#pragma endregion 김형백
 
 
 #pragma region TakeDamage
@@ -878,17 +949,12 @@ float ASanzoCharacter::TakeDamage(
     {
       FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
       GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
-      // Hit Sound - 최윤서
-      if (HitSounds.Num() > 0)
-      {
-        int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
-        UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSounds[RandomIndex], GetActorLocation());
-      }
+      
     }
     if (StatComp->IsDead())
     {
       UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      HandleDeath();
+      //HandleDeath();
     }
   }
   ApplyHitEffect();
@@ -906,15 +972,24 @@ void ASanzoCharacter::ApplyHitEffect()
   CharacterGameplayTags.AddTag(SanzoTags::HitReaction);
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
-    AnimInstance->Montage_Play(HitMontage); //여러개 작동 하게 나중에
+    int32 RandomHitIndex = FMath::RandRange(0, HitMontage.Num() - 1);
+    AnimInstance->Montage_Play(HitMontage[RandomHitIndex]); //여러개 작동 하게 나중에
+    
+    
+    // Hit Sound - 최윤서
+    if (HitSounds.Num() > 0)
+    {
+      int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
+      UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSounds[RandomIndex], GetActorLocation());
+    }
 
-    FOnMontageEnded HitEndDelegate;
-    /*FOnMontageBlendingOutStarted HitEndDelegate;*/
+    /*FOnMontageEnded HitEndDelegate;*/
+    FOnMontageBlendingOutStarted HitEndDelegate;
     HitEndDelegate.BindUObject(this, &ASanzoCharacter::EndHitEffect);
 
     // 반드시 Bind 후에 Set해야 함
-    AnimInstance->Montage_SetEndDelegate(HitEndDelegate, HitMontage);
-
+    /*AnimInstance->Montage_SetEndDelegate(HitEndDelegate, HitMontage[RandomHitIndex]);*/
+    AnimInstance->Montage_SetBlendingOutDelegate(HitEndDelegate, HitMontage[RandomHitIndex]);
     //공격중지
     StopFire(0);
   }
@@ -922,6 +997,10 @@ void ASanzoCharacter::ApplyHitEffect()
 
 void ASanzoCharacter::EndHitEffect(UAnimMontage* Montage, bool bInterrupted)
 {
+  if (bInterrupted)
+  {
+    return;
+  }
   CharacterGameplayTags.RemoveTag(SanzoTags::HitReaction);
 }
 #pragma endregion 김형백
@@ -988,28 +1067,97 @@ void ASanzoCharacter::PlayDeathSequence()
   GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
   GetMesh()->SetSimulatePhysics(true);
   GetMesh()->WakeAllRigidBodies();
-
-  FTimerHandle TimerHandle;
-  GetWorld()->GetTimerManager().SetTimer(
-    TimerHandle,
-    FTimerDelegate::CreateWeakLambda(this, [this]()
-      {
-        if (!IsValid(this)) return;
-
-        if (UWorld* World = GetWorld())
-        {
-          World->GetWorldSettings()->SetTimeDilation(1.0f);
-        }
-
-        UE_LOG(LogCYS, Error, TEXT("Game Over!"));
-
-        if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
-        {
-          GI->Restart();
-        }
-      }),
-    1.f,
-    false
-  );
+	
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
+		{
+			SanzoPlayerController->ShowMainUI(FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")));
+		}
+	}
 }
+
+
 #pragma endregion 최윤서
+
+#pragma region StatusDisplayData
+
+TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
+{
+	TArray<FStatusDisplayData> DisplayData;
+	
+//캐릭터
+	DisplayData.Add(FStatusDisplayData(
+			EUpgradeTarget::Character,
+			FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxHealth),
+			FText::FromString(TEXT("최대 체력")),
+			FCharacterBaseValues::MaxHealth,
+			StatComp->GetMaxHealth()
+		)
+	);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Character,
+		FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxStamina),
+		FText::FromString(TEXT("최대 스태미나")),
+		FCharacterBaseValues::MaxStamina,
+		StatComp->GetMaxStamina()
+	)
+);
+	
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Character,
+		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Speed),
+		FText::FromString(TEXT("이동 속도")),
+		FCharacterBaseValues::DefaultMoveSpeed,
+		NormalSpeed
+	)
+);
+//외모관련 수치 필요 (동기화 단계)
+	
+	//총
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Gun,
+		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::Damage),
+		FText::FromString(TEXT("공격력")),
+		FGunBaseValues::BaseDamage,
+		EquipmentComp->GetGunDamage()
+	)
+);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Gun,
+		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::FireRate),
+		FText::FromString(TEXT("발사 속도")),
+		FGunBaseValues::BaseFireRate,
+		EquipmentComp->GetGunFireRate()
+	)
+);
+	
+	//활
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Bow,
+		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::Damage),
+		FText::FromString(TEXT("공격력")),
+		FBowBaseValues::BaseDamage,
+		EquipmentComp->GetBowDamage()
+	)
+);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Bow,
+		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::MaxChargeTime),
+		FText::FromString(TEXT("차징 시간")),
+		FBowBaseValues::BaseMaxChargeTime,
+		EquipmentComp->GetBowChargeTime()
+	)
+);
+	
+	
+	return DisplayData;
+}
+
+#pragma endregion 이준로
+
+
+void ASanzoCharacter::Cheat()
+{
+  StatComp->AddExperience(100);
+}

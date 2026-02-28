@@ -219,3 +219,15 @@ void ASanzoEnemy_Boss::OnParriedCallback()
   DisableWeaponCollision();
   Super::OnParriedCallback();
 }
+
+int32 ASanzoEnemy_Boss::GetStunGaugeOnParried() const
+{
+  // 내려찍기 공격 또는 궁극기 공격이 패리당했을 때 
+  // 스턴 게이지 2칸, 그 외에는 1칸
+  if (bIsHeavyAttack || bIsUltimateFlurry)
+  {
+    return 2;
+  }
+  return 1;
+}
+

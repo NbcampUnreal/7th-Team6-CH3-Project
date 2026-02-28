@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -20,6 +20,7 @@ enum class EUpgradeRarity : uint8
 UENUM(BlueprintType)
 enum class EUpgradeTarget : uint8
 {
+	None,
 	Character, //이동속도, 이쁨
 	Stat, //체력, 스태미나
 	Gun,
@@ -30,6 +31,7 @@ enum class EUpgradeTarget : uint8
 UENUM(BlueprintType)
 enum class EUpgradeType : uint8
 {
+	None,
 	MaxHealth,
 	MaxStamina,
 	Beauty,
@@ -42,7 +44,7 @@ enum class EUpgradeType : uint8
 	Defense, // 받는 피해 감소율
 	LifeSteal, // 공격 시 체력 회복 %
 	ArrowSplit, // 화살 분열
-	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서
+	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서 ㄴㄴ 없음- 형백
 };
 
 USTRUCT(BlueprintType)
@@ -120,7 +122,7 @@ struct FUpgradeStatKey
 	EUpgradeTarget Target;
 	EUpgradeType Type;
 	
-	FUpgradeStatKey() : Target(EUpgradeTarget::Character), Type(EUpgradeType::MaxHealth) {}
+	FUpgradeStatKey() : Target(EUpgradeTarget::None), Type(EUpgradeType::None) {}
 	FUpgradeStatKey(EUpgradeTarget InputTarget, EUpgradeType InputType)	: Target(InputTarget), Type(InputType) {}
 	
 	bool operator==(const FUpgradeStatKey& Other) const
@@ -132,5 +134,45 @@ struct FUpgradeStatKey
 	{
 		return HashCombine(GetTypeHash(Key.Target), GetTypeHash(Key.Type));
 	}
+	
+};
+
+//캐릭터 스테이터스 인포 전용 데이터 테이블
+USTRUCT(BlueprintType)
+struct FStatusDisplayData
+{
+	GENERATED_BODY()
+	FStatusDisplayData()
+		: DisplayTarget(EUpgradeTarget::None)
+			, UpgradeType(FUpgradeStatKey())
+			, DisplayText(FText::GetEmpty())
+			,BaseValue(0.0f)
+			, Value(0.0f)
+	{
+	}
+
+	FStatusDisplayData(EUpgradeTarget InTarget,FUpgradeStatKey InKey, FText InText, float InBaseValue, float InValue)
+		: DisplayTarget(InTarget)
+			,UpgradeType(InKey)
+			, DisplayText(InText)
+			,BaseValue(InBaseValue)
+			, Value(InValue)
+	{
+	}
+	
+	UPROPERTY()
+	EUpgradeTarget DisplayTarget;
+	
+	UPROPERTY()
+	FUpgradeStatKey UpgradeType;
+
+	UPROPERTY()
+	FText DisplayText;
+	
+	UPROPERTY()
+	float BaseValue;
+
+	UPROPERTY()
+	float Value;
 	
 };
