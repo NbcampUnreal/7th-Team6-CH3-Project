@@ -126,9 +126,8 @@ void ASanzoWeaponBase::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
   switch (Type)
   {
   case EUpgradeType::Damage:
-    BaseDamage += Value;
+    BaseDamage = BaseDamage * (1 + Value);
     break;
-    //TODO : 스탯 추가
   default:
     GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
     break;
