@@ -37,10 +37,6 @@ protected:
 	// 좌클릭 눌렀을 때 시간 넣기용
 	float ChargeStartTime;
 
-	// 최대 차징 유효 시간(현재는 3초, 수정가능)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
-	float MaxChargeTime = 1.0f;
-
 	// 계산 후 차징퍼센티지 넣을 변수
 	float ChargePercent;
 
@@ -100,6 +96,10 @@ public:
 	FOnChargePercentChanged OnChargePercentChanged;
 	
 	virtual FText GetAmmoTextForHUD() const override;
+
+	// 최대 차징 유효 시간(현재는 3초, 수정가능)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bow|Charge")
+	float MaxChargeTime = 1.0f;
 	
 protected:
 	bool bIsCharging = false;

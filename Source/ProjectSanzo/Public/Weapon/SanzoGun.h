@@ -26,10 +26,6 @@ public:
 
 protected:
 
-	// 총 연사 속도
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun|Stats")
-	float FireRate;
-
 	// 에셋에 있는 트레이스 이펙트 사용위한 변수
 	UPROPERTY(EditDefaultsOnly, Category = "Gun|Effects")
 	UParticleSystem* TracerEffect;
@@ -50,6 +46,10 @@ public:
 
 	// 후에 드랍된 총알 먹었을 때 탄약 보충될 함수
 	void AddAmmo(int32 Amount);
+
+	// 총 연사 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun|Stats")
+	float FireRate;
 	
 #pragma region DataForHUD
 	
