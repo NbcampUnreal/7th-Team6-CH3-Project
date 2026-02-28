@@ -21,6 +21,9 @@ public:
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
+	class UImage* UpgradeBackground;
+	
+	UPROPERTY(meta = (BindWidget))
 	class UButton* UpgradeButton;
 	
 	UPROPERTY(meta = (BindWidget))
@@ -35,7 +38,17 @@ protected:
 	
 	UFUNCTION()
 	void HandleButtonClicked();
+	
 	FLinearColor GetColorByRarity(EUpgradeRarity Rarity);
+	
+	UTexture2D* GetTextureByRarity(EUpgradeRarity Rarity);
+
+#pragma endregion 이준로
+	
+#pragma region ChangeTextureByRarity
+	
+	UPROPERTY(EditAnywhere, Category= "UI|Style")
+	TMap<EUpgradeRarity, UTexture2D*> RarityTextures;
 
 #pragma endregion 이준로
 };

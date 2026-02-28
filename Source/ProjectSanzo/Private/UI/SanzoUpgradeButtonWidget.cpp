@@ -2,6 +2,8 @@
 
 
 #include "UI/SanzoUpgradeButtonWidget.h"
+
+#include "Common/SanzoLog.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -12,7 +14,7 @@ void USanzoUpgradeButtonWidget::NativeConstruct()
 	Super::NativeConstruct();
 	if (UpgradeButton)
 	{
-		UpgradeButton->OnClicked.AddDynamic(this, &ThisClass::HandleButtonClicked);
+		UpgradeButton->OnClicked.AddDynamic(this, &ThisClass::HandleButtonClicked);		
 	}
 }
 
@@ -20,9 +22,9 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 {
 	CachedOption = InputOption;
 	
-	if (UpgradeButton)
+	if (UpgradeBackground)
 	{
-		UpgradeButton->SetBackgroundColor(GetColorByRarity(InputOption.Rarity));
+		UpgradeBackground->SetBrushFromTexture(GetTextureByRarity(InputOption.Rarity));
 	}
 	
 	if (UpgradeText && !InputOption.DisplayName.IsEmpty())
@@ -69,4 +71,15 @@ FLinearColor USanzoUpgradeButtonWidget::GetColorByRarity(EUpgradeRarity Rarity)
 	default:
 		return FLinearColor::Black;
 	}
+}
+
+UTexture2D* USanzoUpgradeButtonWidget::GetTextureByRarity(EUpgradeRarity Rarity)
+{
+	UE_LOG(LogLJR, Warning, TEXT("레어리티 선택 들어옴"));
+	if (RarityTextures.Contains(Rarity))
+	{
+		UE_LOG(LogLJR, Warning, TEXT("레어리티 선택됨 들어옴"));
+		return RarityTextures[Rarity];
+	}
+	return nullptr;
 }
