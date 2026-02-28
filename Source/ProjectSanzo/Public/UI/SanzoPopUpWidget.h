@@ -39,9 +39,6 @@ protected:
 	FGameplayTag CurrentState;
 	
 	UFUNCTION(BlueprintCallable)
-	void SetStatusText();
-
-	UFUNCTION(BlueprintCallable)
 	void SetUpgradeList();
 
 	UFUNCTION(BlueprintCallable)
@@ -78,9 +75,6 @@ protected:
 	class UButton* MainMenuButton;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MainMenuText;
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* StatusText;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* UpgradeButtonBox;
