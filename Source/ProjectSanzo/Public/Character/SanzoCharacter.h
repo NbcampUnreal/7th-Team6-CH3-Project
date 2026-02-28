@@ -44,6 +44,9 @@ class PROJECTSANZO_API ASanzoCharacter :
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   USpringArmComponent* CameraBoom;
 
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+  FVector CameraSocketOffSet;
+
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   UCameraComponent* FollowCamera;
 

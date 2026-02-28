@@ -81,6 +81,9 @@ ASanzoCharacter::ASanzoCharacter()
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
 
+  CameraSocketOffSet = FVector(0, 55, 68);
+  CameraBoom->SocketOffset = CameraSocketOffSet;
+
   EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
   StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
   ParryComp = CreateDefaultSubobject<USanzoParryComponent>(TEXT("Parry"));
@@ -844,16 +847,47 @@ void ASanzoCharacter::ChangeModeling(float Value)
   case 1: //로우폴리
     TargetMesh->SetSkeletalMeshAsset(LowPoly);
     TargetMesh->SetAnimInstanceClass(LowPolyABP);
+    for( ASanzoWeaponBase* Weapon: EquipmentComp->Inventory)
+    {
+      Weapon->AttachToComponent(
+        TargetMesh,
+        FAttachmentTransformRules::SnapToTargetIncludingScale,
+        Weapon->AttachSocketName
+      );
+    }
     //TODO :카메라 셋팅
+    CameraSocketOffSet = FVector(0, 42, 53);
+    CameraBoom->SocketOffset = CameraSocketOffSet;
     break;
-  case 2:
+  case 2: //아리사
     TargetMesh->SetSkeletalMeshAsset(Arisa);
     TargetMesh->SetAnimInstanceClass(ArisaABP);
+    for (ASanzoWeaponBase* Weapon : EquipmentComp->Inventory)
+    {
+      Weapon->AttachToComponent(
+        TargetMesh,
+        FAttachmentTransformRules::SnapToTargetIncludingScale,
+        Weapon->AttachSocketName
+      );
+      CameraSocketOffSet = FVector(0, 32, 41);
+      CameraBoom->SocketOffset = CameraSocketOffSet;
+    }
     break;
     //TODO :카메라 셋팅
-  case 3:
+  case 3: //래드돌
     TargetMesh->SetSkeletalMeshAsset(RadDoll);
     TargetMesh->SetAnimInstanceClass(RadDollABP);
+    TargetMesh->SetRelativeScale3D(FVector(1.2, 1.2, 1.2));
+    for (ASanzoWeaponBase* Weapon : EquipmentComp->Inventory)
+    {
+      Weapon->AttachToComponent(
+        TargetMesh,
+        FAttachmentTransformRules::SnapToTargetIncludingScale,
+        Weapon->AttachSocketName
+      );
+      Weapon->GetWeaponMesh()->SetRelativeScale3D(FVector(0.7, 0.7, 0.7));
+     // Weapon->GetWeaponMesh()->SetWorldScale3D
+    }
     break;
     //TODO :카메라 셋팅
   }
