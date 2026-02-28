@@ -85,6 +85,7 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
           }
         }
         BBComp->SetValueAsObject(TEXT("TargetActor"), Actor);
+        SetFocus(Actor);
         BBComp->ClearValue(TEXT("InvestigateLocation"));
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Sight!"));
       }
@@ -98,6 +99,7 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
             Enemy->ShowAlertWidget(false);
           }
           BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
+          SetFocalPoint(Stimulus.StimulusLocation);
           UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
         }
       }
@@ -113,6 +115,7 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
           }
         }
         BBComp->SetValueAsObject(TEXT("TargetActor"), Actor);
+        SetFocalPoint(Stimulus.StimulusLocation);
         BBComp->ClearValue(TEXT("InvestigateLocation"));
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by DAMAGE!"));
       }
@@ -127,7 +130,8 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 
         // 플레이어의 마지막 위치를 기억
         BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Actor->GetActorLocation());
-      	
+        ClearFocus(EAIFocusPriority::Gameplay);
+
       	if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
       	{
       		Enemy->ShowAlertWidget(false);
