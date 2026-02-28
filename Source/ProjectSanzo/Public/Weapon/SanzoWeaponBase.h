@@ -38,10 +38,6 @@ protected:
 	// 플레이어 활, AI 적 원거리 무기 = true, 플레이어 총 = false
 	bool bInfiniteAmmo;
 
-	// 기본 공격력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
-	float BaseDamage;
-
 	// 헤드샷 데미지 배율
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float HeadshotMultiplier = 2.0f;
@@ -111,6 +107,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Animation")
 	class UAnimMontage* EquipMontage;
 
+	// 기본 공격력
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
+	float BaseDamage;
+  
 	//다른곳에서 매시 부르기 -김형백
 	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 

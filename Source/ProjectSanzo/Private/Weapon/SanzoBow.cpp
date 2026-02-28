@@ -125,11 +125,6 @@ void ASanzoBow::StopFire()
 	// 재생되던 드로우 사운드 끄고 혹시 있을 차지 사운드도 끄기
 	if (DrawStartAudioComp && DrawStartAudioComp->IsPlaying()) DrawStartAudioComp->Stop();
 	if (DrawLoopAudioComp && DrawLoopAudioComp->IsPlaying()) DrawLoopAudioComp->Stop();
-	// 다 하고 발사 사운드 재생
-	if (FireSound)
-	{
-		FireAudioComp = UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, StringSocketName);
-	}
 	
 	// 화살 발사하면 더미화살 다시 안보이게 변경
 	if (DummyArrowMesh)
@@ -179,8 +174,6 @@ void ASanzoBow::StopFire()
 
 		return;
 	}
-
-
 
 	Fire();
 }
@@ -263,6 +256,12 @@ void ASanzoBow::Fire()
 				// 화살에 계산한 속도,데미지 전달
 				Arrow->SetArrowSpeed(FinalSpeed);
 				Arrow->SetArrowDamage(FinalDamage);
+
+				// 다 하고 발사 사운드 재생
+				if (FireSound)
+				{
+					FireAudioComp = UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, StringSocketName);
+				}
 			}
 		}
 	}

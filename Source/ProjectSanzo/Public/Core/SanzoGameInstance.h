@@ -1,4 +1,4 @@
-// stage 이동 전 정보 업데이트(save)
+﻿// stage 이동 전 정보 업데이트(save)
 #pragma once
 
 #include "CoreMinimal.h"
@@ -35,6 +35,18 @@ public:
 	UPROPERTY()
 	int32 CachedAmmo;
 
+	// 총 관련 정보
+	UPROPERTY()
+	float CachedGunDamage = -1.0f;
+	UPROPERTY()
+	float CachedGunFireRate = -1.0f;
+
+	// 활 관련 정보
+	UPROPERTY()
+	float CachedBowDamage = -1.0f;
+
+	UPROPERTY()
+	float CachedBowChargeTime = -1.0f;
 	// 스탯 백업
 	void BackupStat(ASanzoCharacter* Player);
   // 스탯 복원

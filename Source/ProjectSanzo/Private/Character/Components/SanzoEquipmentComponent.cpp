@@ -89,14 +89,34 @@ ASanzoCharacter* USanzoEquipmentComponent::GetOwnerCharacter()
 
 void USanzoEquipmentComponent::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value)
 {
-	if (Target == EUpgradeTarget::Gun) //받은게 총일경우에만 실행
+	if (Target != EUpgradeTarget::Gun && Target != EUpgradeTarget::Bow)
 	{
-		CurrentWeapon->ApplyWeaponStatUpgrade(Type, Value);
+		return;
 	}
-	if (Target == EUpgradeTarget::Bow) //받은게 보~우일경우에만 싱행
+
+	// 인벤토리 다 열어봐서 맞는 무기 찾기
+	for (ASanzoWeaponBase* Weapon : Inventory)
 	{
-		CurrentWeapon->ApplyWeaponStatUpgrade(Type, Value);
+		if (!Weapon) continue;
+
+		// 타겟이 총이고 꺼낸 무기가 총일 때 적용
+		if (Target == EUpgradeTarget::Gun)
+		{
+			if (ASanzoGun* Gun = Cast<ASanzoGun>(Weapon))
+			{
+				Gun->ApplyWeaponStatUpgrade(Type, Value);
+			}
+		}
+		// 타겟이 활이고 꺼낸 무기가 활일 때 적용
+		else if (Target == EUpgradeTarget::Bow)
+		{
+			if (ASanzoBow* Bow = Cast<ASanzoBow>(Weapon))
+			{
+				Bow->ApplyWeaponStatUpgrade(Type, Value);
+			}
+		}
 	}
+
 }
 
 void USanzoEquipmentComponent::AddAmmo(int32 Amount)

@@ -214,7 +214,7 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 	switch (Type)
 	{
 	case EUpgradeType::FireRate:
-		FireRate += Value;
+		FireRate = FMath::Max(0.07, FireRate - Value);
 		break;
 
 	default:
