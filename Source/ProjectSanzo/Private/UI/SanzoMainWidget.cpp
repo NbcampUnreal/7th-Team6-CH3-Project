@@ -3,10 +3,12 @@
 
 #include "UI/SanzoMainWidget.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 
 void USanzoMainWidget::NativeConstruct()
 {
@@ -26,6 +28,16 @@ void USanzoMainWidget::NativeConstruct()
 		ExitButton->OnClicked.AddDynamic(this,&ThisClass::HandleExitButtonClicked);
 	}
 	
+}
+
+void USanzoMainWidget::NativeDestruct()
+{
+	if (PlayingAudio && PlayingAudio->IsPlaying())
+	{
+		PlayingAudio->Stop();
+	}
+	
+	Super::NativeDestruct();
 }
 
 void USanzoMainWidget::SetMainUI(FGameplayTag State, float ClearTime, int32 KillScore)
@@ -110,6 +122,7 @@ void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScore)
 
 void USanzoMainWidget::SetGameOverMenuUI()
 {
+	
 	if (TitleImage)
 	{
 		TitleImage->SetVisibility(ESlateVisibility::Hidden);
@@ -130,6 +143,14 @@ void USanzoMainWidget::SetGameOverMenuUI()
 	{
 		ExitText->SetText(FText::FromString(TEXT("메인 메뉴")));
 	}
+	
+	PlayGameOverSound();
+	
+	if (GameOverAnim)
+	{
+		PlayAnimation(GameOverAnim);
+	}
+	
 }
 
 void USanzoMainWidget::HandleStartButtonClicked()
@@ -150,5 +171,22 @@ void USanzoMainWidget::HandleExitButtonClicked()
 	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")))
 	{
 		OnButtonClicked.Broadcast(ReturnMainMenuTag);
+	}
+}
+
+void USanzoMainWidget::PlayGameOverSound()
+{
+	if (GameOverSound)
+	{
+		PlayingAudio = UGameplayStatics::SpawnSound2D(this, GameOverSound);
+		
+		if (PlayingAudio)
+		{
+			PlayingAudio->bIsUISound = true;
+			
+			PlayingAudio->SetTickableWhenPaused(true);
+			
+			PlayingAudio->Play();		
+		}
 	}
 }

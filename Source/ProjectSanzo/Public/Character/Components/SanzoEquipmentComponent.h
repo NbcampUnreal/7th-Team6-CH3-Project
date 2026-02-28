@@ -83,6 +83,12 @@ public:
 	UFUNCTION()
 	void NotifyItemPickedUp(FName InItemType, int32 InAmount);
 	
+	float GetGunDamage();
+	float GetGunFireRate();
+	
+	float GetBowDamage();
+	float GetBowChargeTime();
+	
 protected:
   UFUNCTION()
   void UpdateHUDAmmo();

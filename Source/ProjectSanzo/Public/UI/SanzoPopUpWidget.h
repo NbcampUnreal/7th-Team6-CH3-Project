@@ -102,4 +102,15 @@ protected:
 	FGameplayTag MainMenuTag;
 	
 #pragma endregion 이준로
+	
+#pragma region StatInfo
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetStatInfo();
+	
+protected:
+	UPROPERTY(meta = (BindWidget))
+	class USanzoStatInfoWidget* StatInfoWidget;
+	
+#pragma endregion 이준로
 };

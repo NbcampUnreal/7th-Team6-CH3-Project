@@ -165,7 +165,7 @@ public:
   ASanzoCharacter();
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
-  float NomalSpeed;
+  float NormalSpeed;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
   float SprintSpeedMultiplier;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
@@ -290,4 +290,11 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
   AAmbientSound* BGMActor;
 #pragma endregion 최윤서
+	
+#pragma region StatusDisplayData
+	
+	TArray<FStatusDisplayData> GetStatusDisplayData() const;
+	
+#pragma endregion 이준로
+
 };

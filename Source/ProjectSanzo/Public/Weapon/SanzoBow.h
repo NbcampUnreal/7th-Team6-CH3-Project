@@ -101,6 +101,8 @@ public:
 	
 	virtual FText GetAmmoTextForHUD() const override;
 	
+	float GetMaxChargeTime() const { return MaxChargeTime; }
+	
 protected:
 	bool bIsCharging = false;
 	

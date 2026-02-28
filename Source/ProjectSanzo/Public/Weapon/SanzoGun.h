@@ -51,6 +51,7 @@ public:
 	// 후에 드랍된 총알 먹었을 때 탄약 보충될 함수
 	void AddAmmo(int32 Amount);
 	
+  float GetFireRate() const { return FireRate; }
 #pragma region DataForHUD
 	
 public:
