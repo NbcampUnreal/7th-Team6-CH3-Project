@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Character/Components/SanzoStatComponent.h"
@@ -135,7 +135,7 @@ void USanzoStatComponent::RestoreHealth(float Amount)
 void USanzoStatComponent::AddExperience(float Amount)
 {
 	CurrentExp += Amount;
-	if (CurrentExp >= 100)
+	if(CurrentExp >= 100)
 	{
 		CurrentExp -= 100;
 		LevelUp();
@@ -154,10 +154,18 @@ void USanzoStatComponent::LevelUp()
 
 
 			TWeakObjectPtr<ASanzoPlayerController> WeakPC(PlayerController); //약한 참조로
+			TWeakObjectPtr<USanzoStatComponent> WeakThis(this); //약한 참조로
 			GetWorld()->GetTimerManager().SetTimer(LevelUpLateHandle,
-				[WeakPC]()
+				[WeakPC,WeakThis]()
 				{
-					WeakPC->ShowPopUp(SanzoTags::UpgradeSelet);
+					if(WeakPC.IsValid())
+					{
+						WeakPC->ShowPopUp(SanzoTags::UpgradeSelet);
+					}
+					if(WeakThis.IsValid())
+					{
+						WeakThis->AddExperience(0);
+					}
 				},
 				1.2f,
 				false
@@ -238,7 +246,6 @@ void USanzoStatComponent::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type,
     case EUpgradeType::MaxStamina:
 			MaxStamina += Value;
       break;
-
     default:
 			GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
       break;

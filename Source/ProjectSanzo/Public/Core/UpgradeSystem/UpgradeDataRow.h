@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -42,7 +42,7 @@ enum class EUpgradeType : uint8
 	Defense, // 받는 피해 감소율
 	LifeSteal, // 공격 시 체력 회복 %
 	ArrowSplit, // 화살 분열
-	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서
+	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서 ㄴㄴ 없음- 형백
 };
 
 USTRUCT(BlueprintType)

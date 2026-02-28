@@ -100,7 +100,12 @@ class PROJECTSANZO_API ASanzoCharacter :
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
   UInputAction* PauseAction;
 
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* CheatKey;
+
+  void Cheat();
 #pragma endregion 김형백
+
 #pragma region 스왑 액션 추가
   // 스왑용 액션(임시로 Q키 지정)
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -127,9 +132,35 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Dodge")
   USoundBase* DodgeSuccessSound;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
-  UAnimMontage* HitMontage;
+  TArray<UAnimMontage*> HitMontage;
 
 #pragma endregion 김형백
+
+#pragma region FaceUpgrade
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  USkeletalMesh* LowPoly;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  TSubclassOf<UAnimInstance> LowPolyABP;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  USkeletalMesh* Arisa;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  TSubclassOf<UAnimInstance> ArisaABP;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  USkeletalMesh* RadDoll;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  TSubclassOf<UAnimInstance> RadDollABP;
+
+  
+  uint8 FaceLevel = 0;
+
+  UFUNCTION()
+  void ChangeModeling(float Value);
+
+
+#pragma endregion 김형백
+
+
+
 public:
   ASanzoCharacter();
 

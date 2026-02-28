@@ -33,6 +33,7 @@ DEFINE_LOG_CATEGORY(LogSanzo);
 
 
 #pragma region LifeCycle
+
 ASanzoCharacter::ASanzoCharacter()
 {
   
@@ -66,6 +67,12 @@ ASanzoCharacter::ASanzoCharacter()
   CameraBoom->SetupAttachment(RootComponent);
   CameraBoom->TargetArmLength = 400.0f;
   CameraBoom->bUsePawnControlRotation = true;
+
+  if(GetMesh())
+  {
+    GetMesh()->SetHiddenInGame(true);
+    GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+  }
 
   TargetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TargetMesh"));
   TargetMesh->SetupAttachment(GetMesh());
@@ -106,17 +113,19 @@ ASanzoCharacter::ASanzoCharacter()
 void ASanzoCharacter::PostInitializeComponents()
 {
   Super::PostInitializeComponents();
-  //태그확인용 델리게이 바인딩
+  //스탯 컴포넌트 델리게이 바인딩
   if (StatComp)
   {
     StatComp->TagCheckDelegate.BindUObject(this, &ASanzoCharacter::CheckTags);
+    
   }
-
   //패리 몽타주 끝날때 델리게이트 바인딩
   if(ParryComp)
   {
     ParryComp->BlendingOutDelegate.BindUObject(this, &ASanzoCharacter::EndParry);
   } 
+
+
 }
 
 void ASanzoCharacter::BeginPlay()
@@ -252,6 +261,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ASanzoCharacter::AimStop);
     EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ASanzoCharacter::Parry);
     EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ASanzoCharacter::Pause);
+    EnhancedInputComponent->BindAction(CheatKey, ETriggerEvent::Started, this, &ASanzoCharacter::Cheat);
     // 이용호 추가
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
   }
@@ -699,6 +709,8 @@ void ASanzoCharacter::ZoomOutBow()
 
 
 
+
+
 void ASanzoCharacter::TimelineUpdateCallBack(float Value)
 {
   CameraBoom->TargetArmLength = Value;
@@ -780,6 +792,7 @@ bool ASanzoCharacter::CheckTags(const FGameplayTag& TagsToCheck)
 }
 
 #pragma region InterfaceFunction
+
 void ASanzoCharacter::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
   TagContainer = CharacterGameplayTags;
@@ -802,6 +815,7 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
     switch(Type)
     {
     case EUpgradeType::Beauty:
+      ChangeModeling(Value);
       break;
     default:
       GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
@@ -820,6 +834,32 @@ void ASanzoCharacter::ApplyExpeReward(float Amount)
 }
 #pragma endregion 김형백
 
+#pragma region ChangeModeling
+void ASanzoCharacter::ChangeModeling(float Value)
+{
+  FaceLevel += static_cast<uint8>(FMath::RoundToFloat(Value));
+
+  switch (FaceLevel)
+  {
+  case 1: //로우폴리
+    TargetMesh->SetSkeletalMeshAsset(LowPoly);
+    TargetMesh->SetAnimInstanceClass(LowPolyABP);
+    //TODO :카메라 셋팅
+    break;
+  case 2:
+    TargetMesh->SetSkeletalMeshAsset(Arisa);
+    TargetMesh->SetAnimInstanceClass(ArisaABP);
+    break;
+    //TODO :카메라 셋팅
+  case 3:
+    TargetMesh->SetSkeletalMeshAsset(RadDoll);
+    TargetMesh->SetAnimInstanceClass(RadDollABP);
+    break;
+    //TODO :카메라 셋팅
+  }
+
+}
+#pragma endregion 김형백
 
 
 #pragma region TakeDamage
@@ -878,17 +918,12 @@ float ASanzoCharacter::TakeDamage(
     {
       FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
       GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
-      // Hit Sound - 최윤서
-      if (HitSounds.Num() > 0)
-      {
-        int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
-        UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSounds[RandomIndex], GetActorLocation());
-      }
+      
     }
     if (StatComp->IsDead())
     {
       UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      HandleDeath();
+      //HandleDeath();
     }
   }
   ApplyHitEffect();
@@ -906,15 +941,24 @@ void ASanzoCharacter::ApplyHitEffect()
   CharacterGameplayTags.AddTag(SanzoTags::HitReaction);
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
   {
-    AnimInstance->Montage_Play(HitMontage); //여러개 작동 하게 나중에
+    int32 RandomHitIndex = FMath::RandRange(0, HitMontage.Num() - 1);
+    AnimInstance->Montage_Play(HitMontage[RandomHitIndex]); //여러개 작동 하게 나중에
+    
+    
+    // Hit Sound - 최윤서
+    if (HitSounds.Num() > 0)
+    {
+      int32 RandomIndex = FMath::RandRange(0, HitSounds.Num() - 1);
+      UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSounds[RandomIndex], GetActorLocation());
+    }
 
-    FOnMontageEnded HitEndDelegate;
-    /*FOnMontageBlendingOutStarted HitEndDelegate;*/
+    /*FOnMontageEnded HitEndDelegate;*/
+    FOnMontageBlendingOutStarted HitEndDelegate;
     HitEndDelegate.BindUObject(this, &ASanzoCharacter::EndHitEffect);
 
     // 반드시 Bind 후에 Set해야 함
-    AnimInstance->Montage_SetEndDelegate(HitEndDelegate, HitMontage);
-
+    /*AnimInstance->Montage_SetEndDelegate(HitEndDelegate, HitMontage[RandomHitIndex]);*/
+    AnimInstance->Montage_SetBlendingOutDelegate(HitEndDelegate, HitMontage[RandomHitIndex]);
     //공격중지
     StopFire(0);
   }
@@ -922,6 +966,10 @@ void ASanzoCharacter::ApplyHitEffect()
 
 void ASanzoCharacter::EndHitEffect(UAnimMontage* Montage, bool bInterrupted)
 {
+  if (bInterrupted)
+  {
+    return;
+  }
   CharacterGameplayTags.RemoveTag(SanzoTags::HitReaction);
 }
 #pragma endregion 김형백
@@ -1013,3 +1061,8 @@ void ASanzoCharacter::PlayDeathSequence()
   );
 }
 #pragma endregion 최윤서
+
+void ASanzoCharacter::Cheat()
+{
+  StatComp->AddExperience(100);
+}
