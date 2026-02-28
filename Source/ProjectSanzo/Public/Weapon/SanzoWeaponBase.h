@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -110,6 +110,10 @@ public:
 	// 스왑할 때 플레이할 애니메이션 시퀀스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Animation")
 	class UAnimMontage* EquipMontage;
+
+	//다른곳에서 매시 부르기 -김형백
+	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
+
 
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요

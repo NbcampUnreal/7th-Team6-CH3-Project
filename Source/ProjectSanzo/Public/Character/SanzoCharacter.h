@@ -11,6 +11,7 @@
 #include "Interface/SanzoTagEditorInterface.h"
 #include "Interface/SanzoUpgradeInterface.h"
 #include "Interface/SanzoRewardReceiverInterface.h"
+#include "Interface/SanzoCharacterInterface.h"
 #include "SanzoCharacter.generated.h" 
 
 class USanzoUpgradeComponent;
@@ -32,7 +33,8 @@ class PROJECTSANZO_API ASanzoCharacter :
   public IGameplayTagAssetInterface, 
   public ISanzoTagEditorInterface,
   public ISanzoUpgradeInterface,
-  public ISanzoRewardReceiverInterface
+  public ISanzoRewardReceiverInterface,
+  public ISanzoCharacterInterface
 
 
 {
@@ -41,6 +43,9 @@ class PROJECTSANZO_API ASanzoCharacter :
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   USpringArmComponent* CameraBoom;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+  FVector CameraSocketOffSet;
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   UCameraComponent* FollowCamera;
@@ -187,6 +192,7 @@ public:
   virtual void RemoveGameplayTag(FGameplayTag TagToRemove) override;
   virtual void ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, float Value) override;
   virtual void ApplyExpeReward(float Amount) override; //다른 보상이 있다면 추가가능
+  virtual ACharacter* GetCharacterActor() override { return this; }
 
 protected:
 #pragma region InputFunctions
