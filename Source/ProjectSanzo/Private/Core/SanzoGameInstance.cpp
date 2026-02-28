@@ -1,4 +1,4 @@
-#include "Core/SanzoGameInstance.h"
+﻿#include "Core/SanzoGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
 #include "Character/SanzoCharacter.h"
@@ -6,6 +6,7 @@
 #include "Character/Components/SanzoEquipmentComponent.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
 #include "Weapon/SanzoGun.h"
+#include "Weapon/SanzoBow.h"
 
 USanzoGameInstance::USanzoGameInstance()
 {
@@ -53,12 +54,22 @@ void USanzoGameInstance::BackupStat(ASanzoCharacter* Player)
   }
   if (USanzoEquipmentComponent* EquipComp = Player->FindComponentByClass<USanzoEquipmentComponent>())
   {
-    if (EquipComp->Inventory.IsValidIndex(0))
+    // 인벤토리 돌면서 모든 무기 보기
+    for (ASanzoWeaponBase* Weapon : EquipComp->Inventory)
     {
-      ASanzoWeaponBase* Gun = EquipComp->Inventory[0];
-      CachedAmmo = Gun->GetCurrentAmmo();
-      UE_LOG(LogCYS, Warning, TEXT("GI: 탄약 백업, 탄약: %d"),CachedAmmo);
-
+      // 무기가 총이라면 총 저장 변수에 현재 값 저장
+      if (ASanzoGun* Gun = Cast<ASanzoGun>(Weapon))
+      {
+        CachedGunDamage = Gun->BaseDamage;
+        CachedGunFireRate = Gun->FireRate;
+        CachedAmmo = Gun->GetCurrentAmmo();
+      }
+      // 무기가 활이라면 활 저장 변수에 현재 값 저장
+      else if (ASanzoBow* Bow = Cast<ASanzoBow>(Weapon))
+      {
+        CachedBowDamage = Bow->BaseDamage;
+        CachedBowChargeTime = Bow->MaxChargeTime;
+      }
     }
   }
 }
@@ -71,14 +82,24 @@ void USanzoGameInstance::RestoreStat(ASanzoCharacter* Player)
   }
   if (USanzoEquipmentComponent* EquipComp = Player->FindComponentByClass<USanzoEquipmentComponent>())
   {
-    if (EquipComp->Inventory.IsValidIndex(0))
+    for (ASanzoWeaponBase* Weapon : EquipComp->Inventory)
     {
-      ASanzoWeaponBase* SanzoWeaponBase = EquipComp->Inventory[0];
-    	if (ASanzoGun* Gun = Cast<ASanzoGun>(SanzoWeaponBase))
-    	{
-    		Gun->SetCurrentAmmo(CachedAmmo);
-    		UE_LOG(LogCYS, Warning, TEXT("GI: 복원 후 탄약: %d"), Gun->GetCurrentAmmo());
-    	}
+      // 총 복원
+      if (ASanzoGun* Gun = Cast<ASanzoGun>(Weapon))
+      {
+        Gun->SetCurrentAmmo(CachedAmmo);
+
+        // 업그레이드한 적이 있을 때만 값 덮어쓰기
+        if (CachedGunDamage > 0.0f)     Gun->BaseDamage = CachedGunDamage;
+        if (CachedGunFireRate > 0.0f)   Gun->FireRate = CachedGunFireRate;
+      }
+      // 활 복원
+      else if (ASanzoBow* Bow = Cast<ASanzoBow>(Weapon))
+      {
+        // 업그레이드한 적이 있을 때만 값 덮어쓰기
+        if (CachedBowDamage > 0.0f)     Bow->BaseDamage = CachedBowDamage;
+        if (CachedBowChargeTime > 0.0f) Bow->MaxChargeTime = CachedBowChargeTime;
+      }
     }
   }
 }
@@ -88,6 +109,11 @@ void USanzoGameInstance::InitSetup()
   UE_LOG(LogCYS, Warning, TEXT("GI: Init Set up"));
   CurrentStageIndex = 0;
   CachedAmmo = 1000; // 초기 탄약값 설정
+  // 무기 업그레이드 정보 백지화
+  CachedGunDamage = -1.0f;
+  CachedGunFireRate = -1.0f;
+  CachedBowDamage = -1.0f;
+  CachedBowChargeTime = -1.0f;
   CachedStatData = FSanzoSaveStatData(); // 초기 스탯값 설정
 
 	if (USanzoUpgradeSubsystem* UpgradeSubsystem = GetSubsystem<USanzoUpgradeSubsystem>())
