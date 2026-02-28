@@ -13,7 +13,8 @@ enum class EUpgradeRarity : uint8
 	Common,
 	Rare,
 	Epic,
-	Legend
+	Legend,
+	Link
 };
 
 //업그레이드 타겟 Enum
