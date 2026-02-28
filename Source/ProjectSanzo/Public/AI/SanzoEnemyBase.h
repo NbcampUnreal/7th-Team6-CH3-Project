@@ -199,10 +199,11 @@ protected:
 
   UFUNCTION()
   virtual void OnParriedCallback();
+
+  // 패링 당했을 때 증가할 스턴 게이지 수
+  virtual int32 GetStunGaugeOnParried() const { return 1; }
 #pragma endregion 김동주
 
-
-  
 #pragma region Sound
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> DeathSounds;
