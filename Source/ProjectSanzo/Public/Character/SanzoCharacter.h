@@ -251,11 +251,11 @@ protected:
   //디버그용
   void PrintGameplayTags();
 
-  void ApplyHitEffect();
   void EndHitEffect(UAnimMontage* Montage, bool bInterrupted);
 
 
 public:
+  void ApplyHitEffect();
   FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
   FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
@@ -269,6 +269,9 @@ public:
 
   // 몽타주 종료 시 호출될 델리게이트 함수
   void EndWeaponSwap(UAnimMontage* Montage, bool bInterrupted);
+
+  // 스왑 도중에 스왑 몽타지 끊겼을 때 태그 제거용 호출 함수
+  void ForceResetState();
 #pragma endregion 이용호
 
 #pragma region PlayerTakeDamage

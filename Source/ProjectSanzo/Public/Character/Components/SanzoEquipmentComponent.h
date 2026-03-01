@@ -51,6 +51,10 @@ public:
   // 캐릭터가 호출할 스왑 시작 함수
   UAnimMontage* BeginSwapWeapon();
 
+  // 스왑하다가 끊겼을 때 스왑 롤백용 함수
+  UFUNCTION()
+  void OnSwapMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
   // 원래 무기 하나 소환했지만 무기를 인덱스로 갖는 배열로 수정
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment|Class")
   TArray<TSubclassOf<class ASanzoWeaponBase>> DefaultWeaponClasses;

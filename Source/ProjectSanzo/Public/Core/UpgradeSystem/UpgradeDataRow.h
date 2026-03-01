@@ -44,7 +44,7 @@ enum class EUpgradeType : uint8
   ParryReflectChance, // 패리 반사 확률
 	Defense, // 받는 피해 감소율
 	LifeSteal, // 공격 시 체력 회복 %
-	ArrowSplit, // 화살 분열
+	BowMultiShot, // 화살 분열
 	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서 ㄴㄴ 없음- 형백
 };
 
