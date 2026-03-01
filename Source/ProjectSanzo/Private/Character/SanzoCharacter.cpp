@@ -780,6 +780,14 @@ void ASanzoCharacter::EndWeaponSwap(UAnimMontage* Montage, bool bInterrupted)
   // 태그 제거
   CharacterGameplayTags.RemoveTag(SanzoTags::Swap);
 }
+
+void ASanzoCharacter::ForceResetState()
+{
+  // 피격 태그 제거
+  CharacterGameplayTags.RemoveTag(SanzoTags::HitReaction);
+  // 스왑 태그 제거
+  CharacterGameplayTags.RemoveTag(SanzoTags::Swap);
+}
 #pragma endregion 이용호
 
 #pragma endregion 김형백

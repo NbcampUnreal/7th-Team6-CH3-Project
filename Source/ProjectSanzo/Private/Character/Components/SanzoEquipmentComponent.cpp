@@ -262,11 +262,45 @@ UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
 			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
 				AnimInstance->Montage_Play(NextWeapon->EquipMontage,2.0f);
+				AnimInstance->OnMontageEnded.RemoveDynamic(this, &USanzoEquipmentComponent::OnSwapMontageEnded);
+				AnimInstance->OnMontageEnded.AddDynamic(this, &USanzoEquipmentComponent::OnSwapMontageEnded);
 				return NextWeapon->EquipMontage;
 			}
 		}
 	}
 	return nullptr;
+}
+
+void USanzoEquipmentComponent::OnSwapMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (ASanzoCharacter* Character = Cast<ASanzoCharacter>(GetOwnerCharacter()))
+	{
+		// 감지되면 해제
+		if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->OnMontageEnded.RemoveDynamic(this, &USanzoEquipmentComponent::OnSwapMontageEnded);
+		}
+
+		// 스왑 중에 몽타지 취소되면
+		if (bInterrupted && CurrentWeapon)
+		{
+			FTimerHandle RollbackTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				RollbackTimerHandle,
+				FTimerDelegate::CreateWeakLambda(this, [Character, this]()
+					{
+						// 타이머가 도는 아주 짧은 찰나에 캐릭터나 무기가 파괴되었을 수 있으니 안전 검사
+						if (Character && Character->GetMesh() && CurrentWeapon)
+						{
+							Character->GetMesh()->SetAnimInstanceClass(CurrentWeapon->WeaponAnimInstanceClass);
+							Character->ForceResetState();
+							Character->ApplyHitEffect();
+					}),
+				0.01f, // 0.01초 지연
+				false
+			);
+		}
+	}
 }
 #pragma endregion 이용호
 
