@@ -67,10 +67,14 @@ protected:
 	TSubclassOf<class UUserWidget> UpgradeInfoWidgetClass;
 
 	UPROPERTY(meta = (BindWidget))
+	class UOverlay* ResumeButtonOverlay;
+	UPROPERTY(meta = (BindWidget))
 	class UButton* ResumeButton;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ResumeText;
 
+	UPROPERTY(meta = (BindWidget))
+	class UOverlay* MainMenuButtonOverlay;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* MainMenuButton;
 	UPROPERTY(meta = (BindWidget))

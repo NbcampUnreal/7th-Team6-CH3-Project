@@ -7,6 +7,7 @@
 #include "Common/SanzoLog.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
@@ -75,17 +76,17 @@ void USanzoPopUpWidget::SetPauseUI()
 	{
 		SetStatInfo();
 	}
-	if (MainMenuButton)
+	if (MainMenuButtonOverlay)
 	{
-		MainMenuButton->SetVisibility(ESlateVisibility::Visible);
+		MainMenuButtonOverlay->SetVisibility(ESlateVisibility::Visible);
 		if (MainMenuText)
 		{
 			MainMenuText->SetText(FText::FromString(TEXT("메인 메뉴")));
 		}
 	}
-	if (ResumeButton)
+	if ( ResumeButtonOverlay)
 	{
-		ResumeButton->SetVisibility(ESlateVisibility::Visible);
+		  ResumeButtonOverlay->SetVisibility(ESlateVisibility::Visible);
 		if (ResumeText)
 		{
 			ResumeText->SetText(FText::FromString(TEXT("계속")));
@@ -112,13 +113,13 @@ void USanzoPopUpWidget::SetUpgradeUI()
 	{
 		SetStatInfo();
 	}
-	if (MainMenuButton)
+	if (MainMenuButtonOverlay)
 	{
-		MainMenuButton->SetVisibility(ESlateVisibility::Hidden);
+		MainMenuButtonOverlay->SetVisibility(ESlateVisibility::Hidden);
 	}
-	if (ResumeButton)
+	if (ResumeButtonOverlay)
 	{
-		ResumeButton->SetVisibility(ESlateVisibility::Hidden);
+		ResumeButtonOverlay->SetVisibility(ESlateVisibility::Hidden);
 	}
 	if (UpgradeListBorder)
 	{

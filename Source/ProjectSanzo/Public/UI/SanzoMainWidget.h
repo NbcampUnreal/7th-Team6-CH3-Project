@@ -52,10 +52,14 @@ protected:
 	class UBorder* BackBoard;
 	
 	UPROPERTY(meta = (BindWidget))
+	class UOverlay* StartButtonOverlay;
+	UPROPERTY(meta = (BindWidget))
 	class UButton* StartButton;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StartText;
 	
+	UPROPERTY(meta = (BindWidget))
+	class UOverlay* ExitButtonOverlay;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ExitButton;
 	UPROPERTY(meta = (BindWidget))
