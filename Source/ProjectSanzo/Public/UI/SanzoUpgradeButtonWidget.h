@@ -39,8 +39,6 @@ protected:
 	UFUNCTION()
 	void HandleButtonClicked();
 	
-	FLinearColor GetColorByRarity(EUpgradeRarity Rarity);
-	
 	UTexture2D* GetTextureByRarity(EUpgradeRarity Rarity);
 
 #pragma endregion 이준로
@@ -59,6 +57,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
 	void StopCurrentSound();
+	
+	
+	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
+	USoundBase* GetCurrentSound() { return CurrentSound; }
 	
 protected:
 	

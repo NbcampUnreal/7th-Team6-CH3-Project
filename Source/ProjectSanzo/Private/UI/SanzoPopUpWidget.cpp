@@ -142,6 +142,12 @@ void USanzoPopUpWidget::SetUpgradeUI()
 			}
 		}
 	}
+	
+	if (UpgradeButtonAppearAnim)
+	{
+		PlayAnimation(UpgradeButtonAppearAnim);
+	}
+	
 }
 
 void USanzoPopUpWidget::HandleUpgradeSelected(const FUpgradeOption& SelectedUpgrade)

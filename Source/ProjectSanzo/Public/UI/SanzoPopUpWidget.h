@@ -89,6 +89,9 @@ protected:
 	UPROPERTY()
 	TArray<USanzoUpgradeButtonWidget*> UpgradeButtons;
 	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* UpgradeButtonAppearAnim;
+	
 	//Tag
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	FGameplayTag GamePlayingTag;

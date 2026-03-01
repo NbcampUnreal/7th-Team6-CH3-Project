@@ -56,27 +56,6 @@ void USanzoUpgradeButtonWidget::HandleButtonClicked()
 	OnUpgradeButtonClicked.Broadcast(CachedOption);
 }
 
-FLinearColor USanzoUpgradeButtonWidget::GetColorByRarity(EUpgradeRarity Rarity)
-{
-	switch (Rarity)
-	{
-	case EUpgradeRarity::Legend:
-		return FLinearColor(1.0f, 0.72f, 0.0f);
-
-	case EUpgradeRarity::Epic:
-		return FLinearColor(0.6f, 0.2f, 0.9f);
-
-	case EUpgradeRarity::Rare:
-		return FLinearColor(0.0f, 0.4f, 0.9f);
-
-	case EUpgradeRarity::Common:
-		return FLinearColor(0.5f,0.5f,0.5f);
-		
-	default:
-		return FLinearColor::Black;
-	}
-}
-
 UTexture2D* USanzoUpgradeButtonWidget::GetTextureByRarity(EUpgradeRarity Rarity)
 {
 	UE_LOG(LogLJR, Warning, TEXT("레어리티 선택 들어옴"));
@@ -116,7 +95,7 @@ void USanzoUpgradeButtonWidget::StopCurrentSound()
 	
 	if (CurrentAudioComponent && CurrentAudioComponent->IsPlaying())
 	{
-		CurrentAudioComponent->Stop();
+		CurrentAudioComponent->FadeOut(0.5f,0);
 		CurrentAudioComponent = nullptr;
 	}
 }
