@@ -86,6 +86,10 @@ protected:
 	// 타이머가 실행할 함수
 	void SwitchToLoopSound();
 
+	// 멀티샷이 허용되었는지 확인해 줄 변수
+	UPROPERTY(EditAnywhere, Category = "Bow|Upgrade")
+	bool bIsMultiShotEnabled = false;
+
 #pragma region DataForHUD
 	
 public:

@@ -239,28 +239,43 @@ void ASanzoBow::Fire()
 			SpawnParams.Instigator = GetInstigator();
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-			// 새로 계산한 회전값으로 화살 소환
-			ASanzoProjectile* Arrow = World->SpawnActor<ASanzoProjectile>(
-				ProjectileClass,
-				SpawnLocation,
-				SpawnRotation,
-				SpawnParams);
+			// 화살 업그레이드 되었는지 판단
+			int32 ArrowCount = bIsMultiShotEnabled ? 3 : 1;
 
-			if (Arrow)
+			for (int32 i = 0; i < ArrowCount; i++)
 			{
-				float MinArrowDamage = BaseDamage * 0.2;
-				float MaxArrowDamage = BaseDamage;
-				// 화살의 Speed,Damage 값 계산 (최소값 + ( 최대값 - 최소값 ) * 차징퍼센트 ) 방식
-				float FinalSpeed = FMath::Lerp(MinArrowSpeed, MaxArrowSpeed, ChargePercent);
-				float FinalDamage = FMath::Lerp(MinArrowDamage, MaxArrowDamage, ChargePercent);
-				// 화살에 계산한 속도,데미지 전달
-				Arrow->SetArrowSpeed(FinalSpeed);
-				Arrow->SetArrowDamage(FinalDamage);
 
-				// 다 하고 발사 사운드 재생
-				if (FireSound)
+				FRotator CurrentArrowRotation = SpawnRotation;
+
+				// 업그레이드 되었을 때만 각도 틀기
+				if (bIsMultiShotEnabled)
 				{
-					FireAudioComp = UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, StringSocketName);
+					float AngleOffset = (i - 1) * 5.0f;
+					CurrentArrowRotation.Yaw += AngleOffset;
+				}
+
+				ASanzoProjectile* Arrow = World->SpawnActor<ASanzoProjectile>(
+					ProjectileClass,
+					SpawnLocation,
+					CurrentArrowRotation,
+					SpawnParams);
+
+				if (Arrow)
+				{
+					float MinArrowDamage = BaseDamage * 0.2;
+					float MaxArrowDamage = BaseDamage;
+					// 화살의 Speed,Damage 값 계산 (최소값 + ( 최대값 - 최소값 ) * 차징퍼센트 ) 방식
+					float FinalSpeed = FMath::Lerp(MinArrowSpeed, MaxArrowSpeed, ChargePercent);
+					float FinalDamage = FMath::Lerp(MinArrowDamage, MaxArrowDamage, ChargePercent);
+					// 화살에 계산한 속도,데미지 전달
+					Arrow->SetArrowSpeed(FinalSpeed);
+					Arrow->SetArrowDamage(FinalDamage);
+
+					// 다 하고 발사 사운드 재생
+					if (FireSound)
+					{
+						FireAudioComp = UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, StringSocketName);
+					}
 				}
 			}
 		}
@@ -278,6 +293,13 @@ void ASanzoBow::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		MaxChargeTime = FMath::Max(0.2, MaxChargeTime - Value);
 		break;
 
+	case EUpgradeType::BowMultiShot:
+		if (Value > 0.0f)
+		{
+			bIsMultiShotEnabled = true;
+			BaseDamage = (BaseDamage / 4) * 3;
+		}
+		break;
   default:
     GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
     break;
