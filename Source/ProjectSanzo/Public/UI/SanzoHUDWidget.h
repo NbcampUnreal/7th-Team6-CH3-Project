@@ -85,7 +85,7 @@ protected:
 	float ExhaustionStartTime;
 	const float ExhaustionDuration = 3.0f;
 	
-	const FLinearColor NormalStaminaColor = FLinearColor(0.0f, 1.0f, 0.17f);
+	const FLinearColor NormalStaminaColor = FLinearColor(0.101f,0.474f,0.415f);
 	const FLinearColor ExhaustedColor = FLinearColor::Gray;
 	
 	bool bIsExhausted = false;
