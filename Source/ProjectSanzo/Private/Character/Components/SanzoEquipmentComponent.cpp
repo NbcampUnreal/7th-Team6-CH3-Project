@@ -288,14 +288,15 @@ void USanzoEquipmentComponent::OnSwapMontageEnded(UAnimMontage* Montage, bool bI
 			GetWorld()->GetTimerManager().SetTimer(
 				RollbackTimerHandle,
 				FTimerDelegate::CreateWeakLambda(this, [Character, this]()
+				{
+					// 타이머가 도는 아주 짧은 찰나에 캐릭터나 무기가 파괴되었을 수 있으니 안전 검사
+					if (Character && Character->GetMesh() && CurrentWeapon)
 					{
-						// 타이머가 도는 아주 짧은 찰나에 캐릭터나 무기가 파괴되었을 수 있으니 안전 검사
-						if (Character && Character->GetMesh() && CurrentWeapon)
-						{
-							Character->GetMesh()->SetAnimInstanceClass(CurrentWeapon->WeaponAnimInstanceClass);
-							Character->ForceResetState();
-							Character->ApplyHitEffect();
-					}),
+						Character->GetMesh()->SetAnimInstanceClass(CurrentWeapon->WeaponAnimInstanceClass);
+						Character->ForceResetState();
+						Character->ApplyHitEffect();
+					}
+				}),
 				0.01f, // 0.01초 지연
 				false
 			);
