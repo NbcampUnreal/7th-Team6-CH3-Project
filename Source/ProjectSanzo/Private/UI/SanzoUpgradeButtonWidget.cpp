@@ -2,17 +2,22 @@
 
 
 #include "UI/SanzoUpgradeButtonWidget.h"
+
+#include "Common/SanzoLog.h"
+#include "Components/AudioComponent.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void USanzoUpgradeButtonWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
 	if (UpgradeButton)
 	{
-		UpgradeButton->OnClicked.AddDynamic(this, &ThisClass::HandleButtonClicked);
+		UpgradeButton->OnClicked.AddDynamic(this, &ThisClass::HandleButtonClicked);		
 	}
 }
 
@@ -20,9 +25,9 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 {
 	CachedOption = InputOption;
 	
-	if (UpgradeButton)
+	if (UpgradeBackground)
 	{
-		UpgradeButton->SetBackgroundColor(GetColorByRarity(InputOption.Rarity));
+		UpgradeBackground->SetBrushFromTexture(GetTextureByRarity(InputOption.Rarity));
 	}
 	
 	if (UpgradeText && !InputOption.DisplayName.IsEmpty())
@@ -43,6 +48,7 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 		UpgradeIcon->SetBrushFromTexture(InputOption.IconTexture.LoadSynchronous());
 	}
 	
+	SetSoundByRarity(InputOption.Rarity);
 }
 
 void USanzoUpgradeButtonWidget::HandleButtonClicked()
@@ -50,23 +56,68 @@ void USanzoUpgradeButtonWidget::HandleButtonClicked()
 	OnUpgradeButtonClicked.Broadcast(CachedOption);
 }
 
-FLinearColor USanzoUpgradeButtonWidget::GetColorByRarity(EUpgradeRarity Rarity)
+UTexture2D* USanzoUpgradeButtonWidget::GetTextureByRarity(EUpgradeRarity Rarity)
 {
-	switch (Rarity)
+	UE_LOG(LogLJR, Warning, TEXT("레어리티 선택 들어옴"));
+	if (RarityTextures.Contains(Rarity))
 	{
-	case EUpgradeRarity::Legend:
-		return FLinearColor(1.0f, 0.72f, 0.0f);
+		UE_LOG(LogLJR, Warning, TEXT("레어리티 선택됨 들어옴"));
+		return RarityTextures[Rarity];
+	}
+	return nullptr;
+}
 
-	case EUpgradeRarity::Epic:
-		return FLinearColor(0.6f, 0.2f, 0.9f);
+void USanzoUpgradeButtonWidget::PlaySoundForDuration(float Duration)
+{
+	if (CurrentSound)
+	{
+		StopCurrentSound();
 
-	case EUpgradeRarity::Rare:
-		return FLinearColor(0.0f, 0.4f, 0.9f);
+		CurrentAudioComponent = UGameplayStatics::SpawnSound2D(this, CurrentSound);
+		if (CurrentAudioComponent)
+		{
+			CurrentAudioComponent->bIsUISound = true;
 
-	case EUpgradeRarity::Common:
-		return FLinearColor(0.5f,0.5f,0.5f);
-		
-	default:
-		return FLinearColor::Black;
+			CurrentAudioComponent->SetTickableWhenPaused(true);
+
+			CurrentAudioComponent->Play();
+			
+			SoundStopTargetRealTime = GetWorld()->GetRealTimeSeconds()+Duration;
+			bIsSoundDurationEnded = true;
+			
+		}
 	}
 }
+
+void USanzoUpgradeButtonWidget::StopCurrentSound()
+{
+	bIsSoundDurationEnded = false;
+	
+	if (CurrentAudioComponent && CurrentAudioComponent->IsPlaying())
+	{
+		CurrentAudioComponent->FadeOut(0.5f,0);
+		CurrentAudioComponent = nullptr;
+	}
+}
+
+void USanzoUpgradeButtonWidget::SetSoundByRarity(EUpgradeRarity Rarity)
+{
+	if (RaritySounds.Contains(Rarity))
+	{
+		CurrentSound = RaritySounds[Rarity];
+	}
+}
+
+void USanzoUpgradeButtonWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	if (bIsSoundDurationEnded)
+	{
+		if (GetWorld()->RealTimeSeconds >= SoundStopTargetRealTime)
+		{
+			StopCurrentSound();
+		}
+	}
+}
+

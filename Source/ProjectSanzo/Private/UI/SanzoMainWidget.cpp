@@ -7,6 +7,7 @@
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -85,9 +86,9 @@ void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScore)
 	{
 		SubTitleText->SetVisibility(ESlateVisibility::Hidden);
 	}
-	if (StartButton)
+	if (StartButtonOverlay)
 	{
-		StartButton->SetVisibility(ESlateVisibility::Hidden);
+		StartButtonOverlay->SetVisibility(ESlateVisibility::Hidden);
 	}
 	if (ClearTimeText)
 	{

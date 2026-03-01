@@ -102,8 +102,19 @@ void USanzoUpgradeSubsystem::ProcessSelectedUpgrade(const FUpgradeOption& Select
 
 EUpgradeRarity USanzoUpgradeSubsystem::RollRarity()
 {
+	//링크 업그레이드가 최대치가 아니면 먼저 50%확률로 링크 뽑기
+	FUpgradeStatKey Link = FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Beauty);
+	float CurrentLinkValue = UpgradeTotalMap.Contains(Link) ? UpgradeTotalMap[Link] : 0.0f;
+	if (CurrentLinkValue < 3.0f)
+	{
+		if (FMath::RandRange(1, 100) <= 50)
+		{
+			return EUpgradeRarity::Link;
+		}
+	}
+	
 	int32 RandomValue = FMath::RandRange(1, 100);
-
+	
 	if (RandomValue <= 10) return EUpgradeRarity::Legend;
 	if (RandomValue <= 30) return EUpgradeRarity::Epic;
 	if (RandomValue <= 60) return EUpgradeRarity::Rare;

@@ -57,6 +57,11 @@ void USanzoUpgradeInfo::SetIconBackground(EUpgradeRarity UpgradeRarity)
 		{
 			IconBackground->SetBrushFromTexture(IconBackgrounds[3]);
 		}
+	case EUpgradeRarity::Link:
+		if (IconBackgrounds[4])
+		{
+			IconBackground->SetBrushFromTexture(IconBackgrounds[4]);
+		}
 		break;
 	default:
 		break;

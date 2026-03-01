@@ -39,9 +39,6 @@ protected:
 	FGameplayTag CurrentState;
 	
 	UFUNCTION(BlueprintCallable)
-	void SetStatusText();
-
-	UFUNCTION(BlueprintCallable)
 	void SetUpgradeList();
 
 	UFUNCTION(BlueprintCallable)
@@ -70,30 +67,34 @@ protected:
 	TSubclassOf<class UUserWidget> UpgradeInfoWidgetClass;
 
 	UPROPERTY(meta = (BindWidget))
+	class UOverlay* ResumeButtonOverlay;
+	UPROPERTY(meta = (BindWidget))
 	class UButton* ResumeButton;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ResumeText;
 
 	UPROPERTY(meta = (BindWidget))
+	class UOverlay* MainMenuButtonOverlay;
+	UPROPERTY(meta = (BindWidget))
 	class UButton* MainMenuButton;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MainMenuText;
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* StatusText;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* UpgradeButtonBox;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget),BlueprintReadOnly, Category = "UI")
 	class USanzoUpgradeButtonWidget* UpgradeButton_1;
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget),BlueprintReadOnly, Category = "UI")
 	class USanzoUpgradeButtonWidget* UpgradeButton_2;
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget),BlueprintReadOnly, Category = "UI")
 	class USanzoUpgradeButtonWidget* UpgradeButton_3;
 
 	UPROPERTY()
 	TArray<USanzoUpgradeButtonWidget*> UpgradeButtons;
+	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* UpgradeButtonAppearAnim;
 	
 	//Tag
 	UPROPERTY(EditDefaultsOnly, Category = "State")

@@ -7,6 +7,7 @@
 #include "Common/SanzoLog.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/WrapBox.h"
@@ -75,17 +76,17 @@ void USanzoPopUpWidget::SetPauseUI()
 	{
 		SetStatInfo();
 	}
-	if (MainMenuButton)
+	if (MainMenuButtonOverlay)
 	{
-		MainMenuButton->SetVisibility(ESlateVisibility::Visible);
+		MainMenuButtonOverlay->SetVisibility(ESlateVisibility::Visible);
 		if (MainMenuText)
 		{
 			MainMenuText->SetText(FText::FromString(TEXT("메인 메뉴")));
 		}
 	}
-	if (ResumeButton)
+	if ( ResumeButtonOverlay)
 	{
-		ResumeButton->SetVisibility(ESlateVisibility::Visible);
+		  ResumeButtonOverlay->SetVisibility(ESlateVisibility::Visible);
 		if (ResumeText)
 		{
 			ResumeText->SetText(FText::FromString(TEXT("계속")));
@@ -112,13 +113,13 @@ void USanzoPopUpWidget::SetUpgradeUI()
 	{
 		SetStatInfo();
 	}
-	if (MainMenuButton)
+	if (MainMenuButtonOverlay)
 	{
-		MainMenuButton->SetVisibility(ESlateVisibility::Hidden);
+		MainMenuButtonOverlay->SetVisibility(ESlateVisibility::Hidden);
 	}
-	if (ResumeButton)
+	if (ResumeButtonOverlay)
 	{
-		ResumeButton->SetVisibility(ESlateVisibility::Hidden);
+		ResumeButtonOverlay->SetVisibility(ESlateVisibility::Hidden);
 	}
 	if (UpgradeListBorder)
 	{
@@ -142,6 +143,12 @@ void USanzoPopUpWidget::SetUpgradeUI()
 			}
 		}
 	}
+	
+	if (UpgradeButtonAppearAnim)
+	{
+		PlayAnimation(UpgradeButtonAppearAnim);
+	}
+	
 }
 
 void USanzoPopUpWidget::HandleUpgradeSelected(const FUpgradeOption& SelectedUpgrade)
@@ -181,35 +188,6 @@ void USanzoPopUpWidget::SetStatInfo()
 				StatInfoWidget->SetStatInfo(DisplayData,UpgradeTotalMap);
 			}
 		}
-	}
-}
-
-void USanzoPopUpWidget::SetStatusText()
-{
-	if (StatusText)
-	{
-		FText StatusTemplate = FText::FromString(TEXT(
-				"체력: {HP} (+ {AddHP})\n"
-				"스태미나: {Stamina} (+ {AddStamina})\n"
-				"공격력: {Atk} (+ {AddAtk})\n"
-				"공격 속도: {AtkSpd} (+ {AddAtkSpd})\n"
-				"이동 속도: {MoveSpd} (+ {AddMoveSpd})"
-			)
-		);
-
-		FFormatNamedArguments Arguments;
-		Arguments.Add(TEXT("HP"), 200);
-		Arguments.Add(TEXT("AddHP"), 50);
-		Arguments.Add(TEXT("Stamina"), 100);
-		Arguments.Add(TEXT("AddStamina"), 20);
-		Arguments.Add(TEXT("Atk"), 20);
-		Arguments.Add(TEXT("AddAtk"), 10);
-		Arguments.Add(TEXT("AtkSpd"), 1000);
-		Arguments.Add(TEXT("AddAtkSpd"), 200);
-		Arguments.Add(TEXT("MoveSpd"), 300);
-		Arguments.Add(TEXT("AddMoveSpd"), 40);
-
-		StatusText->SetText(FText::Format(StatusTemplate, Arguments));
 	}
 }
 

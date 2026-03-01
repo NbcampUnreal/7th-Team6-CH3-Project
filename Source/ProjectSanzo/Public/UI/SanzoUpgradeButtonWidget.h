@@ -21,6 +21,9 @@ public:
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
+	class UImage* UpgradeBackground;
+	
+	UPROPERTY(meta = (BindWidget))
 	class UButton* UpgradeButton;
 	
 	UPROPERTY(meta = (BindWidget))
@@ -35,7 +38,52 @@ protected:
 	
 	UFUNCTION()
 	void HandleButtonClicked();
-	FLinearColor GetColorByRarity(EUpgradeRarity Rarity);
+	
+	UTexture2D* GetTextureByRarity(EUpgradeRarity Rarity);
 
 #pragma endregion 이준로
+	
+#pragma region ChangeTextureAndSoundByRarity
+	
+	UPROPERTY(EditAnywhere, Category= "UI|Style")
+	TMap<EUpgradeRarity, UTexture2D*> RarityTextures;
+
+#pragma endregion 이준로
+	
+#pragma region PlayButtonSoundByRarity
+public:
+	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
+	void PlaySoundForDuration(float Duration);
+	
+	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
+	void StopCurrentSound();
+	
+	
+	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
+	USoundBase* GetCurrentSound() { return CurrentSound; }
+	
+protected:
+	
+	FTimerHandle SoundStopTimerHandle;
+	
+	UPROPERTY()
+	class UAudioComponent* CurrentAudioComponent;
+	
+	UPROPERTY()
+	USoundBase* CurrentSound;
+	
+	UPROPERTY(EditAnywhere, Category= "UI|Sound")
+	TMap<EUpgradeRarity, USoundBase*> RaritySounds;
+	
+	UFUNCTION()
+	void SetSoundByRarity(EUpgradeRarity Rarity);
+	
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
+private:
+	float SoundStopTargetRealTime =0.0f;
+	
+	bool bIsSoundDurationEnded = false;
+	
+#pragma endregion 
 };
