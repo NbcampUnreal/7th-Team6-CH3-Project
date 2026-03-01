@@ -45,10 +45,43 @@ protected:
 
 #pragma endregion 이준로
 	
-#pragma region ChangeTextureByRarity
+#pragma region ChangeTextureAndSoundByRarity
 	
 	UPROPERTY(EditAnywhere, Category= "UI|Style")
 	TMap<EUpgradeRarity, UTexture2D*> RarityTextures;
 
 #pragma endregion 이준로
+	
+#pragma region PlayButtonSoundByRarity
+public:
+	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
+	void PlaySoundForDuration(float Duration);
+	
+	UFUNCTION(BlueprintCallable, Category = "PlayButtonSoundByRarity")
+	void StopCurrentSound();
+	
+protected:
+	
+	FTimerHandle SoundStopTimerHandle;
+	
+	UPROPERTY()
+	class UAudioComponent* CurrentAudioComponent;
+	
+	UPROPERTY()
+	USoundBase* CurrentSound;
+	
+	UPROPERTY(EditAnywhere, Category= "UI|Sound")
+	TMap<EUpgradeRarity, USoundBase*> RaritySounds;
+	
+	UFUNCTION()
+	void SetSoundByRarity(EUpgradeRarity Rarity);
+	
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
+private:
+	float SoundStopTargetRealTime =0.0f;
+	
+	bool bIsSoundDurationEnded = false;
+	
+#pragma endregion 
 };

@@ -4,14 +4,17 @@
 #include "UI/SanzoUpgradeButtonWidget.h"
 
 #include "Common/SanzoLog.h"
+#include "Components/AudioComponent.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Core/UpgradeSystem/SanzoUpgradeSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void USanzoUpgradeButtonWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
 	if (UpgradeButton)
 	{
 		UpgradeButton->OnClicked.AddDynamic(this, &ThisClass::HandleButtonClicked);		
@@ -45,6 +48,7 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 		UpgradeIcon->SetBrushFromTexture(InputOption.IconTexture.LoadSynchronous());
 	}
 	
+	SetSoundByRarity(InputOption.Rarity);
 }
 
 void USanzoUpgradeButtonWidget::HandleButtonClicked()
@@ -83,3 +87,58 @@ UTexture2D* USanzoUpgradeButtonWidget::GetTextureByRarity(EUpgradeRarity Rarity)
 	}
 	return nullptr;
 }
+
+void USanzoUpgradeButtonWidget::PlaySoundForDuration(float Duration)
+{
+	if (CurrentSound)
+	{
+		StopCurrentSound();
+
+		CurrentAudioComponent = UGameplayStatics::SpawnSound2D(this, CurrentSound);
+		if (CurrentAudioComponent)
+		{
+			CurrentAudioComponent->bIsUISound = true;
+
+			CurrentAudioComponent->SetTickableWhenPaused(true);
+
+			CurrentAudioComponent->Play();
+			
+			SoundStopTargetRealTime = GetWorld()->GetRealTimeSeconds()+Duration;
+			bIsSoundDurationEnded = true;
+			
+		}
+	}
+}
+
+void USanzoUpgradeButtonWidget::StopCurrentSound()
+{
+	bIsSoundDurationEnded = false;
+	
+	if (CurrentAudioComponent && CurrentAudioComponent->IsPlaying())
+	{
+		CurrentAudioComponent->Stop();
+		CurrentAudioComponent = nullptr;
+	}
+}
+
+void USanzoUpgradeButtonWidget::SetSoundByRarity(EUpgradeRarity Rarity)
+{
+	if (RaritySounds.Contains(Rarity))
+	{
+		CurrentSound = RaritySounds[Rarity];
+	}
+}
+
+void USanzoUpgradeButtonWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	if (bIsSoundDurationEnded)
+	{
+		if (GetWorld()->RealTimeSeconds >= SoundStopTargetRealTime)
+		{
+			StopCurrentSound();
+		}
+	}
+}
+

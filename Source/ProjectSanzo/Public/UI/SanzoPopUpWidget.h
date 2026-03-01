@@ -79,11 +79,11 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* UpgradeButtonBox;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget),BlueprintReadOnly, Category = "UI")
 	class USanzoUpgradeButtonWidget* UpgradeButton_1;
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget),BlueprintReadOnly, Category = "UI")
 	class USanzoUpgradeButtonWidget* UpgradeButton_2;
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget),BlueprintReadOnly, Category = "UI")
 	class USanzoUpgradeButtonWidget* UpgradeButton_3;
 
 	UPROPERTY()
