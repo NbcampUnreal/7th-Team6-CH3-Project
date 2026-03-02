@@ -306,8 +306,14 @@ void USanzoStatComponent::BroadCastStatUpdate()
 FSanzoStatData USanzoStatComponent::MakeStatData() const
 {
 	FSanzoStatData Data;
+	Data.MaxHealth = MaxHealth;
+	Data.CurrentHealth = CurrentHealth;
 	Data.HealthPercent = (MaxHealth > 0.f) ? CurrentHealth / MaxHealth : 0.f;
+	
+	Data.MaxStamina = MaxStamina;
+	Data.CurrentStamina = CurrentStamina;
 	Data.StaminaPercent = (MaxStamina > 0.f) ? CurrentStamina / MaxStamina : 0.0f;
+	
 	Data.ExpPercent = (MaxExp > 0.f) ? CurrentExp / MaxExp : 0.f;
 	Data.CurrentLevel = Level;
 

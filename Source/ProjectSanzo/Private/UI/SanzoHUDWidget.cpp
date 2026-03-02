@@ -9,6 +9,7 @@
 #include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "Components/ProgressBar.h"
+#include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Core/SanzoGameState.h"
@@ -67,7 +68,7 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 {
 	if (HealthBar)
 	{
-		HealthBar->SetPercent(Data.HealthPercent);
+		HandleHealthBarData(Data.MaxHealth,Data.CurrentHealth,Data.HealthPercent);
 	}
 	if (StaminaBar)
 	{
@@ -80,6 +81,56 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 	if (LevelText)
 	{
 		LevelText->SetText(FText::AsNumber(Data.CurrentLevel));
+	}
+}
+
+void USanzoHUDWidget::HandleHealthBarData(float MaxHealth, float CurrentHealth, float NewPercent)
+{
+	if (HealthInfoText)
+	{
+		HealthInfoText->SetText(FText::Format(
+			FText::FromString(TEXT("{0} / {1}"))
+			,FText::AsNumber(CurrentHealth)
+			,FText::AsNumber(MaxHealth)));
+	}
+	
+	if (HealthBarSizeBox)
+	{
+		//1안
+		float BarSize = FMath::Max(MaxHealth * SizePerValue,1000.f);
+		//2안
+		//float BarSize = FMath::Clamp(MaxHealth * 5,500.f,1000.f );
+		HealthBarSizeBox->SetWidthOverride(BarSize);
+	}
+	
+	if (HealthBar)
+	{
+		HealthBar->SetPercent(NewPercent);
+	}
+}
+
+void USanzoHUDWidget::HandleStaminaBarData(float MaxStamina, float CurrentStamina, float NewPercent)
+{
+	if (StaminaInfoText)
+	{
+		StaminaInfoText->SetText(FText::Format(
+			FText::FromString(TEXT("{0} / {1}"))
+			,FText::AsNumber(CurrentStamina)
+			,FText::AsNumber(MaxStamina)));
+	}
+	
+	if (StaminaBarSizeBox)
+	{
+		//1안
+		float BarSize = FMath::Max(MaxStamina * SizePerValue,1000.f);
+		//2안
+		//float BarSize = FMath::Clamp(MaxStamina * 5,500.f,1000.f );
+		StaminaBarSizeBox->SetWidthOverride(BarSize);
+	}
+	
+	if (StaminaBar)
+	{
+		StaminaBar->SetPercent(NewPercent);
 	}
 }
 

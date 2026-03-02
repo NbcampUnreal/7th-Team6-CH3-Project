@@ -1120,6 +1120,16 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		NormalSpeed
 	)
 );
+	
+	DisplayData.Add(FStatusDisplayData(
+	EUpgradeTarget::Character,
+	FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Beauty),
+	FText::FromString(TEXT("링크 강화")),
+	FCharacterBaseValues::DefaultFaceLevel,
+	FaceLevel
+	)
+);
+	
 //외모관련 수치 필요 (동기화 단계)
 	
 	//총
