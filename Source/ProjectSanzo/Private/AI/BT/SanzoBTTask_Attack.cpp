@@ -23,7 +23,7 @@ EBTNodeResult::Type USanzoBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& Own
   // 몽타주가 이미 재생 중이라면 중복 실행 방지
   if (UAnimInstance* AnimInstance = Enemy->GetMesh()->GetAnimInstance())
   {
-    if (AnimInstance->IsAnyMontagePlaying())
+    if (AnimInstance->Montage_IsPlaying(Enemy->GetAttackMontage()))
     {
       return EBTNodeResult::Succeeded;
     }

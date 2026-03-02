@@ -33,4 +33,9 @@ protected:
   void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
 #pragma endregion
 
+  FTimerHandle LoseSightTimer;
+
+  UFUNCTION()
+  // 타겟을 완전히 잃게하는 함수
+  void LoseTarget();
 };
