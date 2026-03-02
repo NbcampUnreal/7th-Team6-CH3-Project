@@ -30,6 +30,7 @@ void ASanzoStageManager::BeginPlay()
   {
     UE_LOG(LogCYS, Error, TEXT("SM: Stage gate 연결 안됨."));
   }
+  PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 }
 
 void ASanzoStageManager::Tick(float DeltaTime)
@@ -66,6 +67,7 @@ void ASanzoStageManager::StartStage()
     case ESanzoStageType::Boss:
       UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 보스"));
       RoomClassToSpawn = BossRoomClass;
+      StartBossIntro();
       break;
   }
   if (!RoomClassToSpawn) return;
@@ -126,7 +128,7 @@ void ASanzoStageManager::SetState(FGameplayTag NewState)
       Fog->SetActorHiddenInGame(true);
     }
 	  // 스테이지 클리어 - 작업자: 이준로
-  	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+  	if (PlayerController)
   	{
   		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
   		{
@@ -140,5 +142,56 @@ void ASanzoStageManager::SetState(FGameplayTag NewState)
     // 다음 방으로 이동
     MoveToNextRoom();
   }
+}
+void ASanzoStageManager::StartBossIntro()
+{
+  if (!PlayerController) return;
+
+  // 입력 잠금
+  PlayerController->SetIgnoreMoveInput(true);
+  PlayerController->SetIgnoreLookInput(true);
+
+  // 보스 카메라 전환
+  PlayerController->SetViewTargetWithBlend(BossCamera, 1.0f);
+
+  // 2초 후 플레이어 보여주기
+  FTimerHandle TimerHandle;
+  GetWorldTimerManager().SetTimer(
+    TimerHandle,
+    this,
+    &ASanzoStageManager::ShowPlayer,
+    2.0f,
+    false
+  );
+}
+void ASanzoStageManager::ShowPlayer()
+{
+  if (!PlayerController) return;
+
+  // 플레이어 카메라 전환
+  PlayerController->SetViewTargetWithBlend(PlayerCamera, 1.0f);
+
+  // 2초 후 종료
+  FTimerHandle TimerHandle;
+  GetWorldTimerManager().SetTimer(
+    TimerHandle,
+    this,
+    &ASanzoStageManager::EndIntro,
+    2.0f,
+    false
+  );
+}
+void ASanzoStageManager::EndIntro()
+{
+  if (!PlayerController) return;
+
+  APawn* PlayerPawn = PlayerController->GetPawn();
+
+  // 원래 카메라 복귀
+  PlayerController->SetViewTargetWithBlend(PlayerPawn, 0.5f);
+
+  // 입력 해제
+  PlayerController->SetIgnoreMoveInput(false);
+  PlayerController->SetIgnoreLookInput(false);
 }
 #pragma endregion 최윤서
