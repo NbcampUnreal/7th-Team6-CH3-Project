@@ -40,13 +40,16 @@ public:
 	float CachedGunDamage = -1.0f;
 	UPROPERTY()
 	float CachedGunFireRate = -1.0f;
+	UPROPERTY()
+	float CachedHomingMissileChance = -1.0f;
 
 	// 활 관련 정보
 	UPROPERTY()
 	float CachedBowDamage = -1.0f;
-
 	UPROPERTY()
 	float CachedBowChargeTime = -1.0f;
+	UPROPERTY()
+	bool bCachedBowMultiShot = false;
 	// 스탯 백업
 	void BackupStat(ASanzoCharacter* Player);
   // 스탯 복원
