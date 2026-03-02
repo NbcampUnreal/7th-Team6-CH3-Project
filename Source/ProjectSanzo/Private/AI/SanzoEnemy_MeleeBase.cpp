@@ -121,6 +121,7 @@ void ASanzoEnemy_MeleeBase::PerformWeaponTrace()
             //회피성공
             if (TagCheck->HasMatchingGameplayTag(SanzoTags::IFrame))
             {
+              DisableWeaponCollision();
               return;
             }
           }

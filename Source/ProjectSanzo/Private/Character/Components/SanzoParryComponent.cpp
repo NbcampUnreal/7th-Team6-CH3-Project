@@ -7,6 +7,7 @@
 #include "GameplayTagAssetInterface.h"
 #include "Character/Interface/SanzoTagEditorInterface.h"
 #include "Common/SanzoGameplayTag.h"
+#include "NiagaraFunctionLibrary.h"
 
 USanzoParryComponent::USanzoParryComponent()
 {
@@ -141,7 +142,10 @@ void USanzoParryComponent::SuccessParry()
       {
         UGameplayStatics::PlaySound2D(GetWorld(), ParrySound); //성공시 소리 재생
       }
-
+      if (ParryEffect)
+      {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParryEffect, GetOwner()->GetActorLocation());
+      }
       GetWorld()->GetWorldSettings()->SetTimeDilation(0.25f); //성공시 시간 느리게
       TWeakObjectPtr<USanzoParryComponent> WeakThis(this);
       GetWorld()->GetTimerManager().SetTimer(
