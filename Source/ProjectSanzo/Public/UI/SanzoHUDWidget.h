@@ -6,8 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "SanzoHUDWidget.generated.h"
 
-struct FSanzoStatData;
-
 UCLASS()
 class PROJECTSANZO_API USanzoHUDWidget : public UUserWidget
 {
@@ -20,6 +18,12 @@ public:
 
 	UFUNCTION()
 	void HandleStatChanged(const FSanzoStatData& Data);
+	
+	UFUNCTION()
+	void HandleHealthBarData(float MaxHealth, float CurrentHealth, float NewPercent);
+	
+	UFUNCTION()
+	void HandleStaminaBarData(float MaxStamina, float CurrentStamina, float NewPercent);
 	
 	UFUNCTION()
 	void HandleAmmoChanged(FText NewAmmoText);
@@ -40,14 +44,24 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* LevelText;
-
-
+	
+	UPROPERTY(meta = (BindWidget))
+	class USizeBox* HealthBarSizeBox;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HealthInfoText;
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthBar;
 
 	UPROPERTY(meta = (BindWidget))
+	class USizeBox* StaminaBarSizeBox;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StaminaInfoText;
+	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* StaminaBar;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SizePerValue = 2.4;
+	
 	// Weapon Component 로 부터 받아올 정보 위젯 연결
 	UPROPERTY(meta = (BindWidget))
 	class UOverlay* BowInfoOverlay;

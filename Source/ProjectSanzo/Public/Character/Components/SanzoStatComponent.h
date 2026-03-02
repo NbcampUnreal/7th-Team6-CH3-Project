@@ -17,9 +17,19 @@ struct FSanzoStatData
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
+	float MaxHealth = 0.0f;
+	UPROPERTY(BlueprintReadOnly)
+	float CurrentHealth = 0.0f;	
+	UPROPERTY(BlueprintReadOnly)
 	float HealthPercent = 0.0f;
+	
+	UPROPERTY(BlueprintReadOnly)
+	float MaxStamina = 0.0f;
+	UPROPERTY(BlueprintReadOnly)
+	float CurrentStamina = 0.0f;
 	UPROPERTY(BlueprintReadOnly)
 	float StaminaPercent = 0.0f;
+	
 	UPROPERTY(BlueprintReadOnly)
 	float ExpPercent = 0.0f;
 	UPROPERTY(BlueprintReadOnly)
