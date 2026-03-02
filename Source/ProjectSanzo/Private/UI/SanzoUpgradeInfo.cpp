@@ -31,39 +31,11 @@ void USanzoUpgradeInfo::SetUpgradeInfoBlock(FName UpgradeID, int32 Count)
 
 void USanzoUpgradeInfo::SetIconBackground(EUpgradeRarity UpgradeRarity)
 {
-	switch (UpgradeRarity)
+	if (IconBackgrounds.Find(UpgradeRarity))
 	{
-	case EUpgradeRarity::Common:
-		if (IconBackgrounds[0])
+		if (IconBackground)
 		{
-			UE_LOG(LogLJR, Warning, TEXT("노말 업그레이드 선택됨"));
-			IconBackground->SetBrushFromTexture(IconBackgrounds[0]);
+			IconBackground->SetBrushFromTexture(IconBackgrounds[UpgradeRarity]);
 		}
-		break;
-	case EUpgradeRarity::Rare:
-		if (IconBackgrounds[1])
-		{
-			IconBackground->SetBrushFromTexture(IconBackgrounds[1]);
-		}
-		break;
-	case EUpgradeRarity::Epic:
-		if (IconBackgrounds[2])
-		{
-			IconBackground->SetBrushFromTexture(IconBackgrounds[2]);
-		}
-		break;
-	case EUpgradeRarity::Legend:
-		if (IconBackgrounds[3])
-		{
-			IconBackground->SetBrushFromTexture(IconBackgrounds[3]);
-		}
-	case EUpgradeRarity::Link:
-		if (IconBackgrounds[4])
-		{
-			IconBackground->SetBrushFromTexture(IconBackgrounds[4]);
-		}
-		break;
-	default:
-		break;
 	}
 }

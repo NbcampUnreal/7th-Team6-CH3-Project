@@ -110,4 +110,36 @@ protected:
 	void PlayGameOverSound();
 	
 #pragma endregion 이준로
+	
+#pragma region ButtonSound
+	
+public:
+	
+	UFUNCTION()
+	void ExecuteStartTransition();
+	UFUNCTION()
+	void ExecuteExitTransition();
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
+	USoundBase* StartSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
+	USoundBase* QuitSound;
+	
+#pragma endregion 이준로
+	
+#pragma region StageClearUI
+	
+protected:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
+	USoundBase* StageClearSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
+	USoundBase* ResultSound;
+	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* StageClearAnim;
+	
+	
+#pragma endregion 이준로
 };

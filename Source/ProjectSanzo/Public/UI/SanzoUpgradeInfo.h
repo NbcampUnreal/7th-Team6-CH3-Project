@@ -24,7 +24,7 @@ protected:
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Upgrade System|Background Images")
-	TArray<UTexture2D*> IconBackgrounds;
+	TMap<EUpgradeRarity, UTexture2D*> IconBackgrounds;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* IconBackground;

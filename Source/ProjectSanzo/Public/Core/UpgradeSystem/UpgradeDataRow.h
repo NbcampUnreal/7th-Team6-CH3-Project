@@ -48,6 +48,17 @@ enum class EUpgradeType : uint8
 	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서 ㄴㄴ 없음- 형백
 };
 
+//UI용 모티파이어 Enum
+UENUM(BlueprintType)
+enum class EStatModifierType : uint8
+{
+	None,
+	FlatPlus,
+	FlatMinus,
+	PercentMultiplyPlus,
+	PercentMultiplyMinus,
+};
+
 USTRUCT(BlueprintType)
 struct FUpgradeDataRow : public FTableRowBase
 {
@@ -145,19 +156,21 @@ struct FStatusDisplayData
 	GENERATED_BODY()
 	FStatusDisplayData()
 		: DisplayTarget(EUpgradeTarget::None)
-			, UpgradeType(FUpgradeStatKey())
-			, DisplayText(FText::GetEmpty())
-			,BaseValue(0.0f)
-			, Value(0.0f)
+		  , UpgradeType(FUpgradeStatKey())
+		  , DisplayText(FText::GetEmpty())
+		  , BaseValue(0.0f)
+		  , Value(0.0f)
+			, ModifierType(EStatModifierType::None)
 	{
 	}
 
-	FStatusDisplayData(EUpgradeTarget InTarget,FUpgradeStatKey InKey, FText InText, float InBaseValue, float InValue)
+	FStatusDisplayData(EUpgradeTarget InTarget, FUpgradeStatKey InKey, FText InText, float InBaseValue, float InValue, EStatModifierType InModifierType)
 		: DisplayTarget(InTarget)
-			,UpgradeType(InKey)
-			, DisplayText(InText)
-			,BaseValue(InBaseValue)
-			, Value(InValue)
+		  , UpgradeType(InKey)
+		  , DisplayText(InText)
+		  , BaseValue(InBaseValue)
+		  , Value(InValue)
+			, ModifierType(InModifierType)
 	{
 	}
 	
@@ -175,5 +188,8 @@ struct FStatusDisplayData
 
 	UPROPERTY()
 	float Value;
+	
+	UPROPERTY()
+	EStatModifierType ModifierType;
 	
 };

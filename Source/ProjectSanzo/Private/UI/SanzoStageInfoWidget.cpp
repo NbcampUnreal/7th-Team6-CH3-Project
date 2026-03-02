@@ -28,6 +28,8 @@ void USanzoStageInfoWidget::SetStageInfo(ESanzoStageType StageType)
 
 void USanzoStageInfoWidget::SetDefaultStageInfo()
 {
+	HandleStageProgressChanged(0);
+	
 	if (ASanzoGameState* GameState = GetWorld()->GetGameState<ASanzoGameState>())
 	{
 		if (StageInfoText)
@@ -43,7 +45,10 @@ void USanzoStageInfoWidget::SetDefaultStageInfo()
 
 void USanzoStageInfoWidget::SetBossStageInfo()
 {
+	HandleStageProgressChanged(0);
+	
 	FindStageBoss();
+	
 	
 	if (StageInfoText)
 	{
