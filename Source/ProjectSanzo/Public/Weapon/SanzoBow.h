@@ -106,6 +106,9 @@ public:
 	float MaxChargeTime = 1.0f;
 	
 	float GetMaxChargeTime() const { return MaxChargeTime; }
+	void SetMaxChargeTime(float NewChargeTime) { MaxChargeTime = NewChargeTime; }
+	bool GetIsMultiShotEnabled() const { return bIsMultiShotEnabled; }
+	void SetIsMultiShotEnabled(bool bEnabled) { bIsMultiShotEnabled = bEnabled; }
 	
 protected:
 	bool bIsCharging = false;

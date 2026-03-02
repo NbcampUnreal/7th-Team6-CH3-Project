@@ -33,9 +33,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UNiagaraComponent* TrailEffectComp;
 
-	// 적이 맞았을 때 이펙트
-	UPROPERTY(EditAnywhere, Category = "Effects")
-	UNiagaraSystem* EnemyImpactEffect;
+	// 미사일에서 쓸 이펙트
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Effects")
+	UParticleSystem* MissileImpactEffect;
 
 	// 활에서 받을 데미지
 	float Damage;
@@ -55,6 +55,9 @@ public:
 	float ArrowDamage;
 	//가지게 될 데미지 설정 함수
 	void SetArrowDamage(float NewDamage);
+	// 호밍 기능 켜주는 함수
+	UFUNCTION(BlueprintCallable, Category = "Projectile|Homing")
+	void SetHomingTarget(class USceneComponent* TargetComp);
 
 protected:
 	virtual void BeginPlay() override;
