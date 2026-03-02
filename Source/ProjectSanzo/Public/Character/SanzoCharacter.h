@@ -139,21 +139,28 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Animation")
   TArray<UAnimMontage*> HitMontage;
 
+
 #pragma endregion 김형백
 
 #pragma region FaceUpgrade
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   USkeletalMesh* LowPoly;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   TSubclassOf<UAnimInstance> LowPolyABP;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   USkeletalMesh* Arisa;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   TSubclassOf<UAnimInstance> ArisaABP;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   USkeletalMesh* RadDoll;
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Modeling")
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   TSubclassOf<UAnimInstance> RadDollABP;
+  
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
+  UParticleSystem* TransformationEffect;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
+  USoundBase* TransformationSound;
+  
 
   
   uint8 FaceLevel = 0;

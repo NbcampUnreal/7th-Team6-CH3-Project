@@ -23,8 +23,9 @@ USanzoStatComponent::USanzoStatComponent()
 	DodgeStaminaCost = 20.f; //Dodge 한번당 소모량
   bIsExhausted = false;
 	//테스트 코드
-	CurrentHealth = 100.f;
+	
 	MaxHealth = 100.f;
+	CurrentHealth = 100.f;
 
 	CurrentExp = 0.f;
 	MaxExp = 100.f;
@@ -167,7 +168,7 @@ void USanzoStatComponent::LevelUp()
 						WeakThis->AddExperience(0);
 					}
 				},
-				1.2f,
+				0.8f,
 				false
 			);
 

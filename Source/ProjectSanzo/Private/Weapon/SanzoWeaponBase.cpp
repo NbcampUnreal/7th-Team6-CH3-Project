@@ -80,6 +80,10 @@ void ASanzoWeaponBase::PlayImpactEffects(FHitResult HitInfo)
         HitInfo.ImpactNormal.Rotation()
       );
     }
+
+    //김형백 제작 히트시 소리
+    UGameplayStatics::PlaySound2D(GetWorld(), HitSuccessSound);
+
   }
   // 맞춘 것이 지형지물일 때
   else

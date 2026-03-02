@@ -287,7 +287,8 @@ void USanzoEquipmentComponent::OnSwapMontageEnded(UAnimMontage* Montage, bool bI
 			FTimerHandle RollbackTimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(
 				RollbackTimerHandle,
-				FTimerDelegate::CreateWeakLambda(this, [Character, this]()
+				FTimerDelegate::CreateWeakLambda(this, 
+				[Character, this]()
 				{
 					// 타이머가 도는 아주 짧은 찰나에 캐릭터나 무기가 파괴되었을 수 있으니 안전 검사
 					if (Character && Character->GetMesh() && CurrentWeapon)

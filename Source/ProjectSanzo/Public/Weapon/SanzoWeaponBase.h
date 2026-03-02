@@ -70,6 +70,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Effects")
 	float DecalSize = 8.0f;
 
+#pragma region HitReact
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Effects")
+	USoundBase* HitSuccessSound;
+#pragma endregion 김형백
+
 public:
 	// 마우스 좌클릭 눌렀을 때 작동, 활이면 차징 시작, 총(연사)면 발사~, 총(단발)이면 Fire() 1번 호출 
 	UFUNCTION(BlueprintCallable, Category = "WeaponAction")

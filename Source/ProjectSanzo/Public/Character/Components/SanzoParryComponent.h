@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SanzoParryComponent.generated.h"
 
+class UNiagaraSystem;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTSANZO_API USanzoParryComponent : public UActorComponent
@@ -21,6 +22,8 @@ public:
   UAnimMontage* ParrySuccessMontage;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
   USoundBase* ParrySound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  UParticleSystem* ParryEffect;
 
   FTimerHandle SlowTimerHandle;
   FTimerHandle ParryPenaltyTimerHandle; //패널티 시간을 관리하는 타이머핸들

@@ -78,8 +78,8 @@ ASanzoCharacter::ASanzoCharacter()
   FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   FollowCamera->bUsePawnControlRotation = false;
 
-  CameraSocketOffSet = FVector(0, 55, 68);
-  CameraBoom->SocketOffset = CameraSocketOffSet;
+  //CameraSocketOffSet = FVector(0, 55, 68);
+  //CameraBoom->SocketOffset = CameraSocketOffSet;
 
   EquipmentComp = CreateDefaultSubobject<USanzoEquipmentComponent>(TEXT("Equipment"));
   StatComp = CreateDefaultSubobject<USanzoStatComponent>(TEXT("Stat"));
@@ -542,6 +542,7 @@ void ASanzoCharacter::SuccessDodge()
 {
   CharacterGameplayTags.RemoveTag(SanzoTags::Exhausted);
   UGameplayStatics::PlaySoundAtLocation(GetWorld(), DodgeSuccessSound, GetActorLocation());
+  StatComp->RestoreHealth(10); //하드코딩
   GetWorld()->GetWorldSettings()->SetTimeDilation(0.3f); //성공시 시간 느리게
   TWeakObjectPtr<ASanzoCharacter> WeakThis(this);
   GetWorld()->GetTimerManager().SetTimer(
@@ -860,9 +861,17 @@ void ASanzoCharacter::ChangeModeling(float Value)
         Weapon->AttachSocketName
       );
     }
-    //TODO :카메라 셋팅
     CameraSocketOffSet = FVector(0, 42, 53);
     CameraBoom->SocketOffset = CameraSocketOffSet;
+    //변신효과
+    if(TransformationSound)
+    {
+      UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
+    }
+    if(TransformationEffect)
+    {
+      UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+    }
     break;
   case 2: //아리사
     TargetMesh->SetSkeletalMeshAsset(Arisa);
@@ -878,7 +887,7 @@ void ASanzoCharacter::ChangeModeling(float Value)
       CameraBoom->SocketOffset = CameraSocketOffSet;
     }
     break;
-    //TODO :카메라 셋팅
+    
   case 3: //래드돌
     TargetMesh->SetSkeletalMeshAsset(RadDoll);
     TargetMesh->SetAnimInstanceClass(RadDollABP);
@@ -893,8 +902,10 @@ void ASanzoCharacter::ChangeModeling(float Value)
       Weapon->GetWeaponMesh()->SetRelativeScale3D(FVector(0.7, 0.7, 0.7));
      // Weapon->GetWeaponMesh()->SetWorldScale3D
     }
+    CameraSocketOffSet = FVector(0, 32, 41);
+    CameraBoom->SocketOffset = CameraSocketOffSet;
     break;
-    //TODO :카메라 셋팅
+    
   }
 
 }
@@ -919,7 +930,7 @@ float ASanzoCharacter::TakeDamage(
     }
   }
 #pragma endregion 김동주
-
+  
   /*패리 성공*/
   //패리태그가 있거나 성공섹션일때 패리 성공
   UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
