@@ -175,14 +175,14 @@ void ASanzoEnemy_Boss::ExecuteSmashShockwave()
       SmashShockwaveEffect,
       ImpactLocation,
       FRotator::ZeroRotator,
-      FVector(1.0f)
+      FVector(0.6f)
     );
   }
   // [디버그용] 빨간색 원(공격 범위) 그리기
-  if (GetWorld())
-  {
-    DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
-  }
+  //if (GetWorld())
+  //{
+  //  DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
+  //}
 }
 
 void ASanzoEnemy_Boss::FireSwordAura()
