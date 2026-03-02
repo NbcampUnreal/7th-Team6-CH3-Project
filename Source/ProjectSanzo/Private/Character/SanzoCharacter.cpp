@@ -1,4 +1,4 @@
-﻿#include "Character/SanzoCharacter.h"
+#include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -25,6 +25,7 @@
 #include "Common/SanzoDamageType_Percent.h"
 #include "Engine/DamageEvents.h"
 #include "Core/SanzoBaseValue.h"
+#include "Stage/SanzoRoomBase.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -264,6 +265,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(CheatKey, ETriggerEvent::Started, this, &ASanzoCharacter::Cheat);
     // 이용호 추가
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
+    // 최윤서 추가
+    EnhancedInputComponent->BindAction(CheatClearKey, ETriggerEvent::Started, this, &ASanzoCharacter::CheatClear);
   }
   else
   {
@@ -1178,4 +1181,18 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 void ASanzoCharacter::Cheat()
 {
   StatComp->AddExperience(100);
+}
+
+void ASanzoCharacter::CheatClear()
+{
+
+  ASanzoRoomBase* Room =
+    Cast<ASanzoRoomBase>(
+      UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoRoomBase::StaticClass())
+    );
+
+  if (Room)
+  {
+    Room->EndRoomSequence();
+  }
 }
