@@ -96,7 +96,11 @@ void USanzoHUDWidget::HandleHealthBarData(float MaxHealth, float CurrentHealth, 
 	
 	if (HealthBarSizeBox)
 	{
-		HealthBarSizeBox->SetWidthOverride(MaxHealth * SizePerValue);
+		//1안
+		float BarSize = FMath::Max(MaxHealth * SizePerValue,1000.f);
+		//2안
+		//float BarSize = FMath::Clamp(MaxHealth * 5,500.f,1000.f );
+		HealthBarSizeBox->SetWidthOverride(BarSize);
 	}
 	
 	if (HealthBar)
@@ -117,7 +121,11 @@ void USanzoHUDWidget::HandleStaminaBarData(float MaxStamina, float CurrentStamin
 	
 	if (StaminaBarSizeBox)
 	{
-		StaminaBarSizeBox->SetWidthOverride(MaxStamina * SizePerValue);
+		//1안
+		float BarSize = FMath::Max(MaxStamina * SizePerValue,1000.f);
+		//2안
+		//float BarSize = FMath::Clamp(MaxStamina * 5,500.f,1000.f );
+		StaminaBarSizeBox->SetWidthOverride(BarSize);
 	}
 	
 	if (StaminaBar)
