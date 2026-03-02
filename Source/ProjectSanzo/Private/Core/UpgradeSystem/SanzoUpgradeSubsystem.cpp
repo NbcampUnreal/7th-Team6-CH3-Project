@@ -132,6 +132,7 @@ FUpgradeOption USanzoUpgradeSubsystem::ConvertToOption(const FUpgradeDataRow* Se
 	NewOption.Value = SelectedRow->Value;
 	NewOption.Rarity = SelectedRow->Rarity;
 	NewOption.IconTexture = SelectedRow->IconTexture;
+	NewOption.ModifierType = SelectedRow->ModifierType;
 	return NewOption;
 }
 
@@ -146,6 +147,7 @@ FUpgradeOption USanzoUpgradeSubsystem::GetNoneOption()
 	EmptyOption.Value = 0.0f;
 	EmptyOption.Rarity = EUpgradeRarity::Common;
 	EmptyOption.IconTexture = nullptr;
+	EmptyOption.ModifierType = EStatModifierType::None;
 	
 	return EmptyOption;
 }

@@ -30,11 +30,7 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 	
 	if (UpgradeText && !InputOption.DisplayName.IsEmpty())
 	{
-		FText DisplayText = FText::Format(FText::FromString("{0}{1}"),
-			InputOption.DisplayName,
-			InputOption.Value == 0 ? FText::FromString("") : (FText::Format(FText::FromString(" + {0}"), FText::AsNumber(InputOption.Value)))
-			);
-		UpgradeText->SetText(DisplayText);
+		SetUpgradeButtonText(InputOption.DisplayName, InputOption.ModifierType, InputOption.Value);
 	}
 	
 	if (UpgradeIcon)
@@ -47,6 +43,74 @@ void USanzoUpgradeButtonWidget::SetUpgradeButton(const FUpgradeOption& InputOpti
 	}
 	
 	SetSoundByRarity(InputOption.Rarity);
+}
+
+void USanzoUpgradeButtonWidget::SetUpgradeButtonText(FText InDisplayName, EStatModifierType InModifierType, float InValue)
+{
+	FText DisplayFormat;
+	if (InValue == 0)
+	{
+		DisplayFormat = FText::FromString("");
+		UpgradeText->SetText(DisplayFormat);
+		return;
+	}
+	
+	switch (InModifierType)
+	{
+	case EStatModifierType::FlatPlus:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+			InDisplayName,
+			(FText::Format(FText::FromString(" + {0}"), FText::AsNumber(InValue)))
+			);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	case EStatModifierType::FlatMinus:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+			InDisplayName,
+			(FText::Format(FText::FromString(" - {0}"), FText::AsNumber(InValue)))
+			);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	case EStatModifierType::PercentPlus:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+			InDisplayName,
+			(FText::Format(FText::FromString(" + {0}%"), FText::AsNumber(InValue * 100)))
+			);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	case EStatModifierType::PercentMinus:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+			InDisplayName,
+			(FText::Format(FText::FromString(" - {0}%"), FText::AsNumber(InValue * 100)))
+			);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	case EStatModifierType::PercentMultiply:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+			InDisplayName,
+			(FText::Format(FText::FromString(" x {0}%"), FText::AsNumber(InValue * 100)))
+			);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	case EStatModifierType::PercentDivide:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+				InDisplayName,
+				(FText::Format(FText::FromString(" / {0}%"), FText::AsNumber(InValue * 100)))
+				);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	case EStatModifierType::None:
+		DisplayFormat = FText::Format(FText::FromString("{0}{1}"),
+			InDisplayName,
+			(FText::Format(FText::FromString(" + {0} \n {1}"),
+				FText::AsNumber(InValue),
+				FText::FromString(TEXT("업그레이드 구현 필요"))))
+			);
+		UpgradeText->SetText(DisplayFormat);
+		break;
+	default:
+		break;
+	}
 }
 
 void USanzoUpgradeButtonWidget::HandleButtonClicked()

@@ -12,9 +12,11 @@ struct FCharacterBaseValues
 	
 	static constexpr float MaxStamina = 100.0f;
 	
-	static constexpr float DefaultMoveSpeed = 500.0f;
+	static constexpr float MoveSpeed = 500.0f;
 	
-	static constexpr float DefaultFaceLevel = 0;
+	static constexpr float FaceLevel = 0;
+	
+	static constexpr float ParryReflectChance = 50.0f;
 
 };
 
@@ -25,7 +27,9 @@ struct FGunBaseValues
 	
 	static constexpr float BaseDamage = 5;
 	
-	static constexpr float BaseFireRate = 0.15f;
+	static constexpr float FireRate = 0.15f;
+	
+	static constexpr float HomingMissileChance = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -35,5 +39,7 @@ struct FBowBaseValues
 	
 	static constexpr float BaseDamage = 40;
 	
-	static constexpr float BaseMaxChargeTime = 1;
+	static constexpr float MaxChargeTime = 1;
+	
+	static constexpr float MultiShot = 0;
 };

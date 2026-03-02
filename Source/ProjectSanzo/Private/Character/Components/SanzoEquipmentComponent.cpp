@@ -178,6 +178,15 @@ float USanzoEquipmentComponent::GetGunFireRate()
 	return 0;
 }
 
+float USanzoEquipmentComponent::GetGunHomingMissileChance()
+{
+	if (ASanzoGun* Gun = Cast<ASanzoGun>(Inventory[0]))
+	{
+		return Gun->GetHomingMissileChance();
+	}
+	return 0;
+}
+
 float USanzoEquipmentComponent::GetBowDamage()
 {
 	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
@@ -192,6 +201,15 @@ float USanzoEquipmentComponent::GetBowChargeTime()
 	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
 	{
 		return Bow->GetMaxChargeTime();
+	}
+	return 0;
+}
+
+float USanzoEquipmentComponent::GetBowMultiShot()
+{
+	if (ASanzoBow* Bow = Cast<ASanzoBow>(Inventory[1]))
+	{
+		return Bow->GetIsMultiShotEnabled();
 	}
 	return 0;
 }

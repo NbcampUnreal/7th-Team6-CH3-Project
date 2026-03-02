@@ -1109,6 +1109,16 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 	TArray<FStatusDisplayData> DisplayData;
 	
 //캐릭터
+		
+	DisplayData.Add(FStatusDisplayData(
+	EUpgradeTarget::Character,
+	FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Beauty),
+	FText::FromString(TEXT("링크 강화")),
+	FCharacterBaseValues::FaceLevel,
+	FaceLevel,
+	EStatModifierType::FlatPlus
+	)
+);
 	DisplayData.Add(FStatusDisplayData(
 			EUpgradeTarget::Character,
 			FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxHealth),
@@ -1132,23 +1142,20 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		EUpgradeTarget::Character,
 		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Speed),
 		FText::FromString(TEXT("이동 속도")),
-		FCharacterBaseValues::DefaultMoveSpeed,
+		FCharacterBaseValues::MoveSpeed,
 		NormalSpeed,
 		EStatModifierType::FlatPlus
 	)
 );
-	
 	DisplayData.Add(FStatusDisplayData(
-	EUpgradeTarget::Character,
-	FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Beauty),
-	FText::FromString(TEXT("링크 강화")),
-	FCharacterBaseValues::DefaultFaceLevel,
-	FaceLevel,
-	EStatModifierType::FlatPlus
+		EUpgradeTarget::Character,
+		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::ParryReflectChance),
+		FText::FromString(TEXT("패링 반사 확률")),
+		FCharacterBaseValues::ParryReflectChance,
+		0,
+		EStatModifierType::PercentPlus
 	)
 );
-	
-//외모관련 수치 필요 (동기화 단계)
 	
 	//총
 	DisplayData.Add(FStatusDisplayData(
@@ -1157,16 +1164,25 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FText::FromString(TEXT("공격력")),
 		FGunBaseValues::BaseDamage,
 		EquipmentComp->GetGunDamage(),
-		EStatModifierType::PercentMultiplyPlus
+		EStatModifierType::PercentMultiply
 	)
 );
 	DisplayData.Add(FStatusDisplayData(
 		EUpgradeTarget::Gun,
 		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::FireRate),
 		FText::FromString(TEXT("발사 속도")),
-		FGunBaseValues::BaseFireRate,
+		FGunBaseValues::FireRate,
 		EquipmentComp->GetGunFireRate(),
 		EStatModifierType::FlatMinus
+	)
+);
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Gun,
+		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::HomingMissile),
+		FText::FromString(TEXT("호밍 미사일 확률")),
+		FGunBaseValues::HomingMissileChance,
+		EquipmentComp->GetGunHomingMissileChance(),
+		EStatModifierType::PercentPlus
 	)
 );
 	
@@ -1177,19 +1193,27 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FText::FromString(TEXT("공격력")),
 		FBowBaseValues::BaseDamage,
 		EquipmentComp->GetBowDamage(),
-		EStatModifierType::PercentMultiplyPlus
+		EStatModifierType::PercentMultiply
 	)
 );
 	DisplayData.Add(FStatusDisplayData(
 		EUpgradeTarget::Bow,
 		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::MaxChargeTime),
 		FText::FromString(TEXT("차징 시간")),
-		FBowBaseValues::BaseMaxChargeTime,
+		FBowBaseValues::MaxChargeTime,
 		EquipmentComp->GetBowChargeTime(),
 		EStatModifierType::FlatMinus
 	)
 );
-	
+	DisplayData.Add(FStatusDisplayData(
+		EUpgradeTarget::Bow,
+		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::MultiShot),
+		FText::FromString(TEXT("멀티샷")),
+		FBowBaseValues::MultiShot,
+		EquipmentComp->GetBowMultiShot(),
+		EStatModifierType::FlatPlus
+	)
+);
 	
 	return DisplayData;
 }
