@@ -13,6 +13,8 @@ struct FCharacterBaseValues
 	static constexpr float MaxStamina = 100.0f;
 	
 	static constexpr float DefaultMoveSpeed = 500.0f;
+	
+	static constexpr float DefaultFaceLevel = 0;
 
 };
 

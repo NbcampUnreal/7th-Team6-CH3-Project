@@ -51,12 +51,14 @@ void USanzoStatInfoWidget::SetStatInfo(TArray<FStatusDisplayData> CurrentStatDat
 			break;
 		}
 		
+		//안에 들어갈 Text 설정
 		if (TargetBox && StatInfoTextWidgetClass)
 		{
 			USanzoStatInfoTextWidget* NewStatInfo = CreateWidget<USanzoStatInfoTextWidget>(this, StatInfoTextWidgetClass);
 			if (NewStatInfo)
 			{
-				NewStatInfo->SetStatInfoText(StatData.DisplayText, StatData.Value, StatData.BaseValue, BonusValue);
+				NewStatInfo->SetStatInfoText(StatData.DisplayText, StatData.ModifierType, StatData.Value, StatData.BaseValue, BonusValue);
+				//스크롤 박스에 추가
 				TargetBox->AddChild(NewStatInfo);
 			}
 		}

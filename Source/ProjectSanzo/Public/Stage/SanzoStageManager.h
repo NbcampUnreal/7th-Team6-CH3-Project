@@ -77,4 +77,17 @@ public:
 	FOnStageCleared StageCleared;
 	
 #pragma endregion 이준로
+
+#pragma region Boss Intro
+  void StartBossIntro();
+  void ShowPlayer();
+  void EndIntro();
+
+  UPROPERTY(EditAnywhere, Category = "Boss Intro")
+  AActor* BossCamera;
+  UPROPERTY(EditAnywhere, Category = "Boss Intro")
+  AActor* PlayerCamera;
+
+  APlayerController* PlayerController;
+#pragma endregion 최윤서
 };

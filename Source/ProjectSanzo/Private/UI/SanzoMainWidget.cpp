@@ -119,6 +119,11 @@ void USanzoMainWidget::SetStageClearMenuUI(float ClearTime, int32 KillScore)
 		ExitText->SetText(FText::FromString(TEXT("다음 스테이지")));
 	}
 	
+	if (StageClearAnim)
+	{
+		PlayAnimation(StageClearAnim);
+	}
+	
 }
 
 void USanzoMainWidget::SetGameOverMenuUI()
@@ -156,23 +161,75 @@ void USanzoMainWidget::SetGameOverMenuUI()
 
 void USanzoMainWidget::HandleStartButtonClicked()
 {
-	OnButtonClicked.Broadcast(StartGameTag);
+	if (StartSound)
+	{
+		UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, StartSound);
+
+		if (ClickAudioComponent)
+		{
+			ClickAudioComponent->bIsUISound = true;
+			ClickAudioComponent->SetTickableWhenPaused(true);
+			ClickAudioComponent->Play();
+
+			FTSTicker::GetCoreTicker().AddTicker(
+				FTickerDelegate::CreateLambda(
+					[ClickAudioComponent](float DeltaTime)
+					{
+						if (IsValid(ClickAudioComponent) && ClickAudioComponent->IsPlaying())
+						{
+							ClickAudioComponent->FadeOut(0.7f, 0.0f);
+						}
+						return false;
+					})
+				, 0.0f);
+		}
+	}
+
+	FTSTicker::GetCoreTicker().AddTicker(
+		FTickerDelegate::CreateLambda(
+			[this](float DeltaTime)
+			{
+				ExecuteStartTransition();
+				return false;
+			})
+		, 0.7f);
 }
 
 void USanzoMainWidget::HandleExitButtonClicked()
 {
-	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu")))
+	if (QuitSound)
 	{
-		OnButtonClicked.Broadcast(QuitGameTag);
+		UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, QuitSound);
+		
+		if (ClickAudioComponent)
+		{
+			ClickAudioComponent->bIsUISound = true;
+			ClickAudioComponent->SetTickableWhenPaused(true);
+			ClickAudioComponent->Play();
+
+			FTSTicker::GetCoreTicker().AddTicker(
+				FTickerDelegate::CreateLambda(
+					[ClickAudioComponent](float DeltaTime)
+					{
+						if (IsValid(ClickAudioComponent) && ClickAudioComponent->IsPlaying())
+						{
+							ClickAudioComponent->FadeOut(0.7f, 0.0f);
+						}
+						return false;
+					})
+				, 0.0f);
+		}
 	}
-	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")))
-	{
-		OnButtonClicked.Broadcast(NextStageTag);
-	}
-	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")))
-	{
-		OnButtonClicked.Broadcast(ReturnMainMenuTag);
-	}
+
+	FTSTicker::GetCoreTicker().AddTicker(
+		FTickerDelegate::CreateLambda(
+			[this](float DeltaTime)
+			{
+				ExecuteExitTransition();
+				return false;
+			})
+		, 0.7f);
+
 }
 
 void USanzoMainWidget::PlayGameOverSound()
@@ -191,3 +248,28 @@ void USanzoMainWidget::PlayGameOverSound()
 		}
 	}
 }
+
+#pragma region Transition
+
+void USanzoMainWidget::ExecuteStartTransition()
+{
+	OnButtonClicked.Broadcast(StartGameTag);
+}
+
+void USanzoMainWidget::ExecuteExitTransition()
+{
+	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.MainMenu")))
+	{
+		OnButtonClicked.Broadcast(QuitGameTag);
+	}
+	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")))
+	{
+		OnButtonClicked.Broadcast(NextStageTag);
+	}
+	if (CurrentState == FGameplayTag::RequestGameplayTag(FName("Game.State.GameOver")))
+	{
+		OnButtonClicked.Broadcast(ReturnMainMenuTag);
+	}
+}
+
+#pragma endregion 이준로

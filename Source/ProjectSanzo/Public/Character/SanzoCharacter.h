@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -109,6 +109,12 @@ class PROJECTSANZO_API ASanzoCharacter :
   UInputAction* CheatKey;
 
   void Cheat();
+
+  // 클리어 치트키 추가(0키로 지정) - 최윤서
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+  UInputAction* CheatClearKey;
+ 
+  void CheatClear();
 #pragma endregion 김형백
 
 #pragma region 스왑 액션 추가

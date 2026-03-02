@@ -2,8 +2,6 @@
 
 
 #include "UI/SanzoUpgradeButtonWidget.h"
-
-#include "Common/SanzoLog.h"
 #include "Components/AudioComponent.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
@@ -58,10 +56,8 @@ void USanzoUpgradeButtonWidget::HandleButtonClicked()
 
 UTexture2D* USanzoUpgradeButtonWidget::GetTextureByRarity(EUpgradeRarity Rarity)
 {
-	UE_LOG(LogLJR, Warning, TEXT("레어리티 선택 들어옴"));
 	if (RarityTextures.Contains(Rarity))
 	{
-		UE_LOG(LogLJR, Warning, TEXT("레어리티 선택됨 들어옴"));
 		return RarityTextures[Rarity];
 	}
 	return nullptr;

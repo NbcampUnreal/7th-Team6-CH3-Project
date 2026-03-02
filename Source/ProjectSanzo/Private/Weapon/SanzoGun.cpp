@@ -5,6 +5,8 @@
 #include "TimerManager.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "AI/SanzoEnemyBase.h"
+#include "Weapon/SanzoProjectile.h"
 
 ASanzoGun::ASanzoGun()
 {
@@ -29,7 +31,12 @@ ASanzoGun::ASanzoGun()
 		// Scale (X, Y, Z)
 		FireStartLocation->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
 	}
+	// 미사일 스폰 위치 담당 컴포넌트 메시와 연결
+	MissileSpawnLocation = CreateDefaultSubobject<UArrowComponent>(TEXT("MissileSpawnLocation"));
+	MissileSpawnLocation->SetupAttachment(WeaponMesh);
+	MissileSpawnLocation->SetRelativeRotation(FRotator(45.0f, 90.0f, 0.0f));
 
+	HomingMissileChance = 0.0f;
 }
 
 void ASanzoGun::StartFire()
@@ -205,6 +212,59 @@ void ASanzoGun::Fire()
 		ApplyDamageToTarget(HitResult.GetActor(), HitResult,BaseDamage);
 		PlayImpactEffects(HitResult);
 	}
+
+	// 호밍 미사일 발사 시스템, 발사 확률이 0보다 크고 발사 확률에 걸렸을 때만 실행
+	if (HomingMissileChance > 0.0f && FMath::RandRange(1.0f, 100.0f) <= HomingMissileChance)
+	{
+		if (HomingProjectileClass && FireStartLocation)
+		{
+			// 화면에 보이는 랜덤한 적 저장
+			ASanzoEnemyBase* RandomTarget = FindRandomVisibleEnemy();
+
+			// 적이 화면에 보이면 위치 저장
+			if (RandomTarget)
+			{
+				if (MissileSpawnLocation)
+				{
+					FVector SpawnLocation = MissileSpawnLocation->GetComponentLocation();
+					FRotator SpawnRotation = MissileSpawnLocation->GetComponentRotation();
+					// 발사할 때마다 좌우 랜덤 각도로 발사
+					SpawnRotation.Yaw += FMath::RandRange(-35.0f, 35.0f);
+
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.Instigator = Cast<APawn>(GetOwner());
+					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+					// 호밍 미사일 스폰
+					ASanzoProjectile* Missile = GetWorld()->SpawnActor<ASanzoProjectile>(HomingProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+					if (Missile)
+					{
+						// 미사일 데미지 설정 (후에 조정 예정)
+						Missile->SetArrowDamage(BaseDamage * 2.0f);
+
+						// 미사일의 타겟 설정 (기본 타겟값은 루트 컴포넌트로 설정)
+						USceneComponent* TargetComp = RandomTarget->GetRootComponent();
+
+						// 적의 컴포넌트 중에 태그로 LockOn 태그 달고 있는 컴포넌트 찾기
+						TArray<USceneComponent*> EnemyComps;
+						RandomTarget->GetComponents(USceneComponent::StaticClass(), EnemyComps);
+						for (USceneComponent* Comp : EnemyComps)
+						{
+							if (Comp->ComponentHasTag(FName("LockOn")))
+							{
+								// 찾았으면 타겟 교체
+								TargetComp = Comp; 
+								break;
+							}
+						}
+						Missile->SetHomingTarget(TargetComp);
+					}
+				}
+			}
+		}
+	}
 }
 
 void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
@@ -217,6 +277,11 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		FireRate = FMath::Max(0.07, FireRate - Value);
 		break;
 
+	case EUpgradeType::HomingMissile:
+		// Value 값에 들어오는 숫자대로 퍼센트가 오름 (ex) Value = 5.0 이면 생성 확률 5% 증가)
+		HomingMissileChance += Value;
+		break;
+
 	default:
 		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
 		break;
@@ -224,6 +289,68 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		
 	}
 	
+}
+// 호밍 시스템을 위한 시야 안의 랜덤한 적을 뽑는 함수
+ASanzoEnemyBase* ASanzoGun::FindRandomVisibleEnemy()
+{
+	// 무기 주인 없으면 실행 X
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (!OwnerPawn) return nullptr;
+
+	// 컨트롤러 없으면 실행 x
+	APlayerController* PlayerController = Cast<APlayerController>(OwnerPawn->GetController());
+	if (!PlayerController) return nullptr;
+	// 플레이어 컨트롤러에서 뷰포트 X,Y 사이즈 가져와서 저장
+	int32 ViewportSizeX, ViewportSizeY;
+	PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
+
+	// 월드의 모든 액터 저장할 배열 선언 후 저장
+	TArray<AActor*> FoundEnemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASanzoEnemyBase::StaticClass(), FoundEnemies);
+
+	// 화면에 보이는 적만 저정할 배열 선언
+	TArray<ASanzoEnemyBase*> VisibleEnemies;
+
+	for (AActor* Actor : FoundEnemies)
+	{
+		ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(Actor);
+		// 적이 아니거나 죽었으면 스킵하고 다음 for문
+		if (!Enemy || Enemy->IsDead()) continue;
+
+		FVector2D ScreenPos;
+		// 모니터 화면 안에 있는지 확인
+		if (PlayerController->ProjectWorldLocationToScreen(Enemy->GetActorLocation(), ScreenPos))
+		{
+			// 시야에 보이는지 확인
+			if (ScreenPos.X >= 0 && ScreenPos.X <= ViewportSizeX &&
+				ScreenPos.Y >= 0 && ScreenPos.Y <= ViewportSizeY)
+			{
+				FHitResult HitResult;
+				FCollisionQueryParams QueryParams;
+				QueryParams.AddIgnoredActor(this);
+				QueryParams.AddIgnoredActor(OwnerPawn);
+
+				if (GetWorld()->LineTraceSingleByChannel(HitResult, OwnerPawn->GetActorLocation(), Enemy->GetActorLocation(), ECC_Visibility, QueryParams))
+				{
+					if (HitResult.GetActor() == Enemy)
+					{
+						// 화면에 잡힌게 적이 맞으면 배열에 추가
+						VisibleEnemies.Add(Enemy);
+					}
+				}
+			}
+		}
+	}
+
+	// 배열이 비어있지 않으면 그 중 하나 랜덤으로 뽑기
+	if (VisibleEnemies.Num() > 0)
+	{
+		int32 RandomIndex = FMath::RandRange(0, VisibleEnemies.Num() - 1);
+		return VisibleEnemies[RandomIndex];
+	}
+
+	// 다 해당안되면 nullptr 반환
+	return nullptr;
 }
 
 void ASanzoGun::AddAmmo(int32 Amount)

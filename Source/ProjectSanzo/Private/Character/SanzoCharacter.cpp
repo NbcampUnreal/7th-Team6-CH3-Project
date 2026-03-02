@@ -1,4 +1,4 @@
-﻿#include "Character/SanzoCharacter.h"
+#include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -25,6 +25,7 @@
 #include "Common/SanzoDamageType_Percent.h"
 #include "Engine/DamageEvents.h"
 #include "Core/SanzoBaseValue.h"
+#include "Stage/SanzoRoomBase.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -264,6 +265,8 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(CheatKey, ETriggerEvent::Started, this, &ASanzoCharacter::Cheat);
     // 이용호 추가
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
+    // 최윤서 추가
+    EnhancedInputComponent->BindAction(CheatClearKey, ETriggerEvent::Started, this, &ASanzoCharacter::CheatClear);
   }
   else
   {
@@ -1111,7 +1114,8 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 			FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxHealth),
 			FText::FromString(TEXT("최대 체력")),
 			FCharacterBaseValues::MaxHealth,
-			StatComp->GetMaxHealth()
+			StatComp->GetMaxHealth(),
+			EStatModifierType::FlatPlus
 		)
 	);
 	DisplayData.Add(FStatusDisplayData(
@@ -1119,7 +1123,8 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FUpgradeStatKey(EUpgradeTarget::Stat,EUpgradeType::MaxStamina),
 		FText::FromString(TEXT("최대 스태미나")),
 		FCharacterBaseValues::MaxStamina,
-		StatComp->GetMaxStamina()
+		StatComp->GetMaxStamina(),
+		EStatModifierType::FlatPlus
 	)
 );
 	
@@ -1128,9 +1133,21 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Speed),
 		FText::FromString(TEXT("이동 속도")),
 		FCharacterBaseValues::DefaultMoveSpeed,
-		NormalSpeed
+		NormalSpeed,
+		EStatModifierType::FlatPlus
 	)
 );
+	
+	DisplayData.Add(FStatusDisplayData(
+	EUpgradeTarget::Character,
+	FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Beauty),
+	FText::FromString(TEXT("링크 강화")),
+	FCharacterBaseValues::DefaultFaceLevel,
+	FaceLevel,
+	EStatModifierType::FlatPlus
+	)
+);
+	
 //외모관련 수치 필요 (동기화 단계)
 	
 	//총
@@ -1139,7 +1156,8 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::Damage),
 		FText::FromString(TEXT("공격력")),
 		FGunBaseValues::BaseDamage,
-		EquipmentComp->GetGunDamage()
+		EquipmentComp->GetGunDamage(),
+		EStatModifierType::PercentMultiplyPlus
 	)
 );
 	DisplayData.Add(FStatusDisplayData(
@@ -1147,7 +1165,8 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FUpgradeStatKey(EUpgradeTarget::Gun,EUpgradeType::FireRate),
 		FText::FromString(TEXT("발사 속도")),
 		FGunBaseValues::BaseFireRate,
-		EquipmentComp->GetGunFireRate()
+		EquipmentComp->GetGunFireRate(),
+		EStatModifierType::FlatMinus
 	)
 );
 	
@@ -1157,7 +1176,8 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::Damage),
 		FText::FromString(TEXT("공격력")),
 		FBowBaseValues::BaseDamage,
-		EquipmentComp->GetBowDamage()
+		EquipmentComp->GetBowDamage(),
+		EStatModifierType::PercentMultiplyPlus
 	)
 );
 	DisplayData.Add(FStatusDisplayData(
@@ -1165,7 +1185,8 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		FUpgradeStatKey(EUpgradeTarget::Bow,EUpgradeType::MaxChargeTime),
 		FText::FromString(TEXT("차징 시간")),
 		FBowBaseValues::BaseMaxChargeTime,
-		EquipmentComp->GetBowChargeTime()
+		EquipmentComp->GetBowChargeTime(),
+		EStatModifierType::FlatMinus
 	)
 );
 	
@@ -1179,4 +1200,18 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 void ASanzoCharacter::Cheat()
 {
   StatComp->AddExperience(100);
+}
+
+void ASanzoCharacter::CheatClear()
+{
+
+  ASanzoRoomBase* Room =
+    Cast<ASanzoRoomBase>(
+      UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoRoomBase::StaticClass())
+    );
+
+  if (Room)
+  {
+    Room->EndRoomSequence();
+  }
 }

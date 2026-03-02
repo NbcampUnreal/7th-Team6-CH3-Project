@@ -38,6 +38,10 @@ protected:
 	// 플레이어 활, AI 적 원거리 무기 = true, 플레이어 총 = false
 	bool bInfiniteAmmo;
 
+	// 기본 공격력
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
+	float BaseDamage;
+
 	// 헤드샷 데미지 배율
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float HeadshotMultiplier = 2.0f;
@@ -111,14 +115,9 @@ public:
 	// 스왑할 때 플레이할 애니메이션 시퀀스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Animation")
 	class UAnimMontage* EquipMontage;
-
-	// 기본 공격력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
-	float BaseDamage;
   
 	//다른곳에서 매시 부르기 -김형백
 	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
-
 
 protected:
 	// 실제 발사 로직, 자녀 클래스(bow, gun 등) 에서 오버라이딩 필요
@@ -138,6 +137,7 @@ public:
 	virtual FText GetAmmoTextForHUD() const { return FText::GetEmpty();}
 	
 	float GetBaseDamage() const { return BaseDamage; }
+	void SetBaseDamage(float NewDamage) { BaseDamage = NewDamage; }
 	
 #pragma endregion 이준로
 

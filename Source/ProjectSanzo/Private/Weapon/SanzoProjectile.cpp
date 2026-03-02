@@ -67,17 +67,35 @@ void ASanzoProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 		WeaponOwner->ApplyDamageToTarget(OtherActor, Hit,ArrowDamage);
 		WeaponOwner->PlayImpactEffects(Hit);
 	}
+	// 쏜 게 호밍 미사일이라면
+	if (ProjectileMovement && ProjectileMovement->bIsHomingProjectile)
+	{
+		if (MissileImpactEffect)
+		{
+				// 미사일 피격 이펙트 소환
+			UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(),
+				MissileImpactEffect,
+				Hit.ImpactPoint,
+				Hit.ImpactNormal.Rotation()
+			);
+		}
 
-	// 맞은 화살 붙이는 로직
-
-	// 어딘가에 맞으면 정지
-	ProjectileMovement->StopMovementImmediately();
-	// 정지 후 화살의 콜리전 판정 없애기
-	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// 맞은게 적이라면 맞고 움직일때 화살도 같이 움직이게 수정
-	AttachToComponent(OtherComp, FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
-	// 2초 후에 사라짐
-	SetLifeSpan(2.0f);
+			// 이펙트 재생 후 바로 사라짐
+			Destroy();
+	}
+	// 쏜 게 화살 이라면
+	else
+	{
+		// 어딘가에 맞으면 정지
+		ProjectileMovement->StopMovementImmediately();
+		// 정지 후 화살의 콜리전 판정 없애기
+		CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// 맞은게 적이라면 맞고 움직일때 화살도 같이 움직이게 수정
+		AttachToComponent(OtherComp, FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+		// 2초 후에 사라짐
+		SetLifeSpan(2.0f);
+	}
 }
 
 void ASanzoProjectile::SetArrowSpeed(float NewSpeed)
@@ -109,5 +127,16 @@ void ASanzoProjectile::BeginPlay()
 	if (GetOwner())
 	{
 		CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
+	}
+}
+
+void ASanzoProjectile::SetHomingTarget(USceneComponent* TargetComp)
+{
+	if (ProjectileMovement && TargetComp)
+	{
+		ProjectileMovement->bIsHomingProjectile = true;
+		ProjectileMovement->HomingTargetComponent = TargetComp;
+		// 유도되는 힘 조절 (이 값이 클수록 적에게 경로가 많이 꺾임)
+		ProjectileMovement->HomingAccelerationMagnitude = 25000.f;
 	}
 }

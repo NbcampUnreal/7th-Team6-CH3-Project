@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Core/UpgradeSystem/UpgradeDataRow.h"
 #include "SanzoStatInfoTextWidget.generated.h"
 
 UCLASS()
@@ -13,7 +14,10 @@ class PROJECTSANZO_API USanzoStatInfoTextWidget : public UUserWidget
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	void SetStatInfoText(FText InName, float InCurrentValue,float InBaseValue, float InBonusValue);
+	void SetStatInfoText(FText InName, EStatModifierType InModifierType, float InCurrentValue,float InBaseValue, float InBonusValue);
+	
+	UFUNCTION(BlueprintCallable)
+	void SetBonusValueText(EStatModifierType InModifierType, float InBonusValue);
 	
 protected:
 	UPROPERTY(meta = (BindWidget))

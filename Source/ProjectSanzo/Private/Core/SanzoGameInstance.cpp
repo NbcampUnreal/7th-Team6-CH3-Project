@@ -60,15 +60,17 @@ void USanzoGameInstance::BackupStat(ASanzoCharacter* Player)
       // 무기가 총이라면 총 저장 변수에 현재 값 저장
       if (ASanzoGun* Gun = Cast<ASanzoGun>(Weapon))
       {
-        CachedGunDamage = Gun->BaseDamage;
-        CachedGunFireRate = Gun->FireRate;
+        CachedGunDamage = Gun->GetBaseDamage();
+        CachedGunFireRate = Gun->GetFireRate();
         CachedAmmo = Gun->GetCurrentAmmo();
+        CachedHomingMissileChance = Gun->GetHomingMissileChance();
       }
       // 무기가 활이라면 활 저장 변수에 현재 값 저장
       else if (ASanzoBow* Bow = Cast<ASanzoBow>(Weapon))
       {
-        CachedBowDamage = Bow->BaseDamage;
-        CachedBowChargeTime = Bow->MaxChargeTime;
+        CachedBowDamage = Bow->GetBaseDamage();
+        CachedBowChargeTime = Bow->GetMaxChargeTime();
+        bCachedBowMultiShot = Bow->GetIsMultiShotEnabled();
       }
     }
   }
@@ -90,15 +92,17 @@ void USanzoGameInstance::RestoreStat(ASanzoCharacter* Player)
         Gun->SetCurrentAmmo(CachedAmmo);
 
         // 업그레이드한 적이 있을 때만 값 덮어쓰기
-        if (CachedGunDamage > 0.0f)     Gun->BaseDamage = CachedGunDamage;
-        if (CachedGunFireRate > 0.0f)   Gun->FireRate = CachedGunFireRate;
+        if (CachedGunDamage > 0.0f)     Gun->SetBaseDamage(CachedGunDamage);
+        if (CachedGunFireRate > 0.0f)   Gun->SetFireRate(CachedGunFireRate);
+        if (CachedHomingMissileChance > 0.0f)   Gun->SetHomingMissileChance(CachedHomingMissileChance);
       }
       // 활 복원
       else if (ASanzoBow* Bow = Cast<ASanzoBow>(Weapon))
       {
         // 업그레이드한 적이 있을 때만 값 덮어쓰기
-        if (CachedBowDamage > 0.0f)     Bow->BaseDamage = CachedBowDamage;
-        if (CachedBowChargeTime > 0.0f) Bow->MaxChargeTime = CachedBowChargeTime;
+        if (CachedBowDamage > 0.0f)     Bow->SetBaseDamage(CachedBowDamage);
+        if (CachedBowChargeTime > 0.0f) Bow->SetMaxChargeTime(CachedBowChargeTime);
+        if (bCachedBowMultiShot) Bow->SetIsMultiShotEnabled(bCachedBowMultiShot);
       }
     }
   }
@@ -114,6 +118,8 @@ void USanzoGameInstance::InitSetup()
   CachedGunFireRate = -1.0f;
   CachedBowDamage = -1.0f;
   CachedBowChargeTime = -1.0f;
+  CachedHomingMissileChance = 1.0f;
+  bCachedBowMultiShot = false;
   CachedStatData = FSanzoSaveStatData(); // 초기 스탯값 설정
 
 	if (USanzoUpgradeSubsystem* UpgradeSubsystem = GetSubsystem<USanzoUpgradeSubsystem>())

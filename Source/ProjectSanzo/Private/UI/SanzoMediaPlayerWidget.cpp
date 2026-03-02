@@ -203,6 +203,7 @@ FReply USanzoMediaPlayerWidget::NativeOnKeyUp(const FGeometry& InGeometry, const
 	if (GetWorld()->GetTimerManager().IsTimerActive(SkipTimerHandle))
 	{
 		IsAnyKeyPressed = false;
+		UpdateSkipProgress(0);
 		GetWorld()->GetTimerManager().ClearTimer(SkipTimerHandle);
 	}
 
@@ -231,6 +232,7 @@ FReply USanzoMediaPlayerWidget::NativeOnMouseButtonUp(const FGeometry& InGeometr
 	if (GetWorld()->GetTimerManager().IsTimerActive(SkipTimerHandle))
 	{
 		IsAnyKeyPressed = false;
+		UpdateSkipProgress(0);
 		GetWorld()->GetTimerManager().ClearTimer(SkipTimerHandle);
 	}
 

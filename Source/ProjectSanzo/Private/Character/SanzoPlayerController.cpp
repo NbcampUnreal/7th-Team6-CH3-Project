@@ -327,10 +327,9 @@ void ASanzoPlayerController::ShowMediaPlayer(FGameplayTag State)
 			MediaPlayerWidgetInstance->AddToViewport();
 			MediaPlayerWidgetInstance->PlayMediaScene(State);
 			
-			FInputModeGameAndUI InputMode;
+			FInputModeUIOnly InputMode;
 			InputMode.SetWidgetToFocus(MediaPlayerWidgetInstance->TakeWidget()); // 위젯에 강제 포커스
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
-			InputMode.SetHideCursorDuringCapture(true);
 			
 			SetInputMode(InputMode);	
 			bShowMouseCursor = false;
