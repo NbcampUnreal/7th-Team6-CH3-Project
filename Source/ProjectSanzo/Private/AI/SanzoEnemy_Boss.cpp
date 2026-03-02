@@ -1,4 +1,4 @@
-﻿#include "AI/SanzoEnemy_Boss.h"
+#include "AI/SanzoEnemy_Boss.h"
 #include "AI/Components/SanzoEnemyStunComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -150,7 +150,34 @@ void ASanzoEnemy_Boss::ExecuteSmashShockwave()
     GetController(),
     true
   );
+  // 충격파 이펙트 생성
+  FHitResult Hit;
+  FVector Start = ImpactLocation;
+  FVector End = ImpactLocation - FVector(0, 0, 500.f);
 
+  FCollisionQueryParams Params;
+  Params.AddIgnoredActor(this);
+
+  if (GetWorld()->LineTraceSingleByChannel(
+    Hit,
+    Start,
+    End,
+    ECC_Visibility,
+    Params))
+  {
+    ImpactLocation = Hit.Location;
+  }
+
+  if (SmashShockwaveEffect)
+  {
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+      GetWorld(),
+      SmashShockwaveEffect,
+      ImpactLocation,
+      FRotator::ZeroRotator,
+      FVector(1.0f)
+    );
+  }
   // [디버그용] 빨간색 원(공격 범위) 그리기
   if (GetWorld())
   {
