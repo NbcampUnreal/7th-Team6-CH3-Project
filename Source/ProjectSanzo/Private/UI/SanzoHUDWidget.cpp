@@ -32,7 +32,7 @@ void USanzoHUDWidget::NativeConstruct()
 			StatComponent->OnStatChanged.AddDynamic(this, &USanzoHUDWidget::HandleStatChanged);
 			StatComponent->OnExhaustedChanged.AddDynamic(this, &USanzoHUDWidget::HandleStaminaColorChange);
 		}
-		
+
 		USanzoEquipmentComponent* EquipmentComponent = PlayerCharacter->FindComponentByClass<USanzoEquipmentComponent>();
 		if (EquipmentComponent)
 		{
@@ -41,14 +41,14 @@ void USanzoHUDWidget::NativeConstruct()
 			EquipmentComponent->OnAnyWeaponHitEnemy.AddDynamic(this, &USanzoHUDWidget::HandleEnemyHitAnim);
 			EquipmentComponent->OnItemPickedUp.AddDynamic(this, &USanzoHUDWidget::HandleItemNotification);
 		}
-		
+
 		if (BowAimProgressBar)
 		{
 			BowAimProgressBarDynamic = BowAimProgressBar->GetDynamicMaterial();
-			
+
 			if (BowAimProgressBarDynamic)
 			{
-				BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"),0.0f);
+				BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"), 0.0f);
 			}
 		}
 	}
@@ -56,7 +56,7 @@ void USanzoHUDWidget::NativeConstruct()
 	if (ASanzoGameState* GameState = GetWorld()->GetGameState<ASanzoGameState>())
 	{
 		ESanzoStageType CurrentStageType = GameState->CurrentStageType;
-		
+
 		if (StageInfoWidget)
 		{
 			StageInfoWidget->SetStageInfo(CurrentStageType);
@@ -68,7 +68,7 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 {
 	if (HealthBar)
 	{
-		HandleHealthBarData(Data.MaxHealth,Data.CurrentHealth,Data.HealthPercent);
+		HandleHealthBarData(Data.MaxHealth, Data.CurrentHealth, Data.HealthPercent);
 	}
 	if (StaminaBar)
 	{
@@ -90,19 +90,19 @@ void USanzoHUDWidget::HandleHealthBarData(float MaxHealth, float CurrentHealth, 
 	{
 		HealthInfoText->SetText(FText::Format(
 			FText::FromString(TEXT("{0} / {1}"))
-			,FText::AsNumber(CurrentHealth)
-			,FText::AsNumber(MaxHealth)));
+			, FText::AsNumber(CurrentHealth)
+			, FText::AsNumber(MaxHealth)));
 	}
-	
+
 	if (HealthBarSizeBox)
 	{
 		//1안
-		float BarSize = FMath::Min(MaxHealth * SizePerValue,1000.f);
+		float BarSize = FMath::Min(MaxHealth * SizePerValue, 1000.f);
 		//2안
 		//float BarSize = FMath::Clamp(MaxHealth * 5,500.f,1000.f );
 		HealthBarSizeBox->SetWidthOverride(BarSize);
 	}
-	
+
 	if (HealthBar)
 	{
 		HealthBar->SetPercent(NewPercent);
@@ -115,19 +115,19 @@ void USanzoHUDWidget::HandleStaminaBarData(float MaxStamina, float CurrentStamin
 	{
 		StaminaInfoText->SetText(FText::Format(
 			FText::FromString(TEXT("{0} / {1}"))
-			,FText::AsNumber(CurrentStamina)
-			,FText::AsNumber(MaxStamina)));
+			, FText::AsNumber(CurrentStamina)
+			, FText::AsNumber(MaxStamina)));
 	}
-	
+
 	if (StaminaBarSizeBox)
 	{
 		//1안
-		float BarSize = FMath::Min(MaxStamina * SizePerValue,1000.f);
+		float BarSize = FMath::Min(MaxStamina * SizePerValue, 1000.f);
 		//2안
 		//float BarSize = FMath::Clamp(MaxStamina * 5,500.f,1000.f );
 		StaminaBarSizeBox->SetWidthOverride(BarSize);
 	}
-	
+
 	if (StaminaBar)
 	{
 		StaminaBar->SetPercent(NewPercent);
@@ -149,16 +149,19 @@ void USanzoHUDWidget::HandleStaminaColorChange(bool bNewExhausted)
 
 void USanzoHUDWidget::UpdateStaminaColor(float DeltaTime)
 {
-	if (!StaminaBar) return;
-	
+	if (!StaminaBar)
+	{
+		return;
+	}
+
 	float ElapsedTime = GetWorld()->GetTimeSeconds() - ExhaustionStartTime;
-	
-	float Percent = FMath::Clamp(ElapsedTime/ExhaustionDuration, 0.f, 1.f);
-	
+
+	float Percent = FMath::Clamp(ElapsedTime / ExhaustionDuration, 0.f, 1.f);
+
 	FLinearColor CurrentColor = FLinearColor::LerpUsingHSV(ExhaustedColor, NormalStaminaColor, Percent);
-	
+
 	StaminaBar->SetFillColorAndOpacity(CurrentColor);
-	
+
 	if (Percent >= 1.0f)
 	{
 		bIsExhausted = false;
@@ -169,7 +172,7 @@ void USanzoHUDWidget::UpdateStaminaColor(float DeltaTime)
 void USanzoHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	
+
 	if (bIsExhausted)
 	{
 		UpdateStaminaColor(InDeltaTime);
@@ -185,28 +188,28 @@ void USanzoHUDWidget::HandleAmmoChanged(FText NewAmmoText)
 void USanzoHUDWidget::HandleWeaponSwapped(int32 CurrentWeaponIndex)
 {
 	bool bIsGunMain = (CurrentWeaponIndex == 0);
-	
+
 	UCanvasPanelSlot* GunSlot = Cast<UCanvasPanelSlot>(GunInfoOverlay->Slot);
 	UCanvasPanelSlot* BowSlot = Cast<UCanvasPanelSlot>(BowInfoOverlay->Slot);
-	
+
 	if (GunSlot && BowSlot)
 	{
 		if (bIsGunMain)
 		{
 			GunSlot->SetZOrder(1);
 			BowSlot->SetZOrder(0);
-		
+
 			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Reverse);
 		}
 		else
 		{
 			GunSlot->SetZOrder(0);
 			BowSlot->SetZOrder(1);
-			
+
 			PlayAnimation(GunInfoSwapBackAnim, 0.0f, 1, EUMGSequencePlayMode::Forward);
 		}
 	}
-	
+
 	if (APawn* PlayerCharacter = GetOwningPlayerPawn())
 	{
 		USanzoEquipmentComponent* EquipmentComponent = PlayerCharacter->FindComponentByClass<USanzoEquipmentComponent>();
@@ -232,13 +235,13 @@ void USanzoHUDWidget::UpdateBowChargingProgress(float NewPercent)
 	{
 		BowAimProgressBarDynamic->SetScalarParameterValue(TEXT("Percentage"), NewPercent);
 	}
-	
+
 	if (BowAimProgressBar)
 	{
 		bool bIsVisible = NewPercent > 0.0f;
 		ESlateVisibility BowAimProgressBarVisibility = bIsVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
 		BowAimProgressBar->SetVisibility(BowAimProgressBarVisibility);
-		
+
 		if (bIsVisible)
 		{
 			FLinearColor StartColor = FLinearColor::White;
@@ -251,7 +254,6 @@ void USanzoHUDWidget::UpdateBowChargingProgress(float NewPercent)
 			BowAimProgressBar->SetColorAndOpacity(CurrentColor);
 		}
 	}
-	
 }
 
 void USanzoHUDWidget::HandleEnemyHitAnim()
@@ -265,15 +267,18 @@ void USanzoHUDWidget::HandleEnemyHitAnim()
 
 void USanzoHUDWidget::HandleItemNotification(FName ItemType, int32 Amount)
 {
-	if (!ItemNotificationClass || !NotificationContainer) return;
-	
-	USanzoItemNotificationWidget* NewNotify = CreateWidget<USanzoItemNotificationWidget>(GetOwningPlayer(), ItemNotificationClass);
+	if (!ItemNotificationClass || !NotificationContainer)
+	{
+		return;
+	}
+
+	USanzoItemNotificationWidget* NewNotify = CreateWidget<USanzoItemNotificationWidget>(
+		GetOwningPlayer(), ItemNotificationClass);
 	if (NewNotify)
 	{
 		NewNotify->SetNotify(ItemType, Amount);
-		
+
 		NotificationContainer->AddChildToVerticalBox(NewNotify);
-		
 	}
 }
 
