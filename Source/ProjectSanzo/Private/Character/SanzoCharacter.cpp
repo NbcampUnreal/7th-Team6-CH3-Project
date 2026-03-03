@@ -26,6 +26,8 @@
 #include "Engine/DamageEvents.h"
 #include "Core/SanzoBaseValue.h"
 #include "Stage/SanzoRoomBase.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 DEFINE_LOG_CATEGORY(LogSanzo);
 
@@ -109,6 +111,14 @@ ASanzoCharacter::ASanzoCharacter()
   CurrentFOV = FollowCamera->FieldOfView;
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
+
+  // 변신 VFX
+  // 컴포넌트 생성 및 루트(또는 Mesh)에 부착
+  TransformationNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TransformationNiagaraComponent"));
+  TransformationNiagaraComponent->SetupAttachment(RootComponent); // 캐릭터 발밑에 고정
+
+  // 시작하자마자 실행되지 않도록 설정
+  TransformationNiagaraComponent->SetAutoActivate(false);
 }
 
 void ASanzoCharacter::PostInitializeComponents()
@@ -871,9 +881,14 @@ void ASanzoCharacter::ChangeModeling(float Value)
     {
       UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
     }
-    if(TransformationEffect)
+    //VFX
+    if (TransformationEffect && TransformationNiagaraComponent)
     {
-      UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+      // 에셋 할당
+      TransformationNiagaraComponent->SetAsset(TransformationEffect);
+
+      // 이펙트 재생
+      TransformationNiagaraComponent->Activate(true);
     }
     break;
   case 2: //아리사
@@ -976,7 +991,7 @@ float ASanzoCharacter::TakeDamage(
     if (StatComp->IsDead())
     {
       UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      //HandleDeath();
+      HandleDeath();
     }
   }
   ApplyHitEffect();
