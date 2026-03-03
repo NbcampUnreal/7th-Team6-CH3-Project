@@ -301,7 +301,6 @@ void ASanzoBow::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		}
 		break;
   default:
-    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
     break;
   }
 }

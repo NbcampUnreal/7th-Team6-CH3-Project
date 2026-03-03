@@ -140,7 +140,6 @@ void ASanzoWeaponBase::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
     BaseDamage += (OriginalBaseDamage * Value);
     break;
   default:
-    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
     break;
   }
 }
@@ -185,12 +184,6 @@ void ASanzoWeaponBase::ApplyDamageToTarget(AActor* TargetActor, FHitResult HitIn
     AController* OwnerController = OwnerPawn ? OwnerPawn->GetController() : nullptr;
     // 데미지 전달
     UGameplayStatics::ApplyDamage(TargetActor, FinalDamage, OwnerController, this, UDamageType::StaticClass());
-    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("WB: Hit Destructible Object"));
   }
 #pragma endregion 최윤서
-
-  if (HitEnemy)
-  {
-    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("Hit Enemy"));
-  }
 }
