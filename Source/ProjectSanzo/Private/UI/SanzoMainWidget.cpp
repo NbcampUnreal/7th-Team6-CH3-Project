@@ -170,36 +170,20 @@ void USanzoMainWidget::HandleStartButtonClicked()
   
 	if (StartSound)
 	{
-		UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, StartSound);
+	  UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, StartSound);
 
-		if (ClickAudioComponent)
-		{
-			ClickAudioComponent->bIsUISound = true;
-			ClickAudioComponent->SetTickableWhenPaused(true);
-			ClickAudioComponent->Play();
-
-			FTSTicker::GetCoreTicker().AddTicker(
-				FTickerDelegate::CreateLambda(
-					[ClickAudioComponent](float DeltaTime)
-					{
-						if (IsValid(ClickAudioComponent) && ClickAudioComponent->IsPlaying())
-						{
-							ClickAudioComponent->FadeOut(0.2f, 0.0f);
-						}
-						return false;
-					})
-				, 1.0f);
-		}
+	  if (ClickAudioComponent)
+	  {
+	    bIsStartButtonTransitioning = true;
+	    ExecuteTransitionDelay = 1.2f;
+		  
+	    ClickAudioComponent->bIsUISound = true;
+	    ClickAudioComponent->SetTickableWhenPaused(true);
+	    ClickAudioComponent->Play();
+		  
+	    ExecuteTransitionTargetTime = GetWorld()->GetRealTimeSeconds() + ExecuteTransitionDelay;
+	  }
 	}
-
-	FTSTicker::GetCoreTicker().AddTicker(
-		FTickerDelegate::CreateLambda(
-			[this](float DeltaTime)
-			{
-				ExecuteStartTransition();
-				return false;
-			})
-		, 1.2f);
 }
 
 void USanzoMainWidget::HandleExitButtonClicked()
@@ -211,37 +195,20 @@ void USanzoMainWidget::HandleExitButtonClicked()
   
 	if (QuitSound)
 	{
-		UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, QuitSound);
+	  UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, QuitSound);
 		
-		if (ClickAudioComponent)
-		{
-			ClickAudioComponent->bIsUISound = true;
-			ClickAudioComponent->SetTickableWhenPaused(true);
-			ClickAudioComponent->Play();
-
-			FTSTicker::GetCoreTicker().AddTicker(
-				FTickerDelegate::CreateLambda(
-					[ClickAudioComponent](float DeltaTime)
-					{
-						if (IsValid(ClickAudioComponent) && ClickAudioComponent->IsPlaying())
-						{
-							ClickAudioComponent->FadeOut(0.7f, 0.0f);
-						}
-						return false;
-					})
-				, 0.0f);
-		}
+	  if (ClickAudioComponent)
+	  {
+	    bIsExitButtonTransitioning = true;
+	    ExecuteTransitionDelay = 0.7f;
+		  
+	    ClickAudioComponent->bIsUISound = true;
+	    ClickAudioComponent->SetTickableWhenPaused(true);
+	    ClickAudioComponent->Play();
+		  
+	    ExecuteTransitionTargetTime = GetWorld()->GetRealTimeSeconds() + ExecuteTransitionDelay;
+	  }
 	}
-
-	FTSTicker::GetCoreTicker().AddTicker(
-		FTickerDelegate::CreateLambda(
-			[this](float DeltaTime)
-			{
-				ExecuteExitTransition();
-				return false;
-			})
-		, 0.7f);
-
 }
 
 void USanzoMainWidget::PlayGameOverSound()
@@ -256,7 +223,7 @@ void USanzoMainWidget::PlayGameOverSound()
 			
 			PlayingAudio->SetTickableWhenPaused(true);
 			
-			PlayingAudio->Play();		
+			PlayingAudio->Play();
 		}
 	}
 }
@@ -282,6 +249,31 @@ void USanzoMainWidget::ExecuteExitTransition()
 	{
 		OnButtonClicked.Broadcast(ReturnMainMenuTag);
 	}
+}
+
+void USanzoMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+  Super::NativeTick(MyGeometry, InDeltaTime);
+  
+  if (bIsStartButtonTransitioning)
+  {
+    if (GetWorld()->GetRealTimeSeconds() >= ExecuteTransitionTargetTime)
+    {
+      bIsStartButtonTransitioning = false;
+            
+      ExecuteStartTransition();
+    }
+  }
+  
+  if (bIsExitButtonTransitioning)
+  {
+    if (GetWorld()->GetRealTimeSeconds() >= ExecuteTransitionTargetTime)
+    {
+      bIsExitButtonTransitioning = false;
+     
+      ExecuteExitTransition();
+    }
+  }
 }
 
 void USanzoMainWidget::PlayMainMenuSound()

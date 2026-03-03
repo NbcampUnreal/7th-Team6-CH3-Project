@@ -126,6 +126,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
 	USoundBase* QuitSound;
 	
+  float ExecuteTransitionTargetTime = 0;
+  float ExecuteTransitionDelay = 0;
+  
+  bool bIsStartButtonTransitioning = false;
+  bool bIsExitButtonTransitioning = false;
+  
+  virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+  
 #pragma endregion 이준로
 	
 #pragma region StageClearUI
