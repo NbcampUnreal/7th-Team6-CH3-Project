@@ -22,6 +22,9 @@ struct FEnemyOverHeadData
   float HealthPercent = 1.0f;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  int32 MaxStunCount = 0;
+  
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
   int32 CurrentStunCount = 0;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")

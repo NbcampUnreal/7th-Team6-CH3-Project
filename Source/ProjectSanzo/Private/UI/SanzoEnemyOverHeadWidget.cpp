@@ -14,29 +14,43 @@ void USanzoEnemyOverHeadWidget::NativeConstruct()
 	
 	if (HealthBorder)
 	{
-		HealthBorder->SetVisibility(ESlateVisibility::Collapsed);
+		HealthBorder->SetVisibility(ESlateVisibility::Visible);
 	}
-	
-	if (StunGageBox)
-	{
-		StunGageImages.Empty();
-		
-		for (int i = 0; i < StunGageBox->GetChildrenCount(); i++)
-		{
-			if (UImage* ChildImage = Cast<UImage>(StunGageBox->GetChildAt(i)))
-			{
-				StunGageImages.Add(ChildImage);
-			}
-		}
-	}
-	
 }
 
 void USanzoEnemyOverHeadWidget::UpdateOverHeadWidget(const FEnemyOverHeadData& OverHeadData)
 {
+  SetStunGage(OverHeadData.MaxStunCount);
 	UpdateHealthBar(OverHeadData.HealthPercent);
 	UpdateStunGage(OverHeadData.CurrentStunCount);
 	UpdateStateImage(OverHeadData.bIsStunned, OverHeadData.bIsSighted);
+}
+
+void USanzoEnemyOverHeadWidget::SetStunGage(int32 MaxStunCount)
+{
+  if (CurrentMaxStunCount == MaxStunCount) return;
+  
+  CurrentMaxStunCount = MaxStunCount;
+  
+  if (StunGageBox)
+  {
+    StunGageBox->ClearChildren();
+    StunGageImages.Empty();
+    
+    for (int i = 0; i < MaxStunCount; i++)
+    {
+      UImage* NewStunImage = NewObject<UImage>(this);
+      
+      if (NewStunImage)
+      {
+        NewStunImage->SetBrushFromTexture(FullTexture);
+        NewStunImage->SetDesiredSizeOverride(FVector2D(50.0f, 50.0f));
+        
+        StunGageBox->AddChildToHorizontalBox(NewStunImage);
+        StunGageImages.Add(NewStunImage);
+      }
+    }
+  }
 }
 
 void USanzoEnemyOverHeadWidget::UpdateStunGage(int32 CurrentStunCount)

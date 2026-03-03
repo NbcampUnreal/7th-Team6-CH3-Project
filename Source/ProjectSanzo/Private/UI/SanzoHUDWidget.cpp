@@ -72,7 +72,7 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 	}
 	if (StaminaBar)
 	{
-		StaminaBar->SetPercent(Data.StaminaPercent);
+	  HandleStaminaBarData(Data.MaxStamina, Data.CurrentStamina, Data.StaminaPercent);
 	}
 	if (ExpBar)
 	{
@@ -113,9 +113,10 @@ void USanzoHUDWidget::HandleStaminaBarData(float MaxStamina, float CurrentStamin
 {
 	if (StaminaInfoText)
 	{
+	  int32 DisplayCurrentStamina = FMath::FloorToInt(CurrentStamina);
 		StaminaInfoText->SetText(FText::Format(
 			FText::FromString(TEXT("{0} / {1}"))
-			, FText::AsNumber(CurrentStamina)
+			, FText::AsNumber(DisplayCurrentStamina)
 			, FText::AsNumber(MaxStamina)));
 	}
 
