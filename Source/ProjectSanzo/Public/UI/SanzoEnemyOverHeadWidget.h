@@ -19,6 +19,9 @@ public:
 	
 	UFUNCTION()
 	void UpdateOverHeadWidget(const FEnemyOverHeadData& OverHeadData);
+  
+  UFUNCTION(BlueprintCallable, Category = "UI")
+  void SetStunGage(int32 MaxStunCount);
 	
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void UpdateStunGage(int32 CurrentStunCount);
@@ -38,6 +41,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* StunGageBox;
 	
+  UPROPERTY()
+  UImage* StunImage;
+  
 	UPROPERTY()
 	TArray<UImage*> StunGageImages;
 	
@@ -66,4 +72,6 @@ protected:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* StunStateAnim;
 	
+private:
+  int32 CurrentMaxStunCount = 0;
 };

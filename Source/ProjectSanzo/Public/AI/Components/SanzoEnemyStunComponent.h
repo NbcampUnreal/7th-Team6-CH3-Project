@@ -66,6 +66,8 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Stun")
   void AddStunGauge(int32 Amount = 1);
 
+  //최대 스턴카운트 가져오기 - 작업자: 이준로
+  int32 GetMaxStunCount() const { return MaxStunCount; }
   int32 GetCurrentStunCount() const { return CurrentStunCount; }
   bool GetIsStunned() const { return bIsStunned; }
 

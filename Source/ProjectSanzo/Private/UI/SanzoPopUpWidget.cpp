@@ -212,8 +212,6 @@ void USanzoPopUpWidget::SetUpgradeList()
 		FName UpgradeID = Elem.Key;
 		int32 Count = Elem.Value;
 		
-		UE_LOG(LogLJR, Log, TEXT("Processing Upgrade: %s (Count: %d)"), *UpgradeID.ToString(), Count);
-		
 		UUserWidget* UpgradeInfoWidget = CreateWidget<UUserWidget>(this, UpgradeInfoWidgetClass);
 		if (UpgradeInfoWidget)
 		{
