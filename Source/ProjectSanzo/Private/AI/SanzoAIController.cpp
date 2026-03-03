@@ -100,7 +100,6 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
           {
             Enemy->ShowAlertWidget(false);
           }
-          SetFocalPoint(Stimulus.StimulusLocation);
           UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
         }
       }
@@ -116,8 +115,8 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
           }
         }
         BBComp->SetValueAsObject(TEXT("TargetActor"), Actor);
-        SetFocalPoint(Stimulus.StimulusLocation);
         BBComp->ClearValue(TEXT("InvestigateLocation"));
+        SetFocus(Actor);
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by DAMAGE!"));
       }
     }
