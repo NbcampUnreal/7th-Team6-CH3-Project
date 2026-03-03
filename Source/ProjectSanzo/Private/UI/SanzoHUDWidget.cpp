@@ -72,7 +72,7 @@ void USanzoHUDWidget::HandleStatChanged(const FSanzoStatData& Data)
 	}
 	if (StaminaBar)
 	{
-		StaminaBar->SetPercent(Data.StaminaPercent);
+	  HandleStaminaBarData(Data.MaxStamina, Data.CurrentStamina, Data.StaminaPercent);
 	}
 	if (ExpBar)
 	{
