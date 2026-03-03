@@ -215,9 +215,8 @@ void ASanzoPlayerController::StartGame()
 {
 	if (USanzoGameInstance* SanzoGameInstance = Cast<USanzoGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
-		//게임 시작시 초기화 필요한 값 입력
-		SanzoGameInstance->InitSetup();
-		SanzoGameInstance->MoveToNextStage();
+		// 게임 시작시 초기화를 위한 함수 실행
+		SanzoGameInstance->StartNewGame();
 	}
 	SetPause(false);
 }

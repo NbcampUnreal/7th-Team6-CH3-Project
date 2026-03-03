@@ -42,8 +42,20 @@ void USanzoGameInstance::Restart()
     FName(*StageLevels[CurrentStageIndex].GetAssetName())
   );
 }
-#pragma endregion 최윤서
 
+#pragma endregion 최윤서
+#pragma region Player Stat & Upgrade Reset
+void USanzoGameInstance::StartNewGame()
+{
+  InitSetup();
+  CurrentStageIndex = 1;
+  UGameplayStatics::OpenLevel(
+    this,
+    FName(*StageLevels[CurrentStageIndex].GetAssetName())
+  );
+}
+
+#pragma endregion 이용호
 #pragma region Save & Load
 void USanzoGameInstance::BackupStat(ASanzoCharacter* Player)
 {
