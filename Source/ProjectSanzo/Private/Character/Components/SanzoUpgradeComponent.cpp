@@ -66,40 +66,7 @@ void USanzoUpgradeComponent::ProcessUpgradeValue(EUpgradeTarget Target, EUpgrade
   }
 #pragma endregion 김형백
 
-	//임시로 주석처리 후에 제거필요
-	/*
-	if (Target == EUpgradeTarget::Character)
-	{
-		if (Type == EUpgradeType::Beauty)
-		{
-			if (ASanzoCharacter* Character = Cast<ASanzoCharacter>(Owner))
-			{
-				UE_LOG(LogLJR, Warning, TEXT("외모 업그레이드 전달 완료"))
-				//외모 업그레이드 함수 등록
-				//Character->ApplyVisualUpgrade(Value);
-			}
-		}
-		else
-		{
-			if (auto* StatComponent = Owner->FindComponentByClass<USanzoStatComponent>())
-			{
-				UE_LOG(LogLJR, Warning, TEXT("스탯 업그레이드 전달 완료"))
-				//스탯 적용 함수 등록
-				//StatComponent->ApplyStatUpgrade(Type, Value);
-			}
-		}
-	}
-	
-	else if (Target == EUpgradeTarget::Gun || Target ==EUpgradeTarget::Bow)
-	{
-		if (auto* EquipmentComponent = Owner->FindComponentByClass<USanzoEquipmentComponent>())
-		{
-			UE_LOG(LogLJR, Warning, TEXT("%s, %s, %.2f 전달 완료"),*TargetStr,*TypeStr, Value);
-			//장비 업그레이드 적용 함수 등록
-			//EquipmentComponent->ApplyWeaponUpgrade(Target,Type,Value);
-		}
-	}
-	*/
+
 }
 
 void USanzoUpgradeComponent::InitializeUpgradeFromSubsystem(const TMap<FUpgradeStatKey, float> TotalMap)
