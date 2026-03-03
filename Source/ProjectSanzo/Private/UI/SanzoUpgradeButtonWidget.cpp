@@ -174,7 +174,7 @@ void USanzoUpgradeButtonWidget::NativeTick(const FGeometry& MyGeometry, float In
 	
 	if (bIsSoundDurationEnded)
 	{
-		if (GetWorld()->RealTimeSeconds >= SoundStopTargetRealTime)
+		if (GetWorld()->GetRealTimeSeconds() >= SoundStopTargetRealTime)
 		{
 			StopCurrentSound();
 		}
