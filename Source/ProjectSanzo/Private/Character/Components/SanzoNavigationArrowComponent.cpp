@@ -32,11 +32,6 @@ void USanzoNavigationArrowComponent::BeginPlay()
 	if (FoundGates.Num() > 0)
 	{
 		TargetActor = Cast<ASanzoStageGate>(FoundGates[0]);
-		UE_LOG(LogLJR, Warning, TEXT("NavArrow: 문을 찾았습니다"));
-	}
-	else
-	{
-		UE_LOG(LogCYS, Error, TEXT("NavArrow: 문을 찾지 못했습니다"));
 	}
 	
 	AActor* StageManagerActor = UGameplayStatics::GetActorOfClass(GetWorld(), ASanzoStageManager::StaticClass());

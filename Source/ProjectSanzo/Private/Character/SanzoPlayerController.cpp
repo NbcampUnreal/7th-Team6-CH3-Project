@@ -57,7 +57,6 @@ void ASanzoPlayerController::BeginPlay()
 		{
 			if (!VideoToPlay.MatchesTag(FGameplayTag::RequestGameplayTag(FName("UI.State.None"))))
 			{
-				UE_LOG(LogLJR, Warning, TEXT("영상 재생 태그: %s"), *VideoToPlay.ToString());
 				ShowMediaPlayer(VideoToPlay);
 			}
 			else

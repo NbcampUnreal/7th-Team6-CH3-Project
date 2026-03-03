@@ -453,7 +453,7 @@ void ASanzoEnemyBase::OnStunRecoveredCallback()
     if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetBrainComponent()))
     {
     	//Stun해제 방송
-    	UE_LOG(LogLJR, Warning, TEXT("EnemyBase: 스턴 회복됨"));
+    	
     	BroadCastAllData();
     	
       BTComp->RestartTree();

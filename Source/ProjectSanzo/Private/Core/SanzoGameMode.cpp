@@ -80,7 +80,6 @@ void ASanzoGameMode::OnStageCleared()
 	ASanzoGameState* SanzoGameState = GetWorld() ? GetWorld()->GetGameState<ASanzoGameState>() : nullptr;
 	if (SanzoGameState)
 	{
-		UE_LOG(LogLJR, Warning, TEXT("SM: 결과창 띄우기"));
 		SanzoGameState->OpenStageClearUI(FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")));
 	}
 }
@@ -126,12 +125,10 @@ void ASanzoGameMode::DecideEnding()
 			const int32* BeautyValuePtr = SelectedTotalMap.Find(FName("Chr_BTY_Li"));
 			if (BeautyValuePtr && *BeautyValuePtr >= 3)
 			{
-				UE_LOG(LogLJR, Warning, TEXT("외모 3단계 업그레이드 확인 진엔딩 태그 적용"))
 				SanzoGameInstance->MediaPlayTag = FGameplayTag::RequestGameplayTag(FName("UI.State.TrueEnding"));
 			}
 			else
 			{
-				UE_LOG(LogLJR, Warning, TEXT("외모 3단계 업그레이드 아님 그냥엔딩 태그 적용"))
 				SanzoGameInstance->MediaPlayTag = FGameplayTag::RequestGameplayTag(FName("UI.State.Ending"));
 			}
 		}

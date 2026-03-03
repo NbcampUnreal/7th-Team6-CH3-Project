@@ -43,8 +43,7 @@ void USanzoUpgradeComponent::ProcessUpgradeValue(EUpgradeTarget Target, EUpgrade
 	//로그용 임시함수
 	FString TargetStr = UEnum::GetValueAsString(Target);
 	FString TypeStr = UEnum::GetValueAsString(Type);
-
-	UE_LOG(LogLJR, Warning, TEXT("[Upgrade] Target: %s, Type: %s, Value: %.2f"), *TargetStr, *TypeStr, Value);
+  
 	//여기까지
 
 #pragma region ApplyUpgrade

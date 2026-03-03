@@ -101,7 +101,6 @@ void ASanzoGameState::ResumeGame()
 	{
 		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
 		{
-			UE_LOG(LogLJR,Warning,TEXT("스테이지 시작"));
 			SanzoPlayerController->ResumeGame();
 		}
 	}
@@ -116,7 +115,6 @@ void ASanzoGameState::OpenAnnouncerUI()
 		if (ASanzoPlayerController* SanzoPlayerController = Cast<ASanzoPlayerController>(PlayerController))
 		{
 			//진짜 받아온 정보로 수정 필요
-			UE_LOG(LogLJR,Warning,TEXT("스테이지 알림 UI 열기"));
 			SanzoPlayerController->ShowAnnouncerUI(CurrentStageState, CurrentStageType);
 		}
 	}

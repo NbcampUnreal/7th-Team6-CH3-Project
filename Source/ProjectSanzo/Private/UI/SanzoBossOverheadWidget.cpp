@@ -19,7 +19,6 @@ void USanzoBossOverheadWidget::UpdateStunImage(bool bIsStunned)
 		{
 			if (!IsAnimationPlaying(StunStateAnim))
 			{
-				UE_LOG(LogLJR, Warning, TEXT("보스 스턴! 애니메이션 재생!"));
 				StateImage->SetOpacity(1.0f);
 				PlayAnimation(StunStateAnim, 0, 0);
 			}
