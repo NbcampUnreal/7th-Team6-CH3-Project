@@ -1,4 +1,4 @@
-﻿#include "AI/SanzoEnemy_MeleeBase.h"
+#include "AI/SanzoEnemy_MeleeBase.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -78,7 +78,7 @@ void ASanzoEnemy_MeleeBase::PerformWeaponTrace()
     ObjectTypes,
     false,
     HitActorsToIgnore,
-    EDrawDebugTrace::ForDuration, // 테스트 후 None으로 변경
+    EDrawDebugTrace::None, // 테스트 후 None으로 변경
     OutHits,
     true,
     FLinearColor::Red, FLinearColor::Green, 2.0f
