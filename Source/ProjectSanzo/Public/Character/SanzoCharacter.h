@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -231,9 +231,11 @@ protected:
   float LastDodgeTime = 0;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Dodge")
   float DodgeCooldownTime;
+  
 
   void Parry(const FInputActionValue& Value);
   void EndParry(UAnimMontage* Montage, bool bInterrupted);
+  float ParryReflectChance;
 
   void AimStart(const FInputActionValue& Value);
 
@@ -251,7 +253,7 @@ protected:
   virtual void Tick(float DeltaTime) override;
   virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 #pragma endregion 김형백
-
+  bool bIsRestoringData = false;
   //현재 FOV
   float CurrentFOV;
 
