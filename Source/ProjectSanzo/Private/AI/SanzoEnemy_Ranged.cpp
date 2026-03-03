@@ -299,7 +299,7 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
 
       if (CurrentAimTime >= BlinkStartTime) bIsAimLocked = true;
 
-     // 디버그 라인
+      // 디버그 라인
 #if !UE_BUILD_SHIPPING
       if (bShowDebugTrace)
       {
@@ -348,7 +348,6 @@ void ASanzoEnemy_Ranged::StartAiming()
   if (UCharacterMovementComponent* Movement = GetCharacterMovement())
   {
     Movement->MaxWalkSpeed = 0.f;
-    Movement->bUseRVOAvoidance = false;
   }
 
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())

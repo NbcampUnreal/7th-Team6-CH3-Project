@@ -93,14 +93,13 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
       // [청각] 총소리(플레이어의 공격)를 들었을 때
       else if (Stimulus.Type == HearingConfig->GetSenseID())
       {
+        BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
         if (bIsNewDetection)
         {
           if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
           {
             Enemy->ShowAlertWidget(false);
           }
-          BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
-          SetFocalPoint(Stimulus.StimulusLocation);
           UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
         }
       }
@@ -116,8 +115,8 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
           }
         }
         BBComp->SetValueAsObject(TEXT("TargetActor"), Actor);
-        SetFocalPoint(Stimulus.StimulusLocation);
         BBComp->ClearValue(TEXT("InvestigateLocation"));
+        SetFocus(Actor);
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by DAMAGE!"));
       }
     }
