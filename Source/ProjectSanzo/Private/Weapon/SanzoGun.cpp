@@ -12,7 +12,7 @@ ASanzoGun::ASanzoGun()
 {
 	BaseDamage = 5.0f;       // 기본 데미지
 	FireRate = 0.15f;          // 0.15초마다 발사 (빠른 연사)         
-	CurrentAmmo = 3000;         // 시작 탄약
+	CurrentAmmo = 100;         // 시작 탄약
 	bInfiniteAmmo = false;
 
 	// 첫 발은 무조건 바로 나가도록 초기화

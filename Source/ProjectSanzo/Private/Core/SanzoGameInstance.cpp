@@ -112,7 +112,7 @@ void USanzoGameInstance::InitSetup()
 {
   UE_LOG(LogCYS, Warning, TEXT("GI: Init Set up"));
   CurrentStageIndex = 0;
-  CachedAmmo = 1000; // 초기 탄약값 설정
+  CachedAmmo = 100; // 초기 탄약값 설정
   // 무기 업그레이드 정보 백지화
   CachedGunDamage = -1.0f;
   CachedGunFireRate = -1.0f;
