@@ -1,4 +1,4 @@
-#include "Stage/SanzoSpawnGate.h"
+﻿#include "Stage/SanzoSpawnGate.h"
 #include "Common/SanzoLog.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
@@ -53,7 +53,7 @@ void ASanzoSpawnGate::BeginPlay()
 void ASanzoSpawnGate::OpenGate()
 {
   if (bIsOpened) return;
-  UE_LOG(LogCYS, Warning, TEXT("SpawnGate: 문 열림"));
+  ////UE_LOG(LogCYS, Warning, TEXT("SpawnGate: 문 열림"));
   bIsOpened = true;
 
   if (OpenSound)
@@ -82,7 +82,7 @@ void ASanzoSpawnGate::OpenGate()
 void ASanzoSpawnGate::CloseGate()
 {
   if (!bIsOpened) return;
-  UE_LOG(LogCYS, Warning, TEXT("SpawnGate: 문 닫힘"));
+  ////UE_LOG(LogCYS, Warning, TEXT("SpawnGate: 문 닫힘"));
   bIsOpened = false;
 
   if (CloseSound)
@@ -151,7 +151,7 @@ void ASanzoSpawnGate::OnOverlapEnd(
 {
   if (OtherActor && OtherActor->ActorHasTag("Enemy"))
   {
-    UE_LOG(LogCYS, Error, TEXT("SpawnGate: Enemy 나감"));
+    //UE_LOG(LogCYS, Error, TEXT("SpawnGate: Enemy 나감"));
     CloseGate();
   }
 }

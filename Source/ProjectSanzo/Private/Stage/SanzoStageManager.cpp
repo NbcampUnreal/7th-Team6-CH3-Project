@@ -28,7 +28,7 @@ void ASanzoStageManager::BeginPlay()
   }
   else
   {
-    UE_LOG(LogCYS, Error, TEXT("SM: Stage gate 연결 안됨."));
+    //UE_LOG(LogCYS, Error, TEXT("SM: Stage gate 연결 안됨."));
   }
   PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 }
@@ -43,7 +43,7 @@ void ASanzoStageManager::Tick(float DeltaTime)
 
 void ASanzoStageManager::StartStage()
 {
-  UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 시작"));
+  //UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 시작"));
   // 현재 스테이지 타입 가져오기
   if (SanzoGameMode)
   {
@@ -54,18 +54,18 @@ void ASanzoStageManager::StartStage()
   switch (StageType)
   {
   case ESanzoStageType::None:
-      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 없음"));
+      //UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 없음"));
       return;
     case ESanzoStageType::Extermination:
-      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 섬멸전"));
+      //UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 섬멸전"));
       RoomClassToSpawn = ExterminationRoomClass;
       break;
     case ESanzoStageType::Survival:
-      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 방호전"));
+      //UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 방호전"));
       RoomClassToSpawn = SurvivalRoomClass;
       break;
     case ESanzoStageType::Boss:
-      UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 보스"));
+      //UE_LOG(LogCYS, Warning, TEXT("SM: 전투 타입 - 보스"));
       RoomClassToSpawn = BossRoomClass;
       StartBossIntro();
       break;
@@ -91,7 +91,7 @@ void ASanzoStageManager::StartStage()
 
 void ASanzoStageManager::OnRoomCleared()
 {
-  UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 클리어"));
+  //UE_LOG(LogCYS, Warning, TEXT("SM: 스테이지 클리어"));
   SetState(StageClearedTag);
 }
 

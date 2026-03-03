@@ -22,7 +22,6 @@ void ASanzoItem_Health::ActivateItem(AActor* Activator)
     	NotifyItemPickedUp(Activator,HealAmount);
     }
     // TODO: 체력 증가 로직
-    UE_LOG(LogCYS, Warning, TEXT("HP 획득 : %d"), HealAmount);
     DestroyItem();
   }
 }

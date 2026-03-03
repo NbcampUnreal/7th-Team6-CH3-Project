@@ -17,7 +17,6 @@ USanzoGameInstance::USanzoGameInstance()
 void USanzoGameInstance::MoveToNextStage()
 {
   // 스테이지 이동 전 정보 업데이트(save)
-  UE_LOG(LogCYS, Warning, TEXT("정보 업데이트 함수 호출"), CurrentStageIndex);
   BackupStat(Cast<ASanzoCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)));
   // 다음 스테이지로 이동
   CurrentStageIndex++;
@@ -26,8 +25,6 @@ void USanzoGameInstance::MoveToNextStage()
     Restart();
   }
 
-  UE_LOG(LogCYS, Warning, TEXT("GI: 다음 스테이지로 이동, 인덱스: %d"), CurrentStageIndex);
-
   UGameplayStatics::OpenLevel(
     this,
     FName(*StageLevels[CurrentStageIndex].GetAssetName())
@@ -35,7 +32,6 @@ void USanzoGameInstance::MoveToNextStage()
 }
 void USanzoGameInstance::Restart()
 {
-  UE_LOG(LogCYS, Warning, TEXT("GI: 처음으로 돌아감"));
   InitSetup();
   UGameplayStatics::OpenLevel(
     this,
@@ -61,7 +57,6 @@ void USanzoGameInstance::BackupStat(ASanzoCharacter* Player)
 {
   if (USanzoStatComponent* StatComp = Player->FindComponentByClass<USanzoStatComponent>())
   {
-    UE_LOG(LogCYS, Warning, TEXT("GI: 스탯 백업"));
     CachedStatData = StatComp->GetSaveData();
   }
   if (USanzoEquipmentComponent* EquipComp = Player->FindComponentByClass<USanzoEquipmentComponent>())
@@ -91,7 +86,6 @@ void USanzoGameInstance::RestoreStat(ASanzoCharacter* Player)
 {
   if (USanzoStatComponent* StatComp = Player->FindComponentByClass<USanzoStatComponent>())
   {
-    UE_LOG(LogCYS, Warning, TEXT("GI: 스탯 복원, 레벨: %d"), CachedStatData.Level);
     StatComp->LoadFromSaveData(CachedStatData);
   }
   if (USanzoEquipmentComponent* EquipComp = Player->FindComponentByClass<USanzoEquipmentComponent>())
@@ -122,7 +116,6 @@ void USanzoGameInstance::RestoreStat(ASanzoCharacter* Player)
 
 void USanzoGameInstance::InitSetup()
 {
-  UE_LOG(LogCYS, Warning, TEXT("GI: Init Set up"));
   CurrentStageIndex = 0;
   CachedAmmo = 100; // 초기 탄약값 설정
   // 무기 업그레이드 정보 백지화

@@ -1,4 +1,4 @@
-#include "Core/SanzoGameState.h"
+﻿#include "Core/SanzoGameState.h"
 #include "Core/SanzoGameInstance.h"
 #include "Core/SanzoStageTypes.h"
 #include "Character/SanzoPlayerController.h"
@@ -42,7 +42,6 @@ void ASanzoGameState::BeginPlay()
 #pragma region UpdateStage
 void ASanzoGameState::UpdateStageInfo(float Current, float Total)
 {
-	//UE_LOG(LogCYS, Warning, TEXT("GS: 전투 정보 업데이트"));
 	CurrentCount = Current;
 	TotalCount = Total;
 	UpdateStageProgressBar();
@@ -50,7 +49,6 @@ void ASanzoGameState::UpdateStageInfo(float Current, float Total)
 
 void ASanzoGameState::UpdateStageResult(int32 KillCount, float SurvivalTime)
 {
-  UE_LOG(LogCYS, Warning, TEXT("GS: 전투 결과 정보 업데이트 Kill: %d, Time: %.1f"),KillCount, SurvivalTime);
   TotalKillCount = KillCount;
   TotalSurvivalTime = SurvivalTime;
 }

@@ -24,7 +24,6 @@ void ASanzoItem_Ammo::ActivateItem(AActor* Activator)
     }
     
     // TODO: 탄약 증가 로직
-    UE_LOG(LogCYS, Warning, TEXT("탄약 획득 : %d"), AmmoAmount);
     DestroyItem();
   }
 }

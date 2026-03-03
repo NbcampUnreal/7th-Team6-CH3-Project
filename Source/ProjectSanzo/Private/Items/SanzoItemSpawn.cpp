@@ -1,4 +1,4 @@
-#include "Items/SanzoItemSpawn.h"
+﻿#include "Items/SanzoItemSpawn.h"
 #include "Common/SanzoLog.h"
 
 #pragma region Item Spawn
@@ -24,7 +24,7 @@ FItemSpawnRow* ASanzoItemSpawn::GetRandomItem() const
 {
 	if (!ItemDataTable)
 	{
-		UE_LOG(LogCYS, Error, TEXT("IS: Data Table 연결 안됨"));
+		////UE_LOG(LogCYS, Error, TEXT("IS: Data Table 연결 안됨"));
 		return nullptr;
 	}
 	TArray<FItemSpawnRow*> AllRows;
@@ -59,7 +59,7 @@ void ASanzoItemSpawn::SpawnItem(TSubclassOf<AActor> ItemClass, FVector Position)
 {
 	if(!ItemClass)
 	{
-		UE_LOG(LogCYS, Error, TEXT("IS: 유효하지 않은 아이템 클래스"));
+		////UE_LOG(LogCYS, Error, TEXT("IS: 유효하지 않은 아이템 클래스"));
 		return;
 	}
   GetWorld()->SpawnActor<AActor>(

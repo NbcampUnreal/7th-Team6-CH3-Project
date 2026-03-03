@@ -247,9 +247,7 @@ void USanzoStatComponent::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type,
     case EUpgradeType::MaxStamina:
 			MaxStamina += Value;
       break;
-		
     default:
-			GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
       break;
 
     }
@@ -332,8 +330,6 @@ void USanzoStatComponent::ApplyDamage(float DamageAmount)
 {
   CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.f, MaxHealth);
   BroadCastStatUpdate();
-
-  UE_LOG(LogKDJ, Warning, TEXT("StatComponent: Health Reduced. Current Health: %f"), CurrentHealth);
 }
 
 bool USanzoStatComponent::IsDead() const

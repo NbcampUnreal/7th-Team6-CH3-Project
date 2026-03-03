@@ -15,10 +15,8 @@ void ASanzoRoom_Survival::BeginPlay()
 }
 void ASanzoRoom_Survival::BeginRoomSequence()
 {
-  Super::BeginRoomSequence();
-  UE_LOG(LogCYS, Warning, TEXT("방호: 시퀀스 시작"));
+  Super::BeginRoomSequence(); 
   // 클리어 조건 달성 시 end
-  UE_LOG(LogCYS, Warning, TEXT("방호: 클리어 조건 - 제한 시간 %.1f초 동안 살아남기"), TotalTime);
   GetWorldTimerManager().SetTimer(
     RoomSequenceTimerHandle,
     this,
@@ -33,7 +31,6 @@ void ASanzoRoom_Survival::EndRoomSequence()
   // 문 열림 호출
   if (!StageGate)
   {
-    UE_LOG(LogCYS, Error, TEXT("방호: StageGate is null"));
     return;
   }
   StageGate->OpenGate();
@@ -57,7 +54,6 @@ void ASanzoRoom_Survival::UpdateTime()
   }
   if (CurrentTime > TotalTime)
   {
-    UE_LOG(LogCYS, Warning, TEXT("방호: 시간 끝"));
     EndRoomSequence();
   }
 }

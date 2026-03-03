@@ -1,4 +1,4 @@
-#include "Stage/SanzoEnemySpawnVolume.h"
+﻿#include "Stage/SanzoEnemySpawnVolume.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -35,7 +35,7 @@ FEnemySpawnRow* ASanzoEnemySpawnVolume::GetRandomEnemy() const
 {
   if (!EnemyDataTable)
   {
-    UE_LOG(LogCYS, Error, TEXT("[%s] EV: Data Table 연결 안됨"), *GetActorNameOrLabel());
+    ////UE_LOG(LogCYS, Error, TEXT("[%s] EV: Data Table 연결 안됨"), *GetActorNameOrLabel());
     return nullptr;
   }
 

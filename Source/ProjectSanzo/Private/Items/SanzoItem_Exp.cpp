@@ -1,4 +1,4 @@
-#include "Items/SanzoItem_Exp.h"
+﻿#include "Items/SanzoItem_Exp.h"
 #include "Common/SanzoLog.h"
 #include "Character/Components/SanzoStatComponent.h"
 
@@ -20,7 +20,6 @@ void ASanzoItem_Exp::ActivateItem(AActor* Activator)
     	//HUD에 데이터 전달
     	NotifyItemPickedUp(Activator,ExpAmount);
     }
-    UE_LOG(LogCYS, Warning, TEXT("EXP 획득 : %d"), ExpAmount);
     DestroyItem();
   }
 }

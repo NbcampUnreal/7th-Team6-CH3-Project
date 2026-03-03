@@ -1,4 +1,4 @@
-#include "Stage/SanzoRoomBase.h"
+﻿#include "Stage/SanzoRoomBase.h"
 #include "Stage/SanzoEnemySpawnVolume.h"
 #include "Items/SanzoItemSpawn.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,11 +30,11 @@ void ASanzoRoomBase::BeginPlay()
 	if (FoundGates.Num() > 0)
 	{
 		StageGate = Cast<ASanzoStageGate>(FoundGates[0]);
-		UE_LOG(LogCYS, Warning, TEXT("RB: Gate Found"));
+		////UE_LOG(LogCYS, Warning, TEXT("RB: Gate Found"));
 	}
 	else
 	{
-		UE_LOG(LogCYS, Error, TEXT("RB: Gate Not Found"));
+		////UE_LOG(LogCYS, Error, TEXT("RB: Gate Not Found"));
 	}
 
   // 적 스폰 볼륨 찾기
@@ -49,7 +49,7 @@ void ASanzoRoomBase::BeginPlay()
 		if (ASanzoEnemySpawnVolume* Volume = Cast<ASanzoEnemySpawnVolume>(Actor))
 		{
 			SpawnVolumes.Add(Volume);
-      UE_LOG(LogCYS, Warning, TEXT("RB: Spawn Volume Found"));
+      ////UE_LOG(LogCYS, Warning, TEXT("RB: Spawn Volume Found"));
 		}
 	}
 
@@ -65,14 +65,14 @@ void ASanzoRoomBase::BeginPlay()
 	ItemSpawn = Cast<ASanzoItemSpawn>(FoundActor);
 	if (ItemSpawn)
 	{
-    UE_LOG(LogCYS, Warning, TEXT("RB: Item Spawn Found"));
+    ////UE_LOG(LogCYS, Warning, TEXT("RB: Item Spawn Found"));
 	}
 }
 
 void ASanzoRoomBase::BeginRoomSequence()
 {
 	// 문 잠금, 스폰 시작
-	UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 시작"));
+	////UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 시작"));
 
 
 }
@@ -85,7 +85,7 @@ void ASanzoRoomBase::EndRoomSequence()
 	GetWorld()->GetTimerManager().ClearTimer(RoomSequenceTimerHandle);
 
     // 문 열기
-	UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 종료"));
+	////UE_LOG(LogCYS, Warning, TEXT("RB: 시퀀스 종료"));
 	if(GameState)
 	{
 		GameState->UpdateStageResult(CurrentEnemyCount, CurrentTime);

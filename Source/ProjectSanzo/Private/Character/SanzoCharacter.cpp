@@ -207,12 +207,6 @@ void ASanzoCharacter::Tick(float DeltaTime)
   {
     AimTimeline.TickTimeline(DeltaTime);
   }
-  
-  //확인용 지울예정
-  PrintGameplayTags(); //겜태그확인용
-  GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Green,
-    FString::Printf(TEXT("현재속도 : %.1f, 현재 스태미너 : %.1f"), 
-      GetCharacterMovement()->MaxWalkSpeed, StatComp->GetStamina()));
 }
 
 void ASanzoCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -286,7 +280,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
   }
   else
   {
-    UE_LOG(LogSanzo, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+    //UE_LOG(LogSanzo, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
   }
 }
 
@@ -414,11 +408,8 @@ void ASanzoCharacter::FireStart(const FInputActionValue& Value)
   if(EquipmentComp)
   {
     CharacterGameplayTags.AddTag(SanzoTags::Attack);
-
-    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Component extists"));
     if (ASanzoWeaponBase* Weapon = EquipmentComp->CurrentWeapon)
     {
-      GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Current weapon exists"));
       Weapon->StartFire();
 
       if (Weapon == EquipmentComp->Inventory[static_cast<uint8>(EWeaponType::Bow)])
@@ -492,7 +483,6 @@ void ASanzoCharacter::Dodge(const FInputActionValue& Value)
 
   if (CharacterGameplayTags.HasTag(SanzoTags::Parry))
   {
-    GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("뭔가이상함"));
     EndDodge(nullptr, false);
     return;
   }
@@ -614,14 +604,13 @@ void ASanzoCharacter::Parry(const FInputActionValue& Value)
     CharacterGameplayTags.AddTag(SanzoTags::ParryPenaltyActive);
 
     ParryComp->ApplyParrySpamPenalty(); //패널티 체크 및 적용함수
-    
 
-    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Parry!"));
   }
   else
   {
-    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Parry Failed!"));
+    return;
   }
+
 
  
 }
@@ -849,7 +838,6 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
       ParryReflectChance += Value;
       break;
     default:
-      GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
       break;
     }
   }
@@ -1012,7 +1000,7 @@ float ASanzoCharacter::TakeDamage(
       UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount, GetController(), this, UDamageType::StaticClass());
     }
 
-    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Parried! No Damage Taken."));
+    
     return FinalDamage;
   }
 
@@ -1021,7 +1009,7 @@ float ASanzoCharacter::TakeDamage(
   {
     SuccessDodge();
     FinalDamage = 0.f;
-    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("회피성공 ㅎㅎ"));
+    
     return FinalDamage;
   }
 
@@ -1029,15 +1017,8 @@ float ASanzoCharacter::TakeDamage(
   if (StatComp)
   {
     StatComp->ApplyDamage(FinalDamage);
-    if (GEngine)
-    {
-      FString Msg = FString::Printf(TEXT("Player Hit! Damage: %.1f"), FinalDamage);
-      GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Msg);
-      
-    }
     if (StatComp->IsDead())
     {
-      UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
       HandleDeath();
     }
   }

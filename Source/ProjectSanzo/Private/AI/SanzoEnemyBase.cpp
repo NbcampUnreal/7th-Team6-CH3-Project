@@ -172,18 +172,6 @@ float ASanzoEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
   //HP바 갱신
   BroadCastAllData();
-
-  if (GEngine)
-  {
-    FString Message = FString::Printf(TEXT("[Enemy Recieved] Damage: %.1f | HP Left: %.1f"),
-      ActualDamage,
-      CurrentHP);
-
-    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, Message);
-  }
-
-  UE_LOG(LogKDJ, Warning, TEXT("Enemy Took Damage: %f"), ActualDamage);
-
   if (EventInstigator && EventInstigator->GetPawn())
   {
     UAISense_Damage::ReportDamageEvent(
@@ -235,7 +223,6 @@ void ASanzoEnemyBase::Die()
 {
   if (bIsDead) return;
   bIsDead = true;
-  UE_LOG(LogKDJ, Error, TEXT("Enemy Died! Engaging Ragdoll."));
 
 #pragma region Sound
   // 사망 사운드 재생
@@ -258,7 +245,6 @@ void ASanzoEnemyBase::Die()
   // 사망 SanzoRoomBase::OnEnemyKilled() 호출
   if (CurrentRoom)
   {
-    UE_LOG(LogCYS, Warning, TEXT("EB: RoomBase에 사망 알림"));
     FVector Position = GetActorLocation();
     Position.Z -= 50.f; // 높이 조절
     CurrentRoom->OnEnemyKilled(Position);

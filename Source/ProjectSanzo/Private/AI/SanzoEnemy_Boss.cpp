@@ -1,4 +1,4 @@
-#include "AI/SanzoEnemy_Boss.h"
+﻿#include "AI/SanzoEnemy_Boss.h"
 #include "AI/Components/SanzoEnemyStunComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -35,7 +35,6 @@ float ASanzoEnemy_Boss::TakeDamage(float DamageAmount, FDamageEvent const& Damag
   if (StunComponent && StunComponent->GetIsStunned())
   {
     ModifiedDamage *= 1.1f;
-    UE_LOG(LogKDJ, Warning, TEXT("Boss is Stunned! Taking extra damage: %f"), ModifiedDamage);
   }
 
   float ActualDamage = Super::TakeDamage(ModifiedDamage, DamageEvent, EventInstigator, DamageCauser);
@@ -52,8 +51,6 @@ float ASanzoEnemy_Boss::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 void ASanzoEnemy_Boss::EnterPhase2()
 {
   bIsPhase2 = true;
-
-  UE_LOG(LogKDJ, Error, TEXT("Boss Phase 2 Started!"));
 
   AAIController* AICon = Cast<AAIController>(GetController());
   if (AICon && AICon->GetBlackboardComponent())
@@ -75,13 +72,13 @@ void ASanzoEnemy_Boss::EnterPhase2()
 // 패턴 알림
 void ASanzoEnemy_Boss::BroadcastAttackWarning(FName PatternName)
 {
-  if (GEngine)
-  {
-    FString DebugMsg = FString::Printf(TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
-    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, DebugMsg);
-  }
+  //if (GEngine)
+  //{
+  //  FString DebugMsg = FString::Printf(TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
+  //  GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, DebugMsg);
+  //}
 
-  UE_LOG(LogKDJ, Warning, TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
+  //UE_LOG(LogKDJ, Warning, TEXT("⚠️ [BOSS WARNING] Pattern Started: %s"), *PatternName.ToString());
 
   OnBossAttackWarning.Broadcast(PatternName);
 }

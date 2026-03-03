@@ -1,4 +1,4 @@
-#include "Stage/SanzoRoom_Extermination.h"
+﻿#include "Stage/SanzoRoom_Extermination.h"
 #include "Stage/SanzoRoomBase.h"
 #include "Common/SanzoLog.h"
 #include "Core/SanzoGameState.h"
@@ -7,13 +7,13 @@
 void ASanzoRoom_Extermination::BeginRoomSequence()
 {
   Super::BeginRoomSequence();
-  UE_LOG(LogCYS, Warning, TEXT("섬멸: 시퀀스 시작"));
+  ////UE_LOG(LogCYS, Warning, TEXT("섬멸: 시퀀스 시작"));
 
   // 적 스폰
   EnemySpawned();
-  UE_LOG(LogCYS, Warning, TEXT("섬멸: 현재 적 수 - %d"), TotalEnemyCount);
+  ////UE_LOG(LogCYS, Warning, TEXT("섬멸: 현재 적 수 - %d"), TotalEnemyCount);
   // 클리어 조건 달성 시 end
-  UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 - 모든 적 처치"));
+  ////UE_LOG(LogCYS, Warning, TEXT("섬멸: 클리어 조건 - 모든 적 처치"));
   GetWorldTimerManager().SetTimer(
     RoomSequenceTimerHandle,
     this,
@@ -30,7 +30,7 @@ void ASanzoRoom_Extermination::EndRoomSequence()
   // 문 열림 호출
   if (!StageGate)
   {
-    UE_LOG(LogCYS, Error, TEXT("섬멸: StageGate is null"));
+    ////UE_LOG(LogCYS, Error, TEXT("섬멸: StageGate is null"));
     return;
   }
   StageGate->OpenGate();
@@ -45,10 +45,10 @@ void ASanzoRoom_Extermination::OnEnemyKilled(FVector Position)
   {
     GameState->UpdateStageInfo(CurrentEnemyCount, TotalEnemyCount);
   }
-  UE_LOG(LogCYS, Warning, TEXT("섬멸: 적 처치 %d / %d"), CurrentEnemyCount, TotalEnemyCount);
+  ////UE_LOG(LogCYS, Warning, TEXT("섬멸: 적 처치 %d / %d"), CurrentEnemyCount, TotalEnemyCount);
   if (CurrentEnemyCount >= TotalEnemyCount)
   {
-    UE_LOG(LogCYS, Warning, TEXT("섬멸: 모든 적 처치 완료"));
+   // //UE_LOG(LogCYS, Warning, TEXT("섬멸: 모든 적 처치 완료"));
     EndRoomSequence();
   }
 }
