@@ -1,4 +1,4 @@
-#include "Character/SanzoCharacter.h"
+﻿#include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -109,6 +109,7 @@ ASanzoCharacter::ASanzoCharacter()
 
   DodgeCooldownTime = 0.3;
   CurrentFOV = FollowCamera->FieldOfView;
+  ParryReflectChance = 0.5f;
   //틱켜키
   PrimaryActorTick.bCanEverTick = true;
 
@@ -124,6 +125,7 @@ ASanzoCharacter::ASanzoCharacter()
 void ASanzoCharacter::PostInitializeComponents()
 {
   Super::PostInitializeComponents();
+  bIsRestoringData = true;
   //스탯 컴포넌트 델리게이 바인딩
   if (StatComp)
   {
@@ -142,7 +144,7 @@ void ASanzoCharacter::PostInitializeComponents()
 void ASanzoCharacter::BeginPlay()
 {
   Super::BeginPlay();
-
+  bIsRestoringData = false;
   //인풋 시스템 설정
   if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
   {
@@ -178,6 +180,10 @@ void ASanzoCharacter::BeginPlay()
   
   // 스탯 복원 최
   RestoreFromGI();
+
+  //복원 후 채워주기
+  StatComp->RestoreHealth(StatComp->GetMaxHealth());
+  StatComp->RestoreStamina(StatComp->GetMaxStamina());
 
   // BGM 액터 찾기
   TArray<AActor*> FoundActors;
@@ -839,6 +845,9 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
     case EUpgradeType::Beauty:
       ChangeModeling(Value);
       break;
+    case EUpgradeType::ParryReflectChance:
+      ParryReflectChance += Value;
+      break;
     default:
       GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
       break;
@@ -877,8 +886,16 @@ void ASanzoCharacter::ChangeModeling(float Value)
     CameraSocketOffSet = FVector(0, 42, 53);
     CameraBoom->SocketOffset = CameraSocketOffSet;
     //변신효과
-    if(TransformationSound)
+    if(!bIsRestoringData)
     {
+      if (TransformationSound)
+      {
+        UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
+      }
+      if (TransformationEffect)
+      {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+      }
       UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
     }
     //VFX
@@ -904,6 +921,17 @@ void ASanzoCharacter::ChangeModeling(float Value)
       CameraSocketOffSet = FVector(0, 32, 41);
       CameraBoom->SocketOffset = CameraSocketOffSet;
     }
+    if (!bIsRestoringData)
+    {
+      if (TransformationSound)
+      {
+        UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
+      }
+      if (TransformationEffect)
+      {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+      }
+    }
     break;
     
   case 3: //래드돌
@@ -922,6 +950,17 @@ void ASanzoCharacter::ChangeModeling(float Value)
     }
     CameraSocketOffSet = FVector(0, 32, 41);
     CameraBoom->SocketOffset = CameraSocketOffSet;
+    if (!bIsRestoringData)
+    {
+      if (TransformationSound)
+      {
+        UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
+      }
+      if (TransformationEffect)
+      {
+        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+      }
+    }
     break;
     
   }
@@ -960,7 +999,9 @@ float ASanzoCharacter::TakeDamage(
     FinalDamage = 0.f;
     
     //50%확률로 딜 반사 딜 반사 
-    if (FMath::RandBool()) 
+    float Chance = FMath::FRandRange(0.f, 1.f);
+    ParryReflectChance = FMath::Clamp(ParryReflectChance, 0.f, 1.f);
+    if (Chance < ParryReflectChance) 
     {
       UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount, GetController(), this, UDamageType::StaticClass());
     }
@@ -1047,9 +1088,12 @@ void ASanzoCharacter::RestoreFromGI()
 {
   if (USanzoGameInstance* GI = GetGameInstance<USanzoGameInstance>())
   {
+    bIsRestoringData = true;
     GI->RestoreStat(this);
+    bIsRestoringData = false;
   }
 }
+
 #pragma region Death
 
 void ASanzoCharacter::HandleDeath()

@@ -111,7 +111,7 @@ protected:
 	FGameplayTag AttackTag;
 	FGameplayTag ExhaustedTag;
 	void ConsumeStamina(float Amount);
-	void RestoreStamina(float Amount);
+	
 
 	FTimerHandle ExhaustionRecoveryTimerHandle;
   void ExhaustionRecovery(); // 콜백함수
@@ -122,7 +122,7 @@ protected:
 public:
 	void BeginExhaustionCooldown(); //타이머함수
 	FOnTagCheckDelegate TagCheckDelegate;
-
+void RestoreStamina(float Amount);
 
 
 
