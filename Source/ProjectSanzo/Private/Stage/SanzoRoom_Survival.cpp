@@ -1,4 +1,4 @@
-#include "Stage/SanzoRoom_Survival.h"
+﻿#include "Stage/SanzoRoom_Survival.h"
 #include "Common/SanzoLog.h"
 #include "Core/SanzoGameState.h"
 #include "Kismet/GameplayStatics.h"
@@ -52,6 +52,7 @@ void ASanzoRoom_Survival::UpdateTime()
   if(ElapsedTime>=CycleTime)
   {
     ElapsedTime = 0.f;
+    EnemySpawned();
     EnemySpawned();
   }
   if (CurrentTime > TotalTime)

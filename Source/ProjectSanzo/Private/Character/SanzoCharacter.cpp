@@ -835,6 +835,9 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
     case EUpgradeType::Beauty:
       ChangeModeling(Value);
       break;
+    case EUpgradeType::ParryReflectChance:
+      ParryReflectChance += Value;
+      break;
     default:
       GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
       break;
