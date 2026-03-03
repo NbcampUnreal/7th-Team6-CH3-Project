@@ -20,6 +20,9 @@ public:
 	FOnUpgradeButtonClicked OnUpgradeButtonClicked;
 	
 protected:
+	
+	void SetUpgradeButtonText(FText InDisplayName, EStatModifierType InModifierType, float InValue);
+	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* UpgradeBackground;
 	

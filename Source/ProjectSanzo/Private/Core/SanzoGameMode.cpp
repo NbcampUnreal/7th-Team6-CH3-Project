@@ -123,7 +123,7 @@ void ASanzoGameMode::DecideEnding()
 		if (UpgradeSubsystem)
 		{
 			const TMap<FName, int32> SelectedTotalMap = UpgradeSubsystem->GetSelectedTotalMap();
-			const int32* BeautyValuePtr = SelectedTotalMap.Find(FName("Chr_Beauty_L"));
+			const int32* BeautyValuePtr = SelectedTotalMap.Find(FName("Chr_BTY_Li"));
 			if (BeautyValuePtr && *BeautyValuePtr >= 3)
 			{
 				UE_LOG(LogLJR, Warning, TEXT("외모 3단계 업그레이드 확인 진엔딩 태그 적용"))

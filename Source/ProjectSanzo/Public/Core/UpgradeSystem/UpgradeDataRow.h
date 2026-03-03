@@ -39,24 +39,23 @@ enum class EUpgradeType : uint8
 	Damage,
 	FireRate, // 총 공격 속도
 	MaxChargeTime, // 활 공격 속도
-	Exp,
   Speed, // 이동 속도
   ParryReflectChance, // 패리 반사 확률
-	Defense, // 받는 피해 감소율
 	HomingMissile, // (총 업그레이드) 하면 적을 따라가는 투사체 생성
-	BowMultiShot, // 화살 분열
-	DodgeChance // 회피 확률 (이 존재하는가...를 모릅니다) -윤서 ㄴㄴ 없음- 형백
+	MultiShot, // 화살 분열
 };
 
-//UI용 모티파이어 Enum
+//UI용 모디파이어 Enum
 UENUM(BlueprintType)
 enum class EStatModifierType : uint8
 {
 	None,
 	FlatPlus,
 	FlatMinus,
-	PercentMultiplyPlus,
-	PercentMultiplyMinus,
+	PercentPlus,
+	PercentMinus,
+	PercentMultiply,
+	PercentDivide,
 };
 
 USTRUCT(BlueprintType)
@@ -92,6 +91,9 @@ public:
 	//업그레이드 이미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UTexture2D> IconTexture;
+	//업그레이드 UI 출력용 모디파이어 정보
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EStatModifierType ModifierType;
 };
 
 //선택된 업그레이드 옵션 Struct
@@ -122,7 +124,9 @@ public:
 	//업그레이드 이미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UTexture2D> IconTexture;
-	
+	//업그레이드 UI 출력용 모디파이어 정보
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EStatModifierType ModifierType;	
 };
 
 //두개의 변수 확인용 키 값 스트럭쳐

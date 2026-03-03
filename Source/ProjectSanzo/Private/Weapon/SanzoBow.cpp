@@ -293,7 +293,7 @@ void ASanzoBow::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		MaxChargeTime = FMath::Max(0.2, MaxChargeTime - Value);
 		break;
 
-	case EUpgradeType::BowMultiShot:
+	case EUpgradeType::MultiShot:
 		if (Value > 0.0f)
 		{
 			bIsMultiShotEnabled = true;

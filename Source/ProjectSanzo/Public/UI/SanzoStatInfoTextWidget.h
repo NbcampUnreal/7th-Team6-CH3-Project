@@ -17,6 +17,9 @@ public:
 	void SetStatInfoText(FText InName, EStatModifierType InModifierType, float InCurrentValue,float InBaseValue, float InBonusValue);
 	
 	UFUNCTION(BlueprintCallable)
+	void SetCurrentValueText(EStatModifierType InModifierType, float InCurrentValue);
+	
+	UFUNCTION(BlueprintCallable)
 	void SetBonusValueText(EStatModifierType InModifierType, float InBonusValue);
 	
 protected:
