@@ -142,4 +142,14 @@ protected:
 	
 	
 #pragma endregion 이준로
+  
+#pragma region MainMenuUI
+  
+protected:
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sound")
+  USoundBase* MainMenuSound;
+  
+  UFUNCTION()
+  void PlayMainMenuSound();
+#pragma endregion 이준로
 };

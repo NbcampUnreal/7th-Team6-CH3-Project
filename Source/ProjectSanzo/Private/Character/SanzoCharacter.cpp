@@ -976,7 +976,7 @@ float ASanzoCharacter::TakeDamage(
     if (StatComp->IsDead())
     {
       UE_LOG(LogKDJ, Error, TEXT("Player Died!"));
-      //HandleDeath();
+      HandleDeath();
     }
   }
   ApplyHitEffect();
