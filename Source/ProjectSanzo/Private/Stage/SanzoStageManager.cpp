@@ -1,4 +1,4 @@
-#include "Stage/SanzoStageManager.h"
+﻿#include "Stage/SanzoStageManager.h"
 
 #include "Character/SanzoPlayerController.h"
 #include "Core/SanzoGameMode.h"
@@ -147,9 +147,12 @@ void ASanzoStageManager::StartBossIntro()
 {
   if (!PlayerController) return;
 
-  // 입력 잠금
-  PlayerController->SetIgnoreMoveInput(true);
-  PlayerController->SetIgnoreLookInput(true);
+  // 플레이어 입력 아무것도 못받게 잠금
+  APawn* PlayerPawn = PlayerController->GetPawn();
+  if (PlayerPawn)
+  {
+    PlayerPawn->DisableInput(PlayerController);
+  }
 
   // 보스 카메라 전환
   PlayerController->SetViewTargetWithBlend(BossCamera, 1.0f);
@@ -190,8 +193,10 @@ void ASanzoStageManager::EndIntro()
   // 원래 카메라 복귀
   PlayerController->SetViewTargetWithBlend(PlayerPawn, 0.5f);
 
-  // 입력 해제
-  PlayerController->SetIgnoreMoveInput(false);
-  PlayerController->SetIgnoreLookInput(false);
+  // 입력 잠금 해제
+  if (PlayerPawn)
+  {
+    PlayerPawn->EnableInput(PlayerController);
+  }
 }
 #pragma endregion 최윤서
