@@ -1202,22 +1202,13 @@ TArray<FStatusDisplayData> ASanzoCharacter::GetStatusDisplayData() const
 		EStatModifierType::FlatPlus
 	)
 );
-	
-	DisplayData.Add(FStatusDisplayData(
-		EUpgradeTarget::Character,
-		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::Speed),
-		FText::FromString(TEXT("이동 속도")),
-		FCharacterBaseValues::MoveSpeed,
-		NormalSpeed,
-		EStatModifierType::FlatPlus
-	)
-);
+
 	DisplayData.Add(FStatusDisplayData(
 		EUpgradeTarget::Character,
 		FUpgradeStatKey(EUpgradeTarget::Character,EUpgradeType::ParryReflectChance),
 		FText::FromString(TEXT("패링 반사 확률")),
 		FCharacterBaseValues::ParryReflectChance,
-		0,
+		ParryReflectChance,
 		EStatModifierType::PercentPlus
 	)
 );
