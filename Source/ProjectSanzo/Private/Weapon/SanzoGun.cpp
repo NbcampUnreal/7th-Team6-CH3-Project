@@ -10,7 +10,7 @@
 
 ASanzoGun::ASanzoGun()
 {
-	BaseDamage = 5.0f;       // 기본 데미지
+	BaseDamage = 8.0f;       // 기본 데미지
 	FireRate = 0.15f;          // 0.15초마다 발사 (빠른 연사)         
 	CurrentAmmo = 100;         // 시작 탄약
 	bInfiniteAmmo = false;
@@ -241,7 +241,6 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		break;
 
 	default:
-		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));
 		break;
 
 		
@@ -315,7 +314,6 @@ void ASanzoGun::AddAmmo(int32 Amount)
 {
 	CurrentAmmo += Amount;
 	OnAmmoChanged.Broadcast();
-	UE_LOG(LogTemp, Log, TEXT("Current Ammo: %d"), CurrentAmmo);
 }
 
 void ASanzoGun::SetCurrentAmmo(int32 Amount)
