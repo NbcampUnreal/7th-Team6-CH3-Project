@@ -85,6 +85,14 @@ protected:
 public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> AttackSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* Phase2Sound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* ShockSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* HeavySmashSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* DashSound;
   UPROPERTY(EditDefaultsOnly, Category = "Effects|VFX")
   UNiagaraSystem* SmashShockwaveEffect;
 #pragma endregion 최윤서
@@ -108,4 +116,6 @@ public:
   virtual void OnParriedCallback() override;
 
   virtual int32 GetStunGaugeOnParried() const override;
+
+  virtual void EnableWeaponCollision() override;
 };
