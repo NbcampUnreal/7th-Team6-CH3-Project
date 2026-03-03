@@ -1,7 +1,9 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "AI/SanzoEnemy_MeleeBase.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h" 
 #include "SanzoEnemy_Boss.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBossAttackWarning, FName, PatternName);
@@ -79,10 +81,20 @@ protected:
   UPROPERTY(EditDefaultsOnly, Category = "Boss|Combat")
   TSubclassOf<class ASanzoEnemy_Boss_SwordAura> SwordAuraClass;
 
-#pragma region Sound
+#pragma region Effects
 public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
   TArray<USoundBase*> AttackSounds;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* Phase2Sound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* ShockSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* HeavySmashSound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects|Sound")
+  USoundBase* DashSound;
+  UPROPERTY(EditDefaultsOnly, Category = "Effects|VFX")
+  UNiagaraSystem* SmashShockwaveEffect;
 #pragma endregion 최윤서
 
   // 궁극기 패턴 플래그
@@ -104,4 +116,6 @@ public:
   virtual void OnParriedCallback() override;
 
   virtual int32 GetStunGaugeOnParried() const override;
+
+  virtual void EnableWeaponCollision() override;
 };

@@ -89,9 +89,11 @@ public:
 	
 	float GetGunDamage();
 	float GetGunFireRate();
+	float GetGunHomingMissileChance();
 	
 	float GetBowDamage();
 	float GetBowChargeTime();
+	float GetBowMultiShot();
 	
 protected:
   UFUNCTION()

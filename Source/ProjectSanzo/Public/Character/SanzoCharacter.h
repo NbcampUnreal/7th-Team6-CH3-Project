@@ -25,6 +25,8 @@ class USanzoParryComponent;
 class USanzoEquipmentComponent;
 class USanzoNavigationArrowComponent;
 class AAmbientSound;
+class UNiagaraSystem;
+class UNiagaraComponent;
 DECLARE_LOG_CATEGORY_EXTERN(LogSanzo, Log, All);
 
 UCLASS(abstract)
@@ -161,14 +163,19 @@ public:
   USkeletalMesh* RadDoll;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   TSubclassOf<UAnimInstance> RadDollABP;
-  
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
-  UParticleSystem* TransformationEffect;
+
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
   USoundBase* TransformationSound;
-  
 
-  
+  // 에디터에서 할당할 나이아가라 에셋
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Transform")
+  UNiagaraSystem* TransformationEffect;
+
+  // 실제 캐릭터에 붙어서 실행될 컴포넌트
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Transform")
+  UNiagaraComponent* TransformationNiagaraComponent;
+
+
   uint8 FaceLevel = 0;
 
   UFUNCTION()

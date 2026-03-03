@@ -14,6 +14,8 @@
 #include "Common/SanzoLog.h"
 #include "AI/Components/SanzoEnemyStunComponent.h" 
 #include "GameplayTagAssetInterface.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
 {
@@ -27,6 +29,11 @@ void ASanzoEnemy_Ranged::BeginPlay()
 {
   Super::BeginPlay();
   CachedPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
+  if (UCharacterMovementComponent* Movement = GetCharacterMovement())
+  {
+    DefaultWalkSpeed = Movement->MaxWalkSpeed;
+  }
 }
 
 void ASanzoEnemy_Ranged::Attack()
@@ -61,8 +68,8 @@ void ASanzoEnemy_Ranged::FireHitScan()
   {
     // 사운드 큐로 변경 - 최윤서
     UGameplayStatics::PlaySoundAtLocation(
-      this, 
-      FireSound, 
+      this,
+      FireSound,
       TraceStart,
       1.f,
       1.f,
@@ -154,7 +161,7 @@ void ASanzoEnemy_Ranged::FireHitScan()
           }
         }
       }
-      
+
 #pragma endregion 김형백
 
       // 피격 위치에 이펙트 생성
@@ -187,140 +194,144 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
 
-  if (bIsAiming && !IsDead() && StaticWeaponMesh && CachedPlayer)
+  // 죽었거나, 무기가 없거나, 타겟이 없으면 즉시 종료
+  if (IsDead() || !StaticWeaponMesh || !CachedPlayer) return;
+
+  VisibilityCheckTimer += DeltaTime;
+  bool bNeedsVisibilityCheck = (VisibilityCheckTimer >= 0.1f);
+
+  if (bIsAiming || bNeedsVisibilityCheck)
   {
-    if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-    {
-      // 현재 AttackMontage가 재생 중이 아니라면
-      if (!AnimInstance->Montage_IsPlaying(AttackMontage))
-      {
-        // 즉시 조준 상태를 초기화
-        CancelAimingAnim();
-        return;
-      }
-    }
-
-    CurrentAimTime += DeltaTime;
-
     static const FName MuzzleSocketName = TEXT("MuzzleFlash");
     static const FName SpineSocketName = TEXT("spine_04");
-    static const FName HeadSocketName = TEXT("head");
 
-    FVector TraceStart = GetActorLocation();
-    if (StaticWeaponMesh->DoesSocketExist(MuzzleSocketName))
+    // 총구 및 플레이어 위치 계산
+    FVector TraceStart = StaticWeaponMesh->DoesSocketExist(MuzzleSocketName) ?
+      StaticWeaponMesh->GetSocketLocation(MuzzleSocketName) : GetActorLocation();
+
+    FVector PlayerCenter = CachedPlayer->GetMesh()->DoesSocketExist(SpineSocketName) ?
+      CachedPlayer->GetMesh()->GetSocketLocation(SpineSocketName) : CachedPlayer->GetActorLocation();
+
+    // 시야 차단 검사
+    if (bNeedsVisibilityCheck)
     {
-      TraceStart = StaticWeaponMesh->GetSocketLocation(MuzzleSocketName);
-    }
+      VisibilityCheckTimer = 0.0f;
+      FVector EyeLocation = GetMesh()->GetSocketLocation(TEXT("head"));
 
-    // 플레이어 위치 계산
-    FVector PlayerCenter = CachedPlayer->GetMesh()->GetSocketLocation(SpineSocketName);
-    FVector EyeLocation = GetMesh()->GetSocketLocation(HeadSocketName);
-
-    VisibilityCheckTimer += DeltaTime;
-    if (VisibilityCheckTimer >= 0.1f)
-    {
-      VisibilityCheckTimer = 0.0f; // 타이머 초기화
-
-      auto IsBlockedByEnvironment = [&](const FHitResult& Hit) -> bool
-        {
-          AActor* HitActor = Hit.GetActor();
-          return HitActor && !HitActor->ActorHasTag("Player") && !HitActor->IsA<ASanzoEnemyBase>();
+      auto IsBlockedByEnvironment = [&](const FHitResult& Hit) -> bool {
+        AActor* HitActor = Hit.GetActor();
+        return HitActor && !HitActor->ActorHasTag("Player") && !HitActor->IsA<ASanzoEnemyBase>();
         };
 
       FCollisionQueryParams Params;
       Params.AddIgnoredActor(this);
-      FHitResult SightHit;
+      bool bIsBlocked = false;
+      FHitResult LineTraceHit;
 
-      // 눈 기준 장애물 검사
-      bool bHitEye = GetWorld()->LineTraceSingleByChannel(SightHit, EyeLocation, PlayerCenter, ECC_Visibility, Params);
-      if (bHitEye && IsBlockedByEnvironment(SightHit))
+      // 눈 기준 검사
+      if (GetWorld()->LineTraceSingleByChannel(LineTraceHit, EyeLocation, PlayerCenter, ECC_Visibility, Params) && IsBlockedByEnvironment(LineTraceHit))
+      {
+        bIsBlocked = true;
+      }
+      // 총구 기준 검사
+      else if (FVector::Distance(GetActorLocation(), CachedPlayer->GetActorLocation()) > 150.0f)
+      {
+        if (GetWorld()->LineTraceSingleByChannel(LineTraceHit, TraceStart, PlayerCenter, ECC_Visibility, Params) && IsBlockedByEnvironment(LineTraceHit))
+        {
+          bIsBlocked = true;
+        }
+      }
+
+      if (AAIController* AICon = Cast<AAIController>(GetController()))
+      {
+        if (UBlackboardComponent* BBComp = AICon->GetBlackboardComponent())
+        {
+          BBComp->SetValueAsBool(TEXT("bIsAimBlocked"), bIsBlocked);
+        }
+      }
+
+      // 조준 중인데 시야가 막혔다면 즉시 취소
+      if (bIsAiming && bIsBlocked)
+      {
+        CancelAimingAnim();
+      }
+    }
+
+    if (bIsAiming)
+    {
+      UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+      // 사거리 이탈 및 몽타주 종료 검사
+      if (FVector::Distance(GetActorLocation(), CachedPlayer->GetActorLocation()) > AttackRange ||
+        (AnimInstance && !AnimInstance->Montage_IsPlaying(AttackMontage)))
       {
         CancelAimingAnim();
         return;
       }
 
-      // 총구 기준 장애물 검사
-      if (FVector::Distance(GetActorLocation(), CachedPlayer->GetActorLocation()) > 150.0f)
-      {
-        FHitResult MuzzleHit;
-        bool bHitMuzzle = GetWorld()->LineTraceSingleByChannel(MuzzleHit, TraceStart, PlayerCenter, ECC_Visibility, Params);
+      CurrentAimTime += DeltaTime;
 
-        if (bHitMuzzle && IsBlockedByEnvironment(MuzzleHit))
+      if (!bIsAimLocked)
+      {
+        FVector DirXY = PlayerCenter - TraceStart;
+        DirXY.Z = 0.f;
+
+        float DistSq = DirXY.SizeSquared();
+        float RotationAlpha = FMath::Clamp((DistSq - 900.f) / (22500.f - 900.f), 0.0f, 1.0f);
+        float FinalRotationSpeed = 15.0f * RotationAlpha;
+
+        if (FinalRotationSpeed > 0.001f && !DirXY.IsNearlyZero())
         {
-          CancelAimingAnim();
-          return;
+          FQuat TargetQuat = DirXY.GetSafeNormal().ToOrientationQuat();
+          FQuat CurrentQuat = GetActorQuat();
+          FQuat NewQuat = FMath::QInterpTo(CurrentQuat, TargetQuat, DeltaTime, FinalRotationSpeed);
+          SetActorRotation(NewQuat);
+        }
+
+        // 상하(Pitch) 계산 및 레이저 갱신
+        FVector DirectionToSpine = (FVector::Distance(PlayerCenter, TraceStart) < 100.f) ? GetActorForwardVector() : (PlayerCenter - TraceStart).GetSafeNormal();
+        float TargetPitch = FMath::Clamp(FRotator::NormalizeAxis(DirectionToSpine.Rotation().Pitch), -60.0f, 60.0f);
+        AimPitch = FMath::FInterpTo(AimPitch, TargetPitch, DeltaTime, 15.0f);
+
+        LockedAimRotation = DirectionToSpine.Rotation();
+        LockedTraceEnd = TraceStart + (DirectionToSpine * AttackRange);
+      }
+
+      if (CurrentAimTime >= BlinkStartTime) bIsAimLocked = true;
+
+      // 디버그 라인
+#if !UE_BUILD_SHIPPING
+      if (bShowDebugTrace)
+      {
+        bool bDrawLaser = true;
+        float LineThickness = 2.0f;
+        FColor LaserColor = FColor::Yellow;
+
+        if (CurrentAimTime >= BlinkStartTime)
+        {
+          if (FMath::Fmod(CurrentAimTime, 0.2f) < 0.1f) { bDrawLaser = false; }
+          LineThickness = 8.0f;
+          LaserColor = FColor::Red;
+        }
+        else
+        {
+          float Alpha = CurrentAimTime / BlinkStartTime;
+          LineThickness = FMath::Lerp(1.0f, 6.0f, Alpha);
+          uint8 GreenValue = FMath::Lerp(255.0f, 0.0f, Alpha);
+          LaserColor = FColor(255, GreenValue, 0);
+        }
+
+        if (bDrawLaser)
+        {
+          DrawDebugLine(GetWorld(), TraceStart, LockedTraceEnd, LaserColor, false, 0.0f, 0, LineThickness);
         }
       }
-    }
-
-    if (!bIsAimLocked)
-    {
-      // Z축(높이)을 무시한 평면(XY) 방향 계산
-      FVector StartLoc = GetActorLocation();
-      FVector TargetLoc = CachedPlayer->GetActorLocation();
-      FVector DirXY = TargetLoc - StartLoc;
-      DirXY.Z = 0.f;
-
-      // 플레이어가 너무 가까이 있지 않을 때만 몸통 회전
-      if (DirXY.SizeSquared() > 2500.f)
-      {
-        FRotator TargetYawRot = DirXY.GetSafeNormal().Rotation();
-        FRotator NewRot = GetActorRotation();
-        NewRot.Yaw = FMath::RInterpTo(GetActorRotation(), TargetYawRot, DeltaTime, 8.0f).Yaw;
-        SetActorRotation(NewRot);
-      }
-
-      // 에임 상하(Pitch) 안정화
-      FVector DirectionToSpine = (PlayerCenter - EyeLocation).GetSafeNormal();
-      float TargetPitch = FRotator::NormalizeAxis(DirectionToSpine.Rotation().Pitch);
-
-      // 코앞에 있을 때 허리가 뒤로 꺾이는 기괴한 현상을 방지
-      TargetPitch = FMath::Clamp(TargetPitch, -60.0f, 60.0f);
-      AimPitch = FMath::FInterpTo(AimPitch, TargetPitch, DeltaTime, 15.0f);
-
-      // 나중에 쏠 방향과 레이저 끝점 갱신 (추적 중)
-      LockedAimRotation = DirectionToSpine.Rotation();
-
-      // 레이저 선은 총구(TraceStart)에서 출발해야 하므로 시작점을 맞춰줌.
-      LockedTraceEnd = TraceStart + (DirectionToSpine * AttackRange);
-    }
-
-    // 점멸 타이밍(BlinkStartTime)이 되면 조준을 락(Lock)
-    if (CurrentAimTime >= BlinkStartTime)
-    {
-      bIsAimLocked = true;
-    }
-
-    // 조준선 그리기 설정
-#if !UE_BUILD_SHIPPING
-    if (bShowDebugTrace)
-    {
-      bool bDrawLaser = true;
-      float LineThickness = 2.0f;
-      FColor LaserColor = FColor::Yellow;
-
-      if (CurrentAimTime >= BlinkStartTime)
-      {
-        if (FMath::Fmod(CurrentAimTime, 0.2f) < 0.1f) { bDrawLaser = false; }
-        LineThickness = 8.0f;
-        LaserColor = FColor::Red;
-      }
-      else
-      {
-        float Alpha = CurrentAimTime / BlinkStartTime;
-        LineThickness = FMath::Lerp(1.0f, 6.0f, Alpha);
-        uint8 GreenValue = FMath::Lerp(255.0f, 0.0f, Alpha);
-        LaserColor = FColor(255, GreenValue, 0);
-      }
-
-      if (bDrawLaser)
-      {
-        DrawDebugLine(GetWorld(), TraceStart, LockedTraceEnd, LaserColor, false, 0.0f, 0, LineThickness);
-      }
-    }
 #endif
+    }
   }
-  else
+
+  // 조준 중이 아닐 때 에임 원복
+  if (!bIsAiming)
   {
     AimPitch = FMath::FInterpTo(AimPitch, 0.f, DeltaTime, 10.0f);
   }
@@ -328,6 +339,8 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
 
 void ASanzoEnemy_Ranged::StartAiming()
 {
+  if (bIsAiming) return;
+
   bIsAiming = true;
   CurrentAimTime = 0.f;
   bIsAimLocked = false;
@@ -335,7 +348,6 @@ void ASanzoEnemy_Ranged::StartAiming()
   if (UCharacterMovementComponent* Movement = GetCharacterMovement())
   {
     Movement->MaxWalkSpeed = 0.f;
-    Movement->bUseRVOAvoidance = false;
   }
 
   if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
@@ -372,7 +384,7 @@ void ASanzoEnemy_Ranged::StopAiming()
 
   if (UCharacterMovementComponent* Movement = GetCharacterMovement())
   {
-    Movement->MaxWalkSpeed = 350.f;
+    Movement->MaxWalkSpeed = DefaultWalkSpeed;
     Movement->bUseRVOAvoidance = true;
   }
 }

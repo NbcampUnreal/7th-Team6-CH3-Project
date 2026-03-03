@@ -5,7 +5,7 @@
 #pragma region ItemExp
 ASanzoItem_Exp::ASanzoItem_Exp()
 {
-  ExpAmount = FMath::RandRange(10, 50);
+  ExpAmount = FMath::RandRange(10, 30);
   ItemType = "Exp";
 }
 

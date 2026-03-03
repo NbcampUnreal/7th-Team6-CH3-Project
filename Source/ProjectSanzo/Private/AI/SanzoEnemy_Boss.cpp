@@ -1,4 +1,4 @@
-﻿#include "AI/SanzoEnemy_Boss.h"
+#include "AI/SanzoEnemy_Boss.h"
 #include "AI/Components/SanzoEnemyStunComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -66,6 +66,10 @@ void ASanzoEnemy_Boss::EnterPhase2()
   {
     PlayAnimMontage(Phase2RoarMontage);
   }
+  if (Phase2Sound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(this, Phase2Sound, GetActorLocation());
+  }
 }
 
 // 패턴 알림
@@ -105,6 +109,10 @@ void ASanzoEnemy_Boss::ExecuteDash()
 
     MoveComp->Velocity = FinalVelocity;
   }
+  if(DashSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(this, DashSound, GetActorLocation(),1.f,1.f,0.f,EnemyAttenuation);
+  }
 }
 
 void ASanzoEnemy_Boss::BeginHeavySmash()
@@ -113,6 +121,10 @@ void ASanzoEnemy_Boss::BeginHeavySmash()
 
   // 내려찍기 시 기본 데미지의 2배
   MeleeDamage = OriginalDamage * 2.f;
+  if (HeavySmashSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(this, HeavySmashSound, GetActorLocation());
+  }
 }
 
 void ASanzoEnemy_Boss::EndHeavySmash()
@@ -150,12 +162,43 @@ void ASanzoEnemy_Boss::ExecuteSmashShockwave()
     GetController(),
     true
   );
+  // 충격파 이펙트 생성
+  FHitResult Hit;
+  FVector Start = ImpactLocation;
+  FVector End = ImpactLocation - FVector(0, 0, 500.f);
 
-  // [디버그용] 빨간색 원(공격 범위) 그리기
-  if (GetWorld())
+  FCollisionQueryParams Params;
+  Params.AddIgnoredActor(this);
+
+  if (GetWorld()->LineTraceSingleByChannel(
+    Hit,
+    Start,
+    End,
+    ECC_Visibility,
+    Params))
   {
-    DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
+    ImpactLocation = Hit.Location;
   }
+
+  if (SmashShockwaveEffect)
+  {
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+      GetWorld(),
+      SmashShockwaveEffect,
+      ImpactLocation,
+      FRotator::ZeroRotator,
+      FVector(0.6f)
+    );
+  }
+  if (ShockSound)
+  {
+    UGameplayStatics::PlaySoundAtLocation(this, ShockSound, ImpactLocation);
+  }
+  // [디버그용] 빨간색 원(공격 범위) 그리기
+  //if (GetWorld())
+  //{
+  //  DrawDebugSphere(GetWorld(), ImpactLocation, ShockwaveRadius, 32, FColor::Red, false, 2.0f, 0, 2.0f);
+  //}
 }
 
 void ASanzoEnemy_Boss::FireSwordAura()
@@ -229,5 +272,16 @@ int32 ASanzoEnemy_Boss::GetStunGaugeOnParried() const
     return 2;
   }
   return 1;
+}
+
+void ASanzoEnemy_Boss::EnableWeaponCollision()
+{
+  Super::EnableWeaponCollision();
+  // 효과음
+  if(AttackSounds.Num() > 0)
+  {
+    int32 RandomIndex = FMath::RandRange(0, AttackSounds.Num() - 1);
+    UGameplayStatics::PlaySoundAtLocation(this, AttackSounds[RandomIndex], GetActorLocation(),1.f,1.f,0.f,EnemyAttenuation);
+  }
 }
 

@@ -100,6 +100,7 @@ void USanzoMediaPlayerWidget::PlayMediaScene(FGameplayTag State)
 
 void USanzoMediaPlayerWidget::OnMediaEndReached()
 {
+  GetWorld()->GetTimerManager().ClearTimer(SubtitlesTimerHandle);
 	FinishedMediaScene();
 }
 

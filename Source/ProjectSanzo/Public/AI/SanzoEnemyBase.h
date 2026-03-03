@@ -22,6 +22,9 @@ struct FEnemyOverHeadData
   float HealthPercent = 1.0f;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
+  int32 MaxStunCount = 0;
+  
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
   int32 CurrentStunCount = 0;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OverheadData")
@@ -216,4 +219,7 @@ protected:
   // 분노 상태 플래그
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
   bool bIsEnraged = false;
+
+  public:
+    TObjectPtr<class UAnimMontage> GetAttackMontage() const { return AttackMontage; }
 };

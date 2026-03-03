@@ -28,6 +28,7 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Stage")
 	void MoveToNextStage();
   void Restart();
+	void StartNewGame();
 
 	// 스탯 정보
 	UPROPERTY()

@@ -73,6 +73,7 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 
     if (Stimulus.WasSuccessfullySensed())
     {
+      GetWorldTimerManager().ClearTimer(LoseSightTimer);
       // [시각] 직접 플레이어를 봤을 때
       if (Stimulus.Type == SightConfig->GetSenseID())
       {
@@ -92,14 +93,13 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
       // [청각] 총소리(플레이어의 공격)를 들었을 때
       else if (Stimulus.Type == HearingConfig->GetSenseID())
       {
+        BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
         if (bIsNewDetection)
         {
           if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
           {
             Enemy->ShowAlertWidget(false);
           }
-          BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Stimulus.StimulusLocation);
-          SetFocalPoint(Stimulus.StimulusLocation);
           UE_LOG(LogKDJ, Warning, TEXT("Player Detected by Hearing!"));
         }
       }
@@ -115,8 +115,8 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
           }
         }
         BBComp->SetValueAsObject(TEXT("TargetActor"), Actor);
-        SetFocalPoint(Stimulus.StimulusLocation);
         BBComp->ClearValue(TEXT("InvestigateLocation"));
+        SetFocus(Actor);
         UE_LOG(LogKDJ, Warning, TEXT("Player Detected by DAMAGE!"));
       }
     }
@@ -125,21 +125,28 @@ void ASanzoAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
       // 플레이어가 시야 범위 밖으로 나가거나 벽에 숨어 감지가 끊기면
       if (Stimulus.Type == SightConfig->GetSenseID())
       {
-        // 타겟을 지워서 공격 상태 해제
-        BBComp->ClearValue(TEXT("TargetActor"));
-
         // 플레이어의 마지막 위치를 기억
         BBComp->SetValueAsVector(TEXT("InvestigateLocation"), Actor->GetActorLocation());
-        ClearFocus(EAIFocusPriority::Gameplay);
-
-      	if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
-      	{
-      		Enemy->ShowAlertWidget(false);
-      	}
-      	
-        UE_LOG(LogKDJ, Log, TEXT("Player Lost! Going to Last Known Location."));
+        // 시야에서 완전히 사라진 후 3초 뒤에 타겟 잃음 처리
+        GetWorldTimerManager().SetTimer(LoseSightTimer, this, &ASanzoAIController::LoseTarget, 3.0f, false);
       }
     }
+  }
+}
+
+// 타겟을 완전히 잃게하는 함수
+void ASanzoAIController::LoseTarget()
+{
+  if (UBlackboardComponent* BBComp = GetBlackboardComponent())
+  {
+    BBComp->ClearValue(TEXT("TargetActor"));
+    ClearFocus(EAIFocusPriority::Gameplay);
+
+    if (ASanzoEnemyBase* Enemy = Cast<ASanzoEnemyBase>(GetPawn()))
+    {
+      Enemy->ShowAlertWidget(false);
+    }
+    UE_LOG(LogKDJ, Log, TEXT("Player Lost! Going to Last Known Location."));
   }
 }
 #pragma endregion 김동주

@@ -46,7 +46,7 @@ private:
 	//빈 값 생성용 함수
 	FUpgradeOption GetNoneOption();
 	
-	//선택된 업그레이드 Limit 값 계산
+	//선택된 업그레이드 Limit 값 계산 및 전체 업그레이드 수치 저장
 	UPROPERTY()
 	TMap<FUpgradeStatKey, float> UpgradeTotalMap;
 	

@@ -29,6 +29,13 @@ ASanzoWeaponBase::ASanzoWeaponBase()
   AttachSocketName = TEXT("HandGrip_R");
 }
 
+void ASanzoWeaponBase::BeginPlay()
+{
+  Super::BeginPlay();
+
+  OriginalBaseDamage = BaseDamage;
+}
+
 void ASanzoWeaponBase::StartFire()
 {
 
@@ -130,7 +137,7 @@ void ASanzoWeaponBase::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
   switch (Type)
   {
   case EUpgradeType::Damage:
-    BaseDamage = BaseDamage * (1 + Value);
+    BaseDamage += (OriginalBaseDamage * Value);
     break;
   default:
     GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("샤갈! 이상한값이 발생했어요!"));

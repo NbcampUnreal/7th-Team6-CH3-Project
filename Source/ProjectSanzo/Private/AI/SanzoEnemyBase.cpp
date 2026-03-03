@@ -335,6 +335,8 @@ FEnemyOverHeadData ASanzoEnemyBase::MakeUpdateOverHeadData() const
   {
     NewData.HealthPercent = CurrentHP / MaxHP;
   }
+  NewData.MaxStunCount = StunComponent ? StunComponent->GetMaxStunCount() : 0;
+  
   NewData.CurrentStunCount = StunComponent ? StunComponent->GetCurrentStunCount() : 0;
 	
 	NewData.bIsStunned = StunComponent? StunComponent->GetIsStunned() : 0;

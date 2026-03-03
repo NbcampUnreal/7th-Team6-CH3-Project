@@ -15,12 +15,12 @@ void USanzoStatInfoTextWidget::SetStatInfoText(FText InName, EStatModifierType I
 	
 	if (CurrentValue)
 	{
-		CurrentValue->SetText(FText::AsNumber(InCurrentValue));
+		SetCurrentValueText(InModifierType, InCurrentValue);
 	}
 	
 	if (BaseValue)
 	{
-		BaseValue->SetText(FText::AsNumber(InBaseValue));
+			BaseValue->SetText(FText::AsNumber(InBaseValue));			
 	}
 	
 	if (UpgradeValue)
@@ -28,6 +28,18 @@ void USanzoStatInfoTextWidget::SetStatInfoText(FText InName, EStatModifierType I
 		SetBonusValueText(InModifierType, InBonusValue);
 	}
 		
+}
+
+void USanzoStatInfoTextWidget::SetCurrentValueText(EStatModifierType InModifierType, float InCurrentValue)
+{
+	if (InModifierType == EStatModifierType::PercentPlus || InModifierType == EStatModifierType::PercentMinus)
+	{
+		CurrentValue->SetText(FText::AsNumber(InCurrentValue * 100));
+	}
+	else
+	{
+		CurrentValue->SetText(FText::AsNumber(InCurrentValue));
+	}
 }
 
 void USanzoStatInfoTextWidget::SetBonusValueText(EStatModifierType InModifierType, float InBonusValue)
@@ -42,21 +54,37 @@ void USanzoStatInfoTextWidget::SetBonusValueText(EStatModifierType InModifierTyp
 			UpgradeValue->SetText(BonusFormat);
 			UpgradeValue->SetVisibility(ESlateVisibility::Visible);
 			break;
+			
 		case EStatModifierType::FlatMinus:
 			BonusFormat = FText::Format(FText::FromString(TEXT("-{0}")), FText::AsNumber(InBonusValue));
 			UpgradeValue->SetText(BonusFormat);
 			UpgradeValue->SetVisibility(ESlateVisibility::Visible);
 			break;
-		case EStatModifierType::PercentMultiplyPlus:
+			
+		case EStatModifierType::PercentPlus:
+			BonusFormat = FText::Format(FText::FromString(TEXT("+{0}%")), FText::AsNumber(100*InBonusValue));
+			UpgradeValue->SetText(BonusFormat);
+			UpgradeValue->SetVisibility(ESlateVisibility::Visible);
+			break;
+			
+		case EStatModifierType::PercentMinus:
+			BonusFormat = FText::Format(FText::FromString(TEXT("-{0}%")), FText::AsNumber(100*InBonusValue));
+			UpgradeValue->SetText(BonusFormat);
+			UpgradeValue->SetVisibility(ESlateVisibility::Visible);
+			break;
+			
+		case EStatModifierType::PercentMultiply:
 			BonusFormat = FText::Format(FText::FromString(TEXT("x{0}")), FText::AsNumber(1+InBonusValue));
 			UpgradeValue->SetText(BonusFormat);
 			UpgradeValue->SetVisibility(ESlateVisibility::Visible);
 			break;
-		case EStatModifierType::PercentMultiplyMinus:
+			
+		case EStatModifierType::PercentDivide:
 			BonusFormat = FText::Format(FText::FromString(TEXT("x{0}")), FText::AsNumber(1-InBonusValue));
 			UpgradeValue->SetText(BonusFormat);
 			UpgradeValue->SetVisibility(ESlateVisibility::Visible);
 			break;
+			
 		default:
 			break;
 		}
