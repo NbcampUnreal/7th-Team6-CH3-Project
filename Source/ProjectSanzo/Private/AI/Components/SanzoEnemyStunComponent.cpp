@@ -33,11 +33,6 @@ void USanzoEnemyStunComponent::EnterStunState()
 {
   // 스턴 상태 진입
   bIsStunned = true;
-  // 스턴 게이지 초기화
-  CurrentStunCount = 0; 
-
-  // 스턴 게이지 변경 이벤트 브로드캐스트
-  OnStunCountChanged.Broadcast(CurrentStunCount, MaxStunCount);
 
   // 스턴 상태 진입 이벤트 브로드캐스트
   OnStunStateEntered.Broadcast();
@@ -53,6 +48,12 @@ void USanzoEnemyStunComponent::RecoverFromStun()
 {
   // 스턴 상태 해제
   bIsStunned = false;
+
+  // 스턴 게이지 초기화
+  CurrentStunCount = 0;
+
+  // 스턴 게이지 변경 이벤트 브로드캐스트
+  OnStunCountChanged.Broadcast(CurrentStunCount, MaxStunCount);
 
   // 스턴 상태 해제 이벤트 브로드캐스트
   OnStunStateRecovered.Broadcast();

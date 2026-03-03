@@ -107,8 +107,6 @@ void ASanzoEnemyBase::BeginPlay()
     if (CurrentWidget)
     {
       OnEnemyDataChanged.AddDynamic(CurrentWidget, &USanzoEnemyOverHeadWidget::UpdateOverHeadWidget);
-
-      BroadCastAllData();
     }
   	
   	//보스전용 Delegate
@@ -117,9 +115,8 @@ void ASanzoEnemyBase::BeginPlay()
   	if (BossOverheadWidget)
   	{
   		OnEnemyDataChanged.AddDynamic(BossOverheadWidget, &USanzoBossOverheadWidget::UpdateOverHeadWidget);
-  		
-  		BroadCastAllData();
   	}
+    BroadCastAllData();
   }
 
   GetWorldTimerManager().SetTimer(
@@ -428,18 +425,20 @@ void ASanzoEnemyBase::OnStunEnteredCallback()
       BTComp->StopTree(EBTStopMode::Safe);
     }
   }
+  BroadCastAllData();
 }
 
 void ASanzoEnemyBase::OnStunRecoveredCallback()
 {
   if (bIsDead) return;
 
+  StopAnimMontage(StunMontage);
+
   if (AAIController* AICon = Cast<AAIController>(GetController()))
   {
     if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetBrainComponent()))
     {
     	//Stun해제 방송
-    	
     	BroadCastAllData();
     	
       BTComp->RestartTree();
@@ -476,7 +475,7 @@ void ASanzoEnemyBase::OnParriedCallback()
   {
   	//Stun상태 방송
   	BroadCastAllData();
-  	
+
     PlayAnimMontage(StaggerMontage);
   }
 }
