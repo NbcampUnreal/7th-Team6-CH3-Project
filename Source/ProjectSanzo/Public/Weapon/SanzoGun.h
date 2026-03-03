@@ -43,7 +43,7 @@ protected:
 
 	// 호밍 미사일 발사 확률
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun|Upgrade")
-	float HomingMissileChance;
+	float HomingMissileChance = 0.0f;
 
 	// 호밍 미사일 설계도 넣을 변수
 	UPROPERTY(EditDefaultsOnly, Category = "Gun|Projectile")
