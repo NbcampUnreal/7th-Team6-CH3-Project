@@ -38,7 +38,10 @@ protected:
 	// 플레이어 활, AI 적 원거리 무기 = true, 플레이어 총 = false
 	bool bInfiniteAmmo;
 
-	// 기본 공격력
+	// 공격력 원본 값
+	float OriginalBaseDamage;
+
+	// 현재 공격력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
 	float BaseDamage;
 
@@ -80,6 +83,9 @@ protected:
 #pragma endregion 김형백
 
 public:
+	
+	virtual void BeginPlay() override;
+
 	// 마우스 좌클릭 눌렀을 때 작동, 활이면 차징 시작, 총(연사)면 발사~, 총(단발)이면 Fire() 1번 호출 
 	UFUNCTION(BlueprintCallable, Category = "WeaponAction")
 	virtual void StartFire();
