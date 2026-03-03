@@ -36,7 +36,6 @@ ASanzoGun::ASanzoGun()
 	MissileSpawnLocation->SetupAttachment(WeaponMesh);
 	MissileSpawnLocation->SetRelativeRotation(FRotator(45.0f, 90.0f, 0.0f));
 
-	HomingMissileChance = 0.0f;
 }
 
 void ASanzoGun::StartFire()
@@ -142,47 +141,6 @@ void ASanzoGun::Fire()
 		{
 			HitResult = MuzzleHit;
 			bHit = true;
-
-			// 디버그용 (보라색 선)
-			if (bShowDebugTrace)
-			{
-				DrawDebugLine(GetWorld(), MuzzleStart, MuzzleEnd, FColor::Magenta, false, 5.0f, 0, 0.5f);
-			}
-		}
-	}
-
-	// 디버그용 선 추가 
-	if (bShowDebugTrace)
-	{
-		FVector BeamEnd = bHit ? HitResult.ImpactPoint : End;
-
-		// 실제 트레이스선(초록색, 카메라 중앙)
-		DrawDebugLine(
-			GetWorld(),
-			Start,
-			BeamEnd,
-			FColor::Green,
-			false,
-			5.0f,
-			0,
-			0.5f
-		);
-
-		// 눈속임선(빨간색, 총구에서 카메라 중앙)
-		if (FireStartLocation)
-		{
-			FVector MuzzleLocation = FireStartLocation->GetComponentLocation();
-
-			DrawDebugLine(
-				GetWorld(),
-				MuzzleLocation,
-				BeamEnd,
-				FColor::Red,
-				false,
-				5.0f,
-				0,
-				0.5f
-			);
 		}
 	}
 
@@ -214,7 +172,7 @@ void ASanzoGun::Fire()
 	}
 
 	// 호밍 미사일 발사 시스템, 발사 확률이 0보다 크고 발사 확률에 걸렸을 때만 실행
-	if (HomingMissileChance > 0.0f && FMath::RandRange(1.0f, 100.0f) <= HomingMissileChance)
+	if (HomingMissileChance > 0.0f && FMath::FRand() <= HomingMissileChance)
 	{
 		if (HomingProjectileClass && FireStartLocation)
 		{
@@ -278,7 +236,7 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 		break;
 
 	case EUpgradeType::HomingMissile:
-		// Value 값에 들어오는 숫자대로 퍼센트가 오름 (ex) Value = 5.0 이면 생성 확률 5% 증가)
+		// Value 값에 들어오는 숫자대로 퍼센트가 오름 (ex) Value = 0.05 이면 생성 확률 5% 증가)
 		HomingMissileChance += Value;
 		break;
 
