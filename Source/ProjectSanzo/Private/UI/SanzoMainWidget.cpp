@@ -62,6 +62,8 @@ void USanzoMainWidget::SetMainUI(FGameplayTag State, float ClearTime, int32 Kill
 
 void USanzoMainWidget::SetMainMenuUI()
 {
+  PlayMainMenuSound();
+  
 	if (BackBoard)
 	{
 		BackBoard->SetVisibility(ESlateVisibility::Hidden);
@@ -161,6 +163,11 @@ void USanzoMainWidget::SetGameOverMenuUI()
 
 void USanzoMainWidget::HandleStartButtonClicked()
 {
+  if (PlayingAudio && PlayingAudio->IsPlaying())
+  {
+    PlayingAudio->Stop();
+  }
+  
 	if (StartSound)
 	{
 		UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, StartSound);
@@ -177,11 +184,11 @@ void USanzoMainWidget::HandleStartButtonClicked()
 					{
 						if (IsValid(ClickAudioComponent) && ClickAudioComponent->IsPlaying())
 						{
-							ClickAudioComponent->FadeOut(0.7f, 0.0f);
+							ClickAudioComponent->FadeOut(0.2f, 0.0f);
 						}
 						return false;
 					})
-				, 0.0f);
+				, 1.0f);
 		}
 	}
 
@@ -192,11 +199,16 @@ void USanzoMainWidget::HandleStartButtonClicked()
 				ExecuteStartTransition();
 				return false;
 			})
-		, 0.7f);
+		, 1.2f);
 }
 
 void USanzoMainWidget::HandleExitButtonClicked()
 {
+  if (PlayingAudio && PlayingAudio->IsPlaying())
+  {
+    PlayingAudio->Stop();
+  }
+  
 	if (QuitSound)
 	{
 		UAudioComponent* ClickAudioComponent = UGameplayStatics::SpawnSound2D(this, QuitSound);
@@ -270,6 +282,23 @@ void USanzoMainWidget::ExecuteExitTransition()
 	{
 		OnButtonClicked.Broadcast(ReturnMainMenuTag);
 	}
+}
+
+void USanzoMainWidget::PlayMainMenuSound()
+{
+  if (MainMenuSound)
+  {
+    PlayingAudio = UGameplayStatics::SpawnSound2D(this, MainMenuSound);
+		
+    if (PlayingAudio)
+    {
+      PlayingAudio->bIsUISound = true;
+			
+      PlayingAudio->SetTickableWhenPaused(true);
+			
+      PlayingAudio->Play();		
+    }
+  }
 }
 
 #pragma endregion 이준로
