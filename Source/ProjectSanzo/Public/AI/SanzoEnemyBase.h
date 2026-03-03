@@ -216,4 +216,7 @@ protected:
   // 분노 상태 플래그
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
   bool bIsEnraged = false;
+
+  public:
+    TObjectPtr<class UAnimMontage> GetAttackMontage() const { return AttackMontage; }
 };

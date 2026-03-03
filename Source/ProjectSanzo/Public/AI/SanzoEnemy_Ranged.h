@@ -31,6 +31,9 @@ public:
   // 조준 재개
   void ResumeAiming();
 protected:
+  // 기본 이동 속도
+  float DefaultWalkSpeed; 
+
   // 원거리 적 전용 공격력
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
   float ShootDamage = 20.f;
