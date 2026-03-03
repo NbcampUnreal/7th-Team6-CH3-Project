@@ -892,21 +892,17 @@ void ASanzoCharacter::ChangeModeling(float Value)
       {
         UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
       }
-      if (TransformationEffect)
+      //VFX
+      if (TransformationEffect && TransformationNiagaraComponent)
       {
-        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
-      }
-      UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
-    }
-    //VFX
-    if (TransformationEffect && TransformationNiagaraComponent)
-    {
-      // 에셋 할당
-      TransformationNiagaraComponent->SetAsset(TransformationEffect);
+        // 에셋 할당
+        TransformationNiagaraComponent->SetAsset(TransformationEffect);
 
-      // 이펙트 재생
-      TransformationNiagaraComponent->Activate(true);
+        // 이펙트 재생
+        TransformationNiagaraComponent->Activate(true);
+      }
     }
+
     break;
   case 2: //아리사
     TargetMesh->SetSkeletalMeshAsset(Arisa);
@@ -927,9 +923,14 @@ void ASanzoCharacter::ChangeModeling(float Value)
       {
         UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
       }
-      if (TransformationEffect)
+      //VFX
+      if (TransformationEffect && TransformationNiagaraComponent)
       {
-        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+        // 에셋 할당
+        TransformationNiagaraComponent->SetAsset(TransformationEffect);
+
+        // 이펙트 재생
+        TransformationNiagaraComponent->Activate(true);
       }
     }
     break;
@@ -956,9 +957,14 @@ void ASanzoCharacter::ChangeModeling(float Value)
       {
         UGameplayStatics::PlaySound2D(GetWorld(), TransformationSound);
       }
-      if (TransformationEffect)
+      //VFX
+      if (TransformationEffect && TransformationNiagaraComponent)
       {
-        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TransformationEffect, GetActorLocation());
+        // 에셋 할당
+        TransformationNiagaraComponent->SetAsset(TransformationEffect);
+
+        // 이펙트 재생
+        TransformationNiagaraComponent->Activate(true);
       }
     }
     break;
