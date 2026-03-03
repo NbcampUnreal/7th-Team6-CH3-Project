@@ -118,7 +118,7 @@ void USanzoGameInstance::InitSetup()
   CachedGunFireRate = -1.0f;
   CachedBowDamage = -1.0f;
   CachedBowChargeTime = -1.0f;
-  CachedHomingMissileChance = 1.0f;
+  CachedHomingMissileChance = -1.0f;
   bCachedBowMultiShot = false;
   CachedStatData = FSanzoSaveStatData(); // 초기 스탯값 설정
 
