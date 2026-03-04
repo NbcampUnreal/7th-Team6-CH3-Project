@@ -834,6 +834,7 @@ void ASanzoCharacter::ApplyUpgrade(EUpgradeTarget Target, EUpgradeType Type, flo
     {
     case EUpgradeType::Beauty:
       ChangeModeling(Value);
+      StatComp->RestoreHealth(StatComp->GetMaxHealth());
       break;
     case EUpgradeType::ParryReflectChance:
       ParryReflectChance += Value;
@@ -998,7 +999,7 @@ float ASanzoCharacter::TakeDamage(
     ParryReflectChance = FMath::Clamp(ParryReflectChance, 0.f, 1.f);
     if (Chance < ParryReflectChance) 
     {
-      UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount, GetController(), this, UDamageType::StaticClass());
+      UGameplayStatics::ApplyDamage(DamageCauser, DamageAmount * 3, GetController(), this, UDamageType::StaticClass());
     }
 
     
