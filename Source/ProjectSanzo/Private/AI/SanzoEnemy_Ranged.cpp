@@ -188,8 +188,15 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
   Super::Tick(DeltaTime);
 
   // 죽었거나, 무기가 없거나, 타겟이 없으면 즉시 종료
-  if (IsDead() || !StaticWeaponMesh || !CachedPlayer) return;
-
+  if (IsDead() || !StaticWeaponMesh || !CachedPlayer)
+  {
+    if (AimLaserComp)
+    {
+      AimLaserComp->DeactivateImmediate();
+      AimLaserComp = nullptr;
+    }
+    return;
+  }
   VisibilityCheckTimer += DeltaTime;
   bool bNeedsVisibilityCheck = (VisibilityCheckTimer >= 0.1f);
 
