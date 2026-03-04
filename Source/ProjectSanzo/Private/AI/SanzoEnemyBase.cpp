@@ -273,16 +273,6 @@ void ASanzoEnemyBase::Die()
   GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
   GetMesh()->SetSimulatePhysics(true);
 
-  FTimerHandle SleepTimerHandle;
-  GetWorldTimerManager().SetTimer(SleepTimerHandle, FTimerDelegate::CreateLambda([this]()
-    {
-      if (GetMesh())
-      {
-        GetMesh()->PutRigidBodyToSleep();
-        GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-      }
-    }), 2.0f, false);
-
   // 일정 시간 후 액터 제거
   SetLifeSpan(5.f);
 }
