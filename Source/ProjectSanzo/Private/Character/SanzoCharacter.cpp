@@ -1,4 +1,4 @@
-﻿#include "Character/SanzoCharacter.h"
+#include "Character/SanzoCharacter.h"
 #include "Character/SanzoPlayerController.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -277,6 +277,7 @@ void ASanzoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
     EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Started, this, &ASanzoCharacter::SwapWeaponAction);
     // 최윤서 추가
     EnhancedInputComponent->BindAction(CheatClearKey, ETriggerEvent::Started, this, &ASanzoCharacter::CheatClear);
+    EnhancedInputComponent->BindAction(ToggleBgmKey, ETriggerEvent::Started, this, &ASanzoCharacter::OnOffBgm);
   }
   else
   {
@@ -1275,4 +1276,16 @@ void ASanzoCharacter::CheatClear()
   {
     Room->EndRoomSequence();
   }
+}
+
+void ASanzoCharacter::OnOffBgm()
+{
+  if (!BGMActor) return;
+
+  UAudioComponent* AudioComp = BGMActor->GetAudioComponent();
+  if (!AudioComp) return;
+
+  bBGMOn = !bBGMOn;
+
+  AudioComp->SetPaused(!bBGMOn);
 }
