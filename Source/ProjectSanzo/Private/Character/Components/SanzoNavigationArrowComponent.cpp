@@ -46,9 +46,9 @@ void USanzoNavigationArrowComponent::BeginPlay()
 void USanzoNavigationArrowComponent::OnRegister()
 {
 	Super::OnRegister();
-  // 1. 생성자에서 하위 메쉬 컴포넌트 생성 (이게 가장 안전합니다)
+  
   ArrowMesh = NewObject<UStaticMeshComponent>(this,TEXT("ArrowMeshInstance"));
-  ArrowMesh->SetupAttachment(this); // SceneComponent인 본체에 부착
+  ArrowMesh->SetupAttachment(this);
   ArrowMesh->RegisterComponent();
  
   if (ArrowMesh && NavigationMeshAsset)
