@@ -4,6 +4,9 @@
 #include "AI/SanzoEnemyBase.h"
 #include "SanzoEnemy_Ranged.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
+
 UCLASS()
 class PROJECTSANZO_API ASanzoEnemy_Ranged : public ASanzoEnemyBase
 {
@@ -50,6 +53,13 @@ protected:
 
   UPROPERTY(EditAnywhere, Category = "Effects|Sound")
   TObjectPtr<class USoundBase> FireSound;
+
+  // 나이아가라 시스템 조준 이펙트
+  UPROPERTY(EditAnywhere, Category = "Effects|Aim")
+  TObjectPtr<UNiagaraSystem> AimLaserEffect;
+
+  UPROPERTY()
+  TObjectPtr<UNiagaraComponent> AimLaserComp;
 
   // 디버그 라인 표시 여부
   UPROPERTY(EditAnywhere, Category = "Combat|Debug")
