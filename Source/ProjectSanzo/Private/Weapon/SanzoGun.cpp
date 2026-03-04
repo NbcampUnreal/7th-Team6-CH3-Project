@@ -200,7 +200,7 @@ void ASanzoGun::Fire()
 					if (Missile)
 					{
 						// 미사일 데미지 설정 (후에 조정 예정)
-						Missile->SetArrowDamage(BaseDamage * 2.0f);
+						Missile->SetArrowDamage(BaseDamage);
 
 						// 미사일의 타겟 설정 (기본 타겟값은 루트 컴포넌트로 설정)
 						USceneComponent* TargetComp = RandomTarget->GetRootComponent();
