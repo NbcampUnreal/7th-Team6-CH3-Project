@@ -262,16 +262,7 @@ void ASanzoPlayerController::ShowAnnouncerUI(FGameplayTag State, ESanzoStageType
 		{
 			StageAnnouncerWidgetInstance->OnAnnouncerEnded.AddDynamic(this,&ThisClass::AnnounceEnded);
 			StageAnnouncerWidgetInstance->AddToViewport();
-			
-			if (State == FGameplayTag::RequestGameplayTag(FName("Room.State.Actived")))
-			{
-				SetPause(true);
-			}
-			
-			if (State == FGameplayTag::RequestGameplayTag(FName("Room.State.Cleared")))
-			{
-				SetPause(false);
-			}
+		  
 		}
 		
 	}
@@ -285,6 +276,7 @@ void ASanzoPlayerController::AnnounceEnded()
 	{
 		StageAnnouncerWidgetInstance->RemoveFromParent();
 		StageAnnouncerWidgetInstance = nullptr;
+	  return;
 	}
 	
 	if (PopUpWidgetInstance)
