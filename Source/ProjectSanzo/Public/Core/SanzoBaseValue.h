@@ -25,7 +25,7 @@ struct FGunBaseValues
 {
 	GENERATED_BODY()
 	
-	static constexpr float BaseDamage = 5;
+	static constexpr float BaseDamage = 8;
 	
 	static constexpr float FireRate = 0.15f;
 	
