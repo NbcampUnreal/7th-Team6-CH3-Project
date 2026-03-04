@@ -178,6 +178,35 @@ void ASanzoBow::StopFire()
 	Fire();
 }
 
+void ASanzoBow::CancelCharge()
+{
+	if (!bIsCharging) return;
+
+	bIsCharging = false;
+
+	// Tick 비활성화
+	SetActorTickEnabled(false);
+
+	if (DrawStartAudioComp && DrawStartAudioComp->IsPlaying())
+	{
+		DrawStartAudioComp->Stop();
+	}
+	if (DrawLoopAudioComp && DrawLoopAudioComp->IsPlaying())
+	{
+		DrawLoopAudioComp->Stop();
+	}
+	// 차징 UI 초기화
+	if (OnChargePercentChanged.IsBound())
+	{
+		OnChargePercentChanged.Broadcast(0.0f);
+	}
+
+	if (DummyArrowMesh)
+	{
+		DummyArrowMesh->SetHiddenInGame(true);
+	}
+}
+
 void ASanzoBow::Fire()
 {
 	if (ProjectileClass && FireStartLocation)
