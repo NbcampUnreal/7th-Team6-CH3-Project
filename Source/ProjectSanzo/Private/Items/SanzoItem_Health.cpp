@@ -1,5 +1,28 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "Items/SanzoItem_Health.h"
+#include "Common/SanzoLog.h"
+#include "Character/Components/SanzoStatComponent.h"
 
+#pragma region ItemHealth
+ASanzoItem_Health::ASanzoItem_Health()
+{
+  HealAmount = 20;
+  ItemType = "Health";
+}
 
-#include "Items/SanzoItem_Health.h"
+void ASanzoItem_Health::ActivateItem(AActor* Activator)
+{
+  Super::ActivateItem(Activator);
 
+  if (Activator && Activator->ActorHasTag("Player"))
+  {
+    if (USanzoStatComponent* StatComp = Activator->FindComponentByClass<USanzoStatComponent>())
+    {
+      StatComp->RestoreHealth(HealAmount);
+    	//HUD에 Data전달
+    	NotifyItemPickedUp(Activator,HealAmount);
+    }
+    // TODO: 체력 증가 로직
+    DestroyItem();
+  }
+}
+#pragma endregion 최윤서

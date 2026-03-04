@@ -1,15 +1,40 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Core/SanzoStageTypes.h"
+#include "Core/SanzoGameInstance.h" 
 #include "SanzoGameMode.generated.h"
 
-UCLASS(abstract)
-class ASanzoGameMode : public AGameModeBase
+UCLASS()
+class PROJECTSANZO_API ASanzoGameMode : public AGameModeBase
 {
   GENERATED_BODY()
+
 public:
   ASanzoGameMode();
+
+  virtual void BeginPlay() override;
+
+#pragma region Stage Management
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
+  ESanzoStageType CurrentStageType;
+  USanzoGameInstance* SanzoGameInstance;
+  void InitStageType();
+
+  // 스테이지 흐름
+  void StartStage();
+  void OnStageCleared();
+	void MoveToNextStage();
+
+  // 성장
+  void TriggerUpgradeSelection();
+  void OnUpgradeSelected();
+#pragma endregion 최윤서
+	
+#pragma region EndingDecision
+	
+	void DecideEnding();
+	
+#pragma endregion 이준로
 };

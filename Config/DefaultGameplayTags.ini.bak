@@ -1,0 +1,28 @@
+<<<<<<< HEAD
+=======
+;METADATA=(Diff=true, UseCommands=true)
+>>>>>>> develop
+[/Script/GameplayTags.GameplayTagsSettings]
+ImportTagsFromConfig=True
+WarnOnInvalidTags=True
+ClearInvalidTags=False
+AllowEditorTagUnloading=True
+AllowGameTagUnloading=False
+FastReplication=False
+bDynamicReplication=False
+InvalidTagCharacters="\"\',"
+NumBitsForContainerSize=6
+NetIndexFirstBitSegment=16
+<<<<<<< HEAD
+=======
++GameplayTagList=(Tag="Character.State.Sprint",DevComment="")
++GameplayTagList=(Tag="Game.State.GameOver",DevComment="")
++GameplayTagList=(Tag="Game.State.Paused",DevComment="")
++GameplayTagList=(Tag="Game.State.Playing",DevComment="")
++GameplayTagList=(Tag="Game.State.UpgradeSelecting",DevComment="")
++GameplayTagList=(Tag="Room.State.Actived",DevComment="")
++GameplayTagList=(Tag="Room.State.Cleared",DevComment="")
++GameplayTagList=(Tag="Room.State.Idle",DevComment="")
++GameplayTagList=(Tag="Room.State.Locked",DevComment="")
+>>>>>>> develop
+

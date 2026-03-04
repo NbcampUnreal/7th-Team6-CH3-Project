@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SanzoParryComponent.generated.h"
 
+class UNiagaraSystem;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTSANZO_API USanzoParryComponent : public UActorComponent
@@ -15,9 +16,43 @@ class PROJECTSANZO_API USanzoParryComponent : public UActorComponent
 public:
   USanzoParryComponent();
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  UAnimMontage* ParryMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  UAnimMontage* ParrySuccessMontage;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  USoundBase* ParrySound;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  UParticleSystem* ParryEffect;
+
+  FTimerHandle SlowTimerHandle;
+  FTimerHandle ParryPenaltyTimerHandle; //패널티 시간을 관리하는 타이머핸들
+
+ 
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  float ParryPenaltyDuration;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Parry")
+  float ParryCooldownTime;
+  int32 ParryPenaltyCount;
+
+  void ApplyParrySpamPenalty();
+  void ResetParrySpamPenalty();
+
+  float LastParryTime;
+  bool TryParry();
+  
+
+  void PlayParryMontage();
+  void SuccessParry();
+
+  //패리몽타주 끝날때 실행할 델리게이트 선언
+  FOnMontageBlendingOutStarted BlendingOutDelegate;
+
 protected:
   virtual void BeginPlay() override;
-
+  
+  
 public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
