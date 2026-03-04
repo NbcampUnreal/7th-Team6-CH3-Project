@@ -28,6 +28,8 @@ public:
 
 	virtual void ApplyWeaponStatUpgrade(EUpgradeType Type, float Value) override;
 
+	void CancelCharge();
+
 protected:
 
 	// 발사할 때마다 생성할 투사체 설계도

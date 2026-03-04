@@ -78,6 +78,9 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   StunComponent = CreateDefaultSubobject<USanzoEnemyStunComponent>(TEXT("StunComponent"));
 #pragma endregion 김동주
 
+  GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+  if (WeaponMesh) WeaponMesh->SetCastShadow(false);
+  if (StaticWeaponMesh) StaticWeaponMesh->SetCastShadow(false);
 }
 
 void ASanzoEnemyBase::BeginPlay()
@@ -123,7 +126,7 @@ void ASanzoEnemyBase::BeginPlay()
     OverHeadWidgetUpdateTimerHandle,
     this,
     &ASanzoEnemyBase::MakeOverHeadWidget3D,
-    0.01f,
+    0.05f,
     true
   );
 #pragma endregion 이준로
@@ -380,6 +383,7 @@ void ASanzoEnemyBase::OnProximityOverlap(
           ShowAlertWidget(true);
           BBComp->SetValueAsObject(TEXT("TargetActor"), OtherActor);
           BBComp->ClearValue(TEXT("InvestigateLocation"));
+          ProximitySensor->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         }
       }
     }

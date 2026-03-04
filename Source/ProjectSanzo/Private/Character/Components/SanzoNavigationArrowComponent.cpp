@@ -10,6 +10,7 @@
 USanzoNavigationArrowComponent::USanzoNavigationArrowComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+  
 }
 
 void USanzoNavigationArrowComponent::ActivateNavigation()
@@ -45,27 +46,20 @@ void USanzoNavigationArrowComponent::BeginPlay()
 void USanzoNavigationArrowComponent::OnRegister()
 {
 	Super::OnRegister();
-	
-	if (!ArrowMesh)
-	{
-		ArrowMesh = NewObject<UStaticMeshComponent>(this, TEXT("ArrowMeshInstance"));
-		ArrowMesh->SetupAttachment(this);
-		ArrowMesh->RegisterComponent();
-		
-		static const FString MeshPath = TEXT("/Game/UI/NavArrow/SM_NavArrow.SM_NavArrow");
-		NavigationMeshAsset = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),nullptr,*MeshPath));
-		
-		if (NavigationMeshAsset)
-		{
-			ArrowMesh->SetStaticMesh(NavigationMeshAsset);
-		}
-        
-		// 초기 설정
-		ArrowMesh->SetHiddenInGame(true);
-		ArrowMesh->SetCastShadow(false);
-		ArrowMesh->SetCollisionProfileName(TEXT("NoCollision"));
-	}
-	
+  
+  ArrowMesh = NewObject<UStaticMeshComponent>(this,TEXT("ArrowMeshInstance"));
+  ArrowMesh->SetupAttachment(this);
+  ArrowMesh->RegisterComponent();
+ 
+  if (ArrowMesh && NavigationMeshAsset)
+  {
+    ArrowMesh->SetStaticMesh(NavigationMeshAsset);
+  }	
+  
+  ArrowMesh->SetHiddenInGame(true);
+  ArrowMesh->SetCastShadow(false);
+  ArrowMesh->SetCollisionProfileName(TEXT("NoCollision"));
+  
 }
 
 void USanzoNavigationArrowComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
