@@ -51,10 +51,7 @@ void USanzoMediaPlayerWidget::NativeConstruct()
 
 void USanzoMediaPlayerWidget::PlayMediaScene(FGameplayTag State)
 {
-	if (DisappearTextBoxAnim)
-	{
-		PlayAnimation(DisappearTextBoxAnim);
-	}
+
 
 	if (!CommonMediaPlayer || !MediaSourceArray.Contains(State))
 	{
@@ -72,11 +69,20 @@ void USanzoMediaPlayerWidget::PlayMediaScene(FGameplayTag State)
 	{
 		if (State == FGameplayTag::RequestGameplayTag(FName("UI.State.Opening")))
 		{
-			StoryTextOverlay->SetVisibility(ESlateVisibility::Visible);
+		  StoryTextOverlay->SetVisibility(ESlateVisibility::Visible);
+		  
+		  if (DisappearTextBoxAnim)
+		  {
+		    PlayAnimation(DisappearTextBoxAnim);
+		  }
 		}
 		else if (State == FGameplayTag::RequestGameplayTag(FName("UI.State.Ending")))
 		{
 			StoryTextOverlay->SetVisibility(ESlateVisibility::Visible);
+		  if (DisappearEndingTextBoxAnim)
+		  {
+		    PlayAnimation(DisappearEndingTextBoxAnim);
+		  }
 		}
 		else if (State == FGameplayTag::RequestGameplayTag(FName("UI.State.TrueEnding")))
 		{

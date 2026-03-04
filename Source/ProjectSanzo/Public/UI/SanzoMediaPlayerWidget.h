@@ -59,6 +59,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sanzo|Resources")
 	UMediaPlayer* CommonMediaPlayer;
 
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sanzo|Time")
+  float OpeningTextBoxDisappearStartTime;
+  
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sanzo|Time")
+  float EndingTextBoxDisappearStartTime;
+  
 	UPROPERTY()
 	UMediaSoundComponent* MediaSoundComponent;
 
@@ -95,9 +101,12 @@ private:
 
 	FTimerHandle SubtitlesTimerHandle;
 	float CurrentSubtitleIndex;
-
+  
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* DisappearTextBoxAnim;
+  
+  UPROPERTY(Transient, meta = (BindWidgetAnim))
+  class UWidgetAnimation* DisappearEndingTextBoxAnim;
 
 #pragma endregion 이준로
 
