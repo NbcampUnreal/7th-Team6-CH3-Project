@@ -263,6 +263,14 @@ UAnimMontage* USanzoEquipmentComponent::BeginSwapWeapon()
 	// 인벤토리에 무기가 2개 이상일 때만 진행
 	if (Inventory.Num() < 2) return nullptr;
 
+	if (CurrentWeapon)
+	{
+		if (ASanzoBow* Bow = Cast<ASanzoBow>(CurrentWeapon))
+		{
+			Bow->CancelCharge();
+		}
+	}
+
 	// 다음에 꺼낼 무기 인덱스 계산
 	int32 NextIndex = (CurrentWeaponIndex + 1) % Inventory.Num();
 	ASanzoWeaponBase* NextWeapon = Inventory[NextIndex];
