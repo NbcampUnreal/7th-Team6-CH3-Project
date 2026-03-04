@@ -163,6 +163,11 @@ void USanzoMainWidget::SetGameOverMenuUI()
 
 void USanzoMainWidget::HandleStartButtonClicked()
 {
+  if (bIsStartButtonTransitioning || bIsExitButtonTransitioning)
+  {
+    return;
+  }
+  
   if (PlayingAudio && PlayingAudio->IsPlaying())
   {
     PlayingAudio->Stop();
@@ -188,6 +193,11 @@ void USanzoMainWidget::HandleStartButtonClicked()
 
 void USanzoMainWidget::HandleExitButtonClicked()
 {
+  if (bIsStartButtonTransitioning || bIsExitButtonTransitioning)
+  {
+    return;
+  }
+  
   if (PlayingAudio && PlayingAudio->IsPlaying())
   {
     PlayingAudio->Stop();
