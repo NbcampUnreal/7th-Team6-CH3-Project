@@ -78,8 +78,7 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   StunComponent = CreateDefaultSubobject<USanzoEnemyStunComponent>(TEXT("StunComponent"));
 #pragma endregion 김동주
 
-  PrimaryActorTick.bCanEverTick = true;
-  PrimaryActorTick.TickInterval = 0.05f;
+
 }
 
 void ASanzoEnemyBase::BeginPlay()
