@@ -31,8 +31,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="Navigation")
 	UStaticMesh* NavigationMeshAsset;
 	
-	UPROPERTY()
-	UStaticMeshComponent* ArrowMesh;
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Navigation", meta=(AllowPrivateAccess = "true"))
+  UStaticMeshComponent* ArrowMesh;
 	
 	UPROPERTY(EditAnywhere)
 	AActor* TargetActor;
