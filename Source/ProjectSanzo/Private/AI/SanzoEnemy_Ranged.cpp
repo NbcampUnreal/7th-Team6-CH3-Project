@@ -16,6 +16,8 @@
 #include "GameplayTagAssetInterface.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 ASanzoEnemy_Ranged::ASanzoEnemy_Ranged()
 {
@@ -45,6 +47,12 @@ void ASanzoEnemy_Ranged::FireHitScan()
 {
   if (IsDead() || !StaticWeaponMesh) return;
 
+  if (AimLaserComp)
+  {
+    AimLaserComp->DeactivateImmediate();
+    AimLaserComp = nullptr;
+  }
+
   FVector TraceStart = GetActorLocation();
 
   if (StaticWeaponMesh->DoesSocketExist(TEXT("MuzzleFlash")))
@@ -56,8 +64,9 @@ void ASanzoEnemy_Ranged::FireHitScan()
     TraceStart = GetActorLocation() + (GetActorForwardVector() * 50.0f) + FVector(0.f, 0.f, 50.f);
   }
 
-  FRotator TraceRotation = LockedAimRotation;
-  FVector TraceEnd = TraceStart + (LockedAimRotation.Vector() * AttackRange);
+  FVector ShootDirection = (LockedTraceEnd - TraceStart).GetSafeNormal();
+  FRotator TraceRotation = ShootDirection.Rotation();
+  FVector TraceEnd = TraceStart + (ShootDirection * AttackRange);
 
   // 발사 이펙트 및 사운드 재생
   if (MuzzleFlashEffect)
@@ -170,22 +179,6 @@ void ASanzoEnemy_Ranged::FireHitScan()
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, ValidHitResult.ImpactPoint, ValidHitResult.ImpactNormal.Rotation());
       }
 
-
-
-    }
-
-    // [디버그용] 명중 시 초록색 선 출력
-    if (bShowDebugTrace)
-    {
-      DrawDebugLine(GetWorld(), TraceStart, ValidHitResult.ImpactPoint, FColor::Green, false, 2.0f, 0, 1.0f);
-    }
-  }
-  else
-  {
-    // [디버그용] 허공에 쏘면 빨간색 선 출력
-    if (bShowDebugTrace)
-    {
-      DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 2.0f, 0, 1.0f);
     }
   }
 }
@@ -293,40 +286,38 @@ void ASanzoEnemy_Ranged::Tick(float DeltaTime)
         float TargetPitch = FMath::Clamp(FRotator::NormalizeAxis(DirectionToSpine.Rotation().Pitch), -60.0f, 60.0f);
         AimPitch = FMath::FInterpTo(AimPitch, TargetPitch, DeltaTime, 15.0f);
 
-        LockedAimRotation = DirectionToSpine.Rotation();
+        //LockedAimRotation = DirectionToSpine.Rotation();
         LockedTraceEnd = TraceStart + (DirectionToSpine * AttackRange);
       }
 
       if (CurrentAimTime >= BlinkStartTime) bIsAimLocked = true;
 
       // 디버그 라인
-#if !UE_BUILD_SHIPPING
-      if (bShowDebugTrace)
+      if (AimLaserComp && CachedPlayer)
       {
-        bool bDrawLaser = true;
-        float LineThickness = 2.0f;
-        FColor LaserColor = FColor::Yellow;
+        // 나이아가라 레이저의 끝점을 목표물 위치로 설정
+        AimLaserComp->SetVariableVec3(TEXT("User.BeamEnd"), LockedTraceEnd);
 
+        float GlowIntensity = 50.0f;
+        FLinearColor YellowGlow = FLinearColor(1.0f * GlowIntensity, 1.0f * GlowIntensity, 0.0f, 1.0f);
+        FLinearColor RedGlow = FLinearColor(1.0f * GlowIntensity, 0.0f, 0.0f, 1.0f);
+        // 시간에 따른 레이저 색상 계산
+        FLinearColor LaserColor = YellowGlow;
         if (CurrentAimTime >= BlinkStartTime)
         {
-          if (FMath::Fmod(CurrentAimTime, 0.2f) < 0.1f) { bDrawLaser = false; }
-          LineThickness = 8.0f;
-          LaserColor = FColor::Red;
-        }
-        else
-        {
-          float Alpha = CurrentAimTime / BlinkStartTime;
-          LineThickness = FMath::Lerp(1.0f, 6.0f, Alpha);
-          uint8 GreenValue = FMath::Lerp(255.0f, 0.0f, Alpha);
-          LaserColor = FColor(255, GreenValue, 0);
+          if (FMath::Fmod(CurrentAimTime, 0.2f) < 0.1f)
+          {
+            LaserColor = RedGlow; // 빨간색
+          }
+          else
+          {
+            LaserColor = FLinearColor::Black;
+          }
         }
 
-        if (bDrawLaser)
-        {
-          DrawDebugLine(GetWorld(), TraceStart, LockedTraceEnd, LaserColor, false, 0.0f, 0, LineThickness);
-        }
+        // 나이아가라 시스템에 색상 전달
+        AimLaserComp->SetVariableLinearColor(TEXT("User.BeamColor"), LaserColor);
       }
-#endif
     }
   }
 
@@ -360,6 +351,19 @@ void ASanzoEnemy_Ranged::StartAiming()
 
   float SafeAimTime = FMath::Max(0.1f, TotalAimTime);
   GetWorldTimerManager().SetTimer(AimTimerHandle, this, &ASanzoEnemy_Ranged::ResumeAiming, SafeAimTime, false);
+
+  if (AimLaserEffect && AimLaserComp == nullptr)
+  {
+    AimLaserComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+      AimLaserEffect,
+      StaticWeaponMesh,
+      TEXT("MuzzleFlash"),
+      FVector::ZeroVector,
+      FRotator::ZeroRotator,
+      EAttachLocation::SnapToTarget,
+      true
+    );
+  }
 }
 
 void ASanzoEnemy_Ranged::ResumeAiming()
@@ -380,6 +384,13 @@ void ASanzoEnemy_Ranged::StopAiming()
   bIsAiming = false;
   bIsAimLocked = false;
   CurrentAimTime = 0.f;
+
+  if (AimLaserComp)
+  {
+    AimLaserComp->DeactivateImmediate();
+    AimLaserComp = nullptr;
+  }
+
   GetWorldTimerManager().ClearTimer(AimTimerHandle);
 
   if (UCharacterMovementComponent* Movement = GetCharacterMovement())
@@ -403,4 +414,5 @@ void ASanzoEnemy_Ranged::OnStunEnteredCallback()
 {
   CancelAimingAnim();
   Super::OnStunEnteredCallback();
+
 }
