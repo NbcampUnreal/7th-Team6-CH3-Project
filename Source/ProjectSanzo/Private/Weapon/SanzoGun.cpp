@@ -237,7 +237,7 @@ void ASanzoGun::ApplyWeaponStatUpgrade(EUpgradeType Type, float Value)
 
 	case EUpgradeType::HomingMissile:
 		// Value 값에 들어오는 숫자대로 퍼센트가 오름 (ex) Value = 0.05 이면 생성 확률 5% 증가)
-		HomingMissileChance += Value;
+		HomingMissileChance = FMath::Min(0.3, HomingMissileChance + Value);
 		break;
 
 	default:
