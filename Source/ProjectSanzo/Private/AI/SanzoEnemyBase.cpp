@@ -78,7 +78,9 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   StunComponent = CreateDefaultSubobject<USanzoEnemyStunComponent>(TEXT("StunComponent"));
 #pragma endregion 김동주
 
-
+  GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+  if (WeaponMesh) WeaponMesh->SetCastShadow(false);
+  if (StaticWeaponMesh) StaticWeaponMesh->SetCastShadow(false);
 }
 
 void ASanzoEnemyBase::BeginPlay()
@@ -271,6 +273,16 @@ void ASanzoEnemyBase::Die()
   GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
   GetMesh()->SetSimulatePhysics(true);
 
+  FTimerHandle SleepTimerHandle;
+  GetWorldTimerManager().SetTimer(SleepTimerHandle, FTimerDelegate::CreateLambda([this]()
+    {
+      if (GetMesh())
+      {
+        GetMesh()->PutRigidBodyToSleep();
+        GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+      }
+    }), 2.0f, false);
+
   // 일정 시간 후 액터 제거
   SetLifeSpan(5.f);
 }
@@ -381,6 +393,7 @@ void ASanzoEnemyBase::OnProximityOverlap(
           ShowAlertWidget(true);
           BBComp->SetValueAsObject(TEXT("TargetActor"), OtherActor);
           BBComp->ClearValue(TEXT("InvestigateLocation"));
+          ProximitySensor->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         }
       }
     }
