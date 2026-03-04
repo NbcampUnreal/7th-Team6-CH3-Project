@@ -78,7 +78,6 @@ ASanzoEnemyBase::ASanzoEnemyBase()
   StunComponent = CreateDefaultSubobject<USanzoEnemyStunComponent>(TEXT("StunComponent"));
 #pragma endregion 김동주
 
-  PrimaryActorTick.TickInterval = 0.1f;
   GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
   if (WeaponMesh) WeaponMesh->SetCastShadow(false);
   if (StaticWeaponMesh) StaticWeaponMesh->SetCastShadow(false);

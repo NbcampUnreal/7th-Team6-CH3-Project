@@ -7,7 +7,7 @@
 ASanzoRoom_Survival::ASanzoRoom_Survival()
 {
   // 클리어 조건 시간 (더미)
-  TotalTime = 180.0;
+  TotalTime = 120.0;
 }
 void ASanzoRoom_Survival::BeginPlay()
 {
