@@ -1,4 +1,4 @@
-﻿// stage 이동 전 정보 업데이트(save)
+// stage 이동 전 정보 업데이트(save)
 #pragma once
 
 #include "CoreMinimal.h"
@@ -22,7 +22,7 @@ public:
 	TArray<TSoftObjectPtr<UWorld>> StageLevels;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Stage")
-	int32 CurrentStageIndex = 0;
+	int32 CurrentStageIndex;
 
   // 스테이지 이동 함수
   UFUNCTION(BlueprintCallable, Category = "Stage")
@@ -57,6 +57,7 @@ public:
 	void RestoreStat(ASanzoCharacter* Player);
 	void InitSetup();
 
+	virtual void OnStart() override;
 #pragma endregion 최윤서
 	
 #pragma region UIMediaData

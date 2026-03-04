@@ -1,4 +1,4 @@
-﻿#include "Core/SanzoGameInstance.h"
+#include "Core/SanzoGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Common/SanzoLog.h"
 #include "Character/SanzoCharacter.h"
@@ -132,5 +132,28 @@ void USanzoGameInstance::InitSetup()
 		UpgradeSubsystem->ResetUpgradeData();
 	}
 	
+}
+void USanzoGameInstance::OnStart()
+{
+  Super::OnStart();
+
+  FString MapName = GetWorld()->GetMapName();
+
+  if (MapName.Contains("Stage1"))
+  {
+    CurrentStageIndex = 1;
+  }
+  else if (MapName.Contains("Stage2"))
+  {
+    CurrentStageIndex = 2;
+  }
+  else if (MapName.Contains("Stage3"))
+  {
+    CurrentStageIndex = 3;
+  }
+  else
+  {
+    CurrentStageIndex = 0;
+  }
 }
 #pragma endregion 최윤서
