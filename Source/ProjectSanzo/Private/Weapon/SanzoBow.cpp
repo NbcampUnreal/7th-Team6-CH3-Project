@@ -91,7 +91,9 @@ void ASanzoBow::StopFire()
 	if (IGameplayTagAssetInterface* TagCheak = Cast<IGameplayTagAssetInterface>(GetOwner()))
 	{
 		if (TagCheak->HasMatchingGameplayTag(SanzoTags::HitReaction) ||
-			TagCheak->HasMatchingGameplayTag(SanzoTags::Swap)
+			TagCheak->HasMatchingGameplayTag(SanzoTags::Swap)||
+			TagCheak->HasMatchingGameplayTag(SanzoTags::Parry)||
+			TagCheak->HasMatchingGameplayTag(SanzoTags::Dodge)
 			)
 		{
 			ChargeStartTime = GetWorld()->GetTimeSeconds();
